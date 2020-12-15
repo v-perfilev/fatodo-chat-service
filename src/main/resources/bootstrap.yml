@@ -1,6 +1,6 @@
 spring:
   application:
-    name: extended-mysql-skeleton
+    name: message-service
 
   cloud:
     config:

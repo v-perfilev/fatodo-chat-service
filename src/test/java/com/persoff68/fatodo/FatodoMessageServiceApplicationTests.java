@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-class ExtendedMysqlSkeletonApplicationTests {
+class FatodoMessageServiceApplicationTests {
 
     @Autowired
     private WebApplicationContext context;
@@ -25,7 +25,7 @@ class ExtendedMysqlSkeletonApplicationTests {
 
     @Test
     void contextLoads() throws Exception {
-        ExtendedMysqlSkeletonApplication.main(new String[]{});
+        FatodoMessageServiceApplication.main(new String[]{});
         mvc.perform(get("/"))
                 .andExpect(status().isNotFound());
     }

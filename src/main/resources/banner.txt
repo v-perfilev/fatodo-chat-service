@@ -7,6 +7,6 @@ oooooooooooo           ooooooooooooo           oooooooooo.
  888         d8(  888       888      888   888  888     d88' 888   888
 o888o        `Y888""8o     o888o     `Y8bod8P' o888bood8P'   `Y8bod8P'
 ${AnsiColor.BRIGHT_MAGENTA}
-:: Fatodo : extended-mysql-skeleton ::
+:: Fatodo : message-service ::
 ${AnsiColor.BLUE}:: Running Spring Boot ${spring-boot.version} ::
 :: developed by persoff68 :: ${AnsiColor.DEFAULT}

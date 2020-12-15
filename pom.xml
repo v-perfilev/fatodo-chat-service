@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.persoff68.fatodo</groupId>
-    <artifactId>extendedmongoskeleton</artifactId>
+    <artifactId>messageservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>extended-mysql-skeleton</name>
-    <description>Extended mysql skeleton for Fatodo</description>
+    <name>fatodo-message-service</name>
+    <description>Message service for Fatodo</description>
 
     <properties>
         <!-- Common variables -->
@@ -21,7 +21,7 @@
         <maven.repo.username/>
         <maven.repo.password/>
         <!-- Classes and packages -->
-        <main.class>com.persoff68.fatodo.ExtendedMysqlSkeletonApplication</main.class>
+        <main.class>com.persoff68.fatodo.FatodoMessageServiceApplication</main.class>
         <root.package>com.persoff68.fatodo</root.package>
         <contract.package>com.persoff68.fatodo.contract</contract.package>
         <!-- Dependency versions -->
