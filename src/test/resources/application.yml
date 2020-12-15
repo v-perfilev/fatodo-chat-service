@@ -14,6 +14,7 @@ stubrunner:
     mailservice: mail-service
     imageservice: image-service
     contactservice: contact-service
+    messageservice: message-service
   repositoryRoot: '@maven.repo.url@'
   username: '@maven.repo.username@'
   password: '@maven.repo.password@'
