@@ -4,6 +4,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
 
-    <include file="db/changelog/20201216220000_create_message_schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/20201220200000_create_chat_schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/20201220203000_create_chat_message_schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/20201220210000_create_chat_member_schema.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

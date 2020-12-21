@@ -1,10 +1,10 @@
 package com.persoff68.fatodo.web.rest;
 
-import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.ChatMessage;
 import com.persoff68.fatodo.model.mapper.MessageMapper;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
 import com.persoff68.fatodo.security.util.SecurityUtils;
-import com.persoff68.fatodo.service.MessageService;
+import com.persoff68.fatodo.service.ChatMessageService;
 import com.persoff68.fatodo.web.rest.vm.MessageVM;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ import java.util.UUID;
 public class MessageController {
     static final String ENDPOINT = "/api/messages";
 
-    private final MessageService messageService;
+    private final ChatMessageService chatMessageService;
     private final MessageMapper messageMapper;
 
     @GetMapping(value = "/{userId}")
@@ -39,23 +39,23 @@ public class MessageController {
     @PostMapping
     public ResponseEntity<Void> sendMessage(@RequestBody @Valid MessageVM messageVM) {
         UUID id = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Message message = messageMapper.vmToPojo(messageVM);
-        messageService.send(message, id);
+        ChatMessage chatMessage = messageMapper.vmToPojo(messageVM);
+//        chatMessageService.send(chatMessage, id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping
     public ResponseEntity<Void> editMessage(@RequestBody @Valid MessageVM messageVM) {
         UUID id = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Message message = messageMapper.vmToPojo(messageVM);
-        messageService.edit(message, id);
+        ChatMessage chatMessage = messageMapper.vmToPojo(messageVM);
+//        chatMessageService.edit(chatMessage, id);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(value = "/{messageId}")
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
         UUID id = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        messageService.delete(messageId, id);
+//        chatMessageService.delete(messageId, id);
         return ResponseEntity.ok().build();
     }
 

@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-class FatodoMessageServiceApplicationTests {
+class FatodoChatChatMessageServiceApplicationTests {
 
     @Autowired
     private WebApplicationContext context;
