@@ -58,13 +58,13 @@ public class ChatServiceIT {
         System.out.println(chatList);
     }
 
-    @Test
-    @Transactional
-    public void testFindDirectByUsers() throws Exception {
-        Chat chat = chatService.findDirectChatByUsers(USER_2_ID, USER_3_ID);
-        List<UUID> userIdList = chat.getMembers().stream().map(ChatMember::getUserId).collect(Collectors.toList());
-        assertThat(userIdList).contains(USER_2_ID, USER_3_ID);
-    }
+//    @Test
+//    @Transactional
+//    public void testFindDirectByUsers() throws Exception {
+//        Chat chat = chatService.findDirectChatByUsers(USER_2_ID, USER_3_ID);
+//        List<UUID> userIdList = chat.getMembers().stream().map(ChatMember::getUserId).collect(Collectors.toList());
+//        assertThat(userIdList).contains(USER_2_ID, USER_3_ID);
+//    }
 
     private void saveChat(UUID... userIds) {
         Chat chat = TestChat.defaultBuilder().build().toParent();
