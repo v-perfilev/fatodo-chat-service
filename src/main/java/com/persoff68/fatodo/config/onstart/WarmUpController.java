@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.config.warmup;
+package com.persoff68.fatodo.config.onstart;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
