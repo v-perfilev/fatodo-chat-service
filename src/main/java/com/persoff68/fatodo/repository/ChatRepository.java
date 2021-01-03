@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface ChatRepository extends JpaRepository<Chat, UUID> {
 
     @Query("select c from Chat c where c.isDirect = true and c.id in "
-            + "(select cm.chatId from ChatMember cm where cm.userId in ?1 "
+            + "(select cm.chatId from Member cm where cm.userId in ?1 "
             + "group by cm.chatId having count(cm.chatId) > 1)")
     Optional<Chat> findDirectChat(List<UUID> userIdList);
 }

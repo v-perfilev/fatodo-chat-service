@@ -2,18 +2,16 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.FatodoMessageServiceApplication;
 import com.persoff68.fatodo.builder.TestChat;
-import com.persoff68.fatodo.builder.TestChatMember;
+import com.persoff68.fatodo.builder.TestMember;
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.ChatMember;
-import com.persoff68.fatodo.repository.ChatMemberRepository;
+import com.persoff68.fatodo.model.Member;
+import com.persoff68.fatodo.repository.MemberRepository;
 import com.persoff68.fatodo.repository.ChatRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
@@ -36,7 +34,7 @@ public class ChatServiceIT {
     @Autowired
     ChatRepository chatRepository;
     @Autowired
-    ChatMemberRepository chatMemberRepository;
+    MemberRepository memberRepository;
     @Autowired
     ChatService chatService;
 
@@ -46,7 +44,7 @@ public class ChatServiceIT {
     public void setup() {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
-        chatMemberRepository.deleteAll();
+        memberRepository.deleteAll();
         chatRepository.deleteAll();
 
         saveChat(USER_1_ID, USER_2_ID);
@@ -70,8 +68,8 @@ public class ChatServiceIT {
         Chat chat = TestChat.defaultBuilder().build().toParent();
         chat = chatRepository.save(chat);
         UUID chatId = chat.getId();
-        List<ChatMember> memberList = Arrays.stream(userIds)
-                .map(userId -> TestChatMember.defaultBuilder().chatId(chatId).userId(userId).build().toParent())
+        List<Member> memberList = Arrays.stream(userIds)
+                .map(userId -> TestMember.defaultBuilder().chatId(chatId).userId(userId).build().toParent())
                 .collect(Collectors.toList());
         chat.setMembers(memberList);
         chatRepository.save(chat);

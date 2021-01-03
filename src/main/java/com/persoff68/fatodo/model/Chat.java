@@ -24,10 +24,10 @@ public class Chat extends AbstractAuditingModel {
     private boolean isDirect;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<ChatMember> members;
+    private List<Member> members;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<ChatMessage> messages;
+    private List<Message> messages;
 
     public Chat(boolean isDirect) {
         super();

@@ -1,8 +1,8 @@
 package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.ChatMember;
-import com.persoff68.fatodo.repository.ChatMemberRepository;
+import com.persoff68.fatodo.model.Member;
+import com.persoff68.fatodo.repository.MemberRepository;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.PermissionUtils;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class ChatService {
 
     private final ChatRepository chatRepository;
-    private final ChatMemberRepository chatMemberRepository;
+    private final MemberRepository memberRepository;
     private final UserService userService;
 
     public Chat getDirectChatForUsers(UUID firstUserId, UUID secondUserId) {
@@ -34,9 +34,9 @@ public class ChatService {
         Chat chat = chatRepository.save(new Chat(isDirect));
 
         userIdList.add(userId);
-        List<ChatMember> memberList = userIdList.stream()
+        List<Member> memberList = userIdList.stream()
                 .distinct()
-                .map(id -> new ChatMember(chat.getId(), id))
+                .map(id -> new Member(chat.getId(), id))
                 .collect(Collectors.toList());
         chat.setMembers(memberList);
 
@@ -62,17 +62,17 @@ public class ChatService {
         PermissionUtils.checkUserInChat(chat, userId);
         PermissionUtils.checkMemberChangesAllowed(chat);
 
-        List<ChatMember> memberList = chat.getMembers();
+        List<Member> memberList = chat.getMembers();
         List<UUID> existingMemberUserIdList = memberList.stream()
-                .map(ChatMember::getUserId)
+                .map(Member::getUserId)
                 .collect(Collectors.toList());
-        List<ChatMember> newMemberList = userIdList.stream()
+        List<Member> newMemberList = userIdList.stream()
                 .filter(id -> !existingMemberUserIdList.contains(id))
                 .distinct()
-                .map(id -> new ChatMember(chat.getId(), id))
+                .map(id -> new Member(chat.getId(), id))
                 .collect(Collectors.toList());
 
-        chatMemberRepository.saveAll(newMemberList);
+        memberRepository.saveAll(newMemberList);
     }
 
     public void removeMembers(UUID chatId, UUID userId, List<UUID> userIdList) {
@@ -82,12 +82,12 @@ public class ChatService {
         PermissionUtils.checkUserInChat(chat, userId);
         PermissionUtils.checkMemberChangesAllowed(chat);
 
-        List<ChatMember> memberList = chat.getMembers();
-        List<ChatMember> memberToDeleteList = memberList.stream()
+        List<Member> memberList = chat.getMembers();
+        List<Member> memberToDeleteList = memberList.stream()
                 .filter(member -> userIdList.contains(member.getUserId()))
                 .collect(Collectors.toList());
 
-        chatMemberRepository.deleteAll(memberToDeleteList);
+        memberRepository.deleteAll(memberToDeleteList);
     }
 
     public void checkPermission(UUID chatId, UUID userId) {

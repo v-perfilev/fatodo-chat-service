@@ -11,25 +11,17 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
-@Table(name = "ftd_chat_member")
+@Table(name = "ftd_chat_status")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ChatMember extends AbstractAuditingModel {
+public class Status extends AbstractModel {
 
     @NotNull
-    private UUID chatId;
+    private UUID messageId;
 
     @NotNull
     private UUID userId;
-
-    private UUID lastReadMessageId;
-
-    public ChatMember(UUID chatId, UUID userId) {
-        super();
-        this.chatId = chatId;
-        this.userId = userId;
-    }
 
 }

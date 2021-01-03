@@ -1,8 +1,8 @@
 package com.persoff68.fatodo.builder;
 
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.ChatMember;
-import com.persoff68.fatodo.model.ChatMessage;
+import com.persoff68.fatodo.model.Member;
+import com.persoff68.fatodo.model.Message;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class TestChat extends Chat {
     private static final String DEFAULT_VALUE = "test_value";
 
     @Builder
-    public TestChat(UUID id, String title, boolean isDirect, List<ChatMember> members, List<ChatMessage> messages) {
+    public TestChat(UUID id, String title, boolean isDirect, List<Member> members, List<Message> messages) {
         super(title, isDirect, members, messages);
         super.id = id;
     }

@@ -4,24 +4,19 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
 
-    <changeSet id="00000000000003" author="persoff68">
+    <changeSet id="00000000000004" author="persoff68">
 
-        <createTable tableName="ftd_chat_member">
+        <createTable tableName="ftd_chat_status">
             <column name="id" type="binary(16)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="chat_id" type="binary(16)">
+            <column name="message_id" type="binary(16)">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="binary(16)">
                 <constraints nullable="false"/>
             </column>
-
-            <column name="created_by" type="binary(16)"/>
-            <column name="created_at" type="timestamp"/>
-            <column name="last_modified_by" type="binary(16)"/>
-            <column name="last_modified_at" type="timestamp"/>
         </createTable>
 
     </changeSet>
