@@ -9,12 +9,12 @@ import java.util.UUID;
 public class TestMember extends Member {
 
     @Builder
-    public TestMember(UUID id, @NotNull UUID chatId, @NotNull UUID userId, UUID lastReadMessageId) {
-        super(chatId, userId, lastReadMessageId);
+    public TestMember(UUID id, @NotNull UUID chatId, @NotNull UUID userId) {
+        super(chatId, userId);
         super.id = id;
     }
 
-    public static TestChatMemberBuilder defaultBuilder() {
+    public static TestMemberBuilder defaultBuilder() {
         return TestMember.builder();
     }
 
@@ -23,7 +23,6 @@ public class TestMember extends Member {
         member.setId(getId());
         member.setChatId(getChatId());
         member.setUserId(getUserId());
-        member.setLastReadMessageId(getLastReadMessageId());
         return member;
     }
 

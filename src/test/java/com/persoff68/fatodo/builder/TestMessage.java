@@ -11,10 +11,11 @@ public class TestMessage extends Message {
 
     @Builder
     public TestMessage(UUID id, @NotNull UUID chatId, @NotNull UUID userId, @NotNull String text, boolean isDeleted) {
-        super(chatId, userId, text, isDeleted);
+        super(chatId, userId, text);
+        super.setDeleted(isDeleted);
     }
 
-    public static TestChatMessageBuilder defaultBuilder() {
+    public static TestMessageBuilder defaultBuilder() {
         return TestMessage.builder()
                 .chatId(UUID.randomUUID())
                 .userId(UUID.randomUUID())

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class Chat extends AbstractAuditingModel {
     private List<Member> members;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("createdBy DESC")
     private List<Message> messages;
 
     public Chat(boolean isDirect) {

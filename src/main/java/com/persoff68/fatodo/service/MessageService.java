@@ -16,23 +16,26 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final ChatService chatService;
     private final UserService userService;
+    private final PermissionService permissionService;
 
-    public void sendToChat(UUID userId, UUID chatId, String text) {
-        chatService.checkPermission(chatId, userId);
-        Message message = new Message(chatId, userId, text);
+    public void sendDirect(UUID userId, UUID recipientId, String text) {
+        userService.checkUserExists(recipientId);
+        Chat chat = chatService.getDirectByUserIds(userId, recipientId);
+        Message message = new Message(chat.getId(), userId, text);
         messageRepository.save(message);
     }
 
-    public void sendToUser(UUID userId, UUID recipientId, String text) {
-        userService.checkUserExists(recipientId);
-        Chat chat = chatService.getDirectChatForUsers(userId, recipientId);
-        Message message = new Message(chat.getId(), userId, text);
+    public void send(UUID userId, UUID chatId, String text) {
+        Chat chat = chatService.getById(chatId);
+        permissionService.hasSendMessagePermission(chat, userId);
+        Message message = new Message(chatId, userId, text);
         messageRepository.save(message);
     }
 
     public void edit(UUID userId, UUID messageId, String text) {
         Message message = messageRepository.findByIdAndUserId(messageId, userId)
                 .orElseThrow(ModelNotFoundException::new);
+        permissionService.hasEditMessagePermission(message, userId);
         message.setText(text);
         messageRepository.save(message);
     }
@@ -40,6 +43,7 @@ public class MessageService {
     public void delete(UUID userId, UUID messageId) {
         Message message = messageRepository.findByIdAndUserId(messageId, userId)
                 .orElseThrow(ModelNotFoundException::new);
+        permissionService.hasEditMessagePermission(message, userId);
         message.setDeleted(true);
         messageRepository.save(message);
     }

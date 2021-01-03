@@ -5,13 +5,18 @@ import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.builder.TestMember;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Member;
-import com.persoff68.fatodo.repository.MemberRepository;
 import com.persoff68.fatodo.repository.ChatRepository;
+import com.persoff68.fatodo.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
@@ -56,13 +61,23 @@ public class ChatServiceIT {
         System.out.println(chatList);
     }
 
-//    @Test
-//    @Transactional
-//    public void testFindDirectByUsers() throws Exception {
-//        Chat chat = chatService.findDirectChatByUsers(USER_2_ID, USER_3_ID);
-//        List<UUID> userIdList = chat.getMembers().stream().map(ChatMember::getUserId).collect(Collectors.toList());
-//        assertThat(userIdList).contains(USER_2_ID, USER_3_ID);
-//    }
+    @Test
+    @Transactional
+    public void testFindDirectByUsers() throws Exception {
+        Chat chat = chatService.getDirectByUserIds(USER_2_ID, USER_3_ID);
+        List<UUID> userIdList = chat.getMembers().stream().map(Member::getUserId).collect(Collectors.toList());
+        assertThat(userIdList).contains(USER_2_ID, USER_3_ID);
+    }
+
+    @Test
+    @Transactional
+    public void testFindAllByUser() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Chat> chats = chatService.getAllByUserId(USER_2_ID, pageable);
+        List<Chat> chatList = chats.toList();
+        System.out.println(chatList);
+        assertThat(chatList.size()).isEqualTo(2);
+    }
 
     private void saveChat(UUID... userIds) {
         Chat chat = TestChat.defaultBuilder().build().toParent();
