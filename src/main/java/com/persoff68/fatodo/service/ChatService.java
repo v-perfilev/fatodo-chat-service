@@ -9,7 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -23,9 +26,18 @@ public class ChatService {
     private final UserService userService;
     private final PermissionService permissionService;
 
-    public Page<Chat> getAllByUserId(UUID userId, Pageable pageable) {
-        return chatRepository.findAllByUser(userId, pageable);
-//        return chatRepository.findAllByUser(userId);
+    public List<Chat> getAllByUserId(UUID userId, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.findAllByUserId(userId, pageable);
+        return chatPage.toList();
+    }
+
+    public List<Chat> getAllNewByUserId(UUID userId, Date date) {
+        Instant oldestInstant = Instant.now().minus(10, ChronoUnit.MINUTES);
+        Date oldestDate = Date.from(oldestInstant);
+        if (date.before(oldestDate)) {
+            date = oldestDate;
+        }
+        return chatRepository.findAllNewByUserId(userId, date);
     }
 
     public Chat getById(UUID chatId) {

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,8 +20,15 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
             + "group by cm.chatId having count(cm.chatId) > 1)")
     Optional<Chat> findDirectChat(List<UUID> userIdList);
 
-    @Query("select c from Chat c join c.members as m where m.userId = ?1")
-    Page<Chat> findAllByUser(UUID userId, Pageable pageable);
+    @Query("select c from Chat c join c.members as m "
+            + "where m.userId = ?1 "
+            + "order by c.lastModifiedAt")
+    Page<Chat> findAllByUserId(UUID userId, Pageable pageable);
 
+    @Query("select c from Chat c join c.members as m "
+            + "where m.userId = ?1 "
+            + "and c.lastModifiedAt > ?2 "
+            + "order by c.lastModifiedAt desc")
+    List<Chat> findAllNewByUserId(UUID userId, Date date);
 
 }

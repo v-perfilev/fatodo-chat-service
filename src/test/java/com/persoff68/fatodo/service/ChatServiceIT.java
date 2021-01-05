@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,19 +45,16 @@ public class ChatServiceIT {
     MockMvc mvc;
 
     @BeforeEach
-    public void setup() {
+    public void setup()  throws Exception{
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
         memberRepository.deleteAll();
         chatRepository.deleteAll();
 
-        saveChat(USER_1_ID, USER_2_ID);
+        Chat chat = saveChat(USER_1_ID, USER_2_ID);
         saveChat(USER_2_ID, USER_3_ID);
         saveChat(USER_1_ID, USER_3_ID);
         saveChat(USER_1_ID);
-
-        List<Chat> chatList = chatRepository.findAll();
-        System.out.println(chatList);
     }
 
     @Test
@@ -73,13 +69,11 @@ public class ChatServiceIT {
     @Transactional
     public void testFindAllByUser() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Chat> chats = chatService.getAllByUserId(USER_2_ID, pageable);
-        List<Chat> chatList = chats.toList();
-        System.out.println(chatList);
-        assertThat(chatList.size()).isEqualTo(2);
+        List<Chat> chatPage = chatService.getAllByUserId(USER_2_ID, pageable);
+        assertThat(chatPage.size()).isEqualTo(2);
     }
 
-    private void saveChat(UUID... userIds) {
+    private Chat saveChat(UUID... userIds) {
         Chat chat = TestChat.defaultBuilder().build().toParent();
         chat = chatRepository.save(chat);
         UUID chatId = chat.getId();
@@ -87,7 +81,9 @@ public class ChatServiceIT {
                 .map(userId -> TestMember.defaultBuilder().chatId(chatId).userId(userId).build().toParent())
                 .collect(Collectors.toList());
         chat.setMembers(memberList);
-        chatRepository.save(chat);
+        return chatRepository.save(chat);
     }
+
+//    private saveMessage()
 
 }

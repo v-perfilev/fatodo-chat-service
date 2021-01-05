@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.UUID;
 public class MessageService {
 
     private final MessageRepository messageRepository;
+    private final ChatRepository chatRepository;
     private final ChatService chatService;
     private final UserService userService;
     private final PermissionService permissionService;
@@ -23,6 +25,7 @@ public class MessageService {
         Chat chat = chatService.getDirectByUserIds(userId, recipientId);
         Message message = new Message(chat.getId(), userId, text);
         messageRepository.save(message);
+        chatRepository.save(chat);
     }
 
     public void send(UUID userId, UUID chatId, String text) {
@@ -30,6 +33,7 @@ public class MessageService {
         permissionService.hasSendMessagePermission(chat, userId);
         Message message = new Message(chatId, userId, text);
         messageRepository.save(message);
+        chatRepository.save(chat);
     }
 
     public void edit(UUID userId, UUID messageId, String text) {
