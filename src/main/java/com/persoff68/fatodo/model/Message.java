@@ -26,7 +26,7 @@ import java.util.UUID;
 public class Message extends AbstractAuditingModel {
 
     @NotNull
-    @Column(name = "chat_Id")
+    @Column(name = "chat_id")
     private UUID chatId;
 
     @NotNull
@@ -35,21 +35,35 @@ public class Message extends AbstractAuditingModel {
     @NotNull
     private String text;
 
-    private boolean isDeleted = false;
+    private UUID forwardedMessageId;
+
+    private boolean isEvent = false;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Status> statuses;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Reaction> reactions;
 
     @ManyToOne
     @JoinColumn(name = "chat_id", insertable = false, updatable = false)
     @JsonIgnore
     private Chat chat;
 
-    public Message(UUID chatId, UUID userId, String text) {
-        super();
+    public Message(UUID chatId, UUID userId, String text, UUID forwardedMessageId, boolean isEvent) {
         this.chatId = chatId;
         this.userId = userId;
         this.text = text;
+        this.forwardedMessageId = forwardedMessageId;
+        this.isEvent = isEvent;
+    }
+
+    public static Message of(UUID chatId, UUID userId, String text, UUID forwardedMessageId) {
+        return new Message(chatId, userId, text, forwardedMessageId, false);
+    }
+
+    public static Message of(UUID chatId, UUID userId, String text, UUID forwardedMessageId, boolean isEvent) {
+        return new Message(chatId, userId, text, forwardedMessageId, isEvent);
     }
 
 }

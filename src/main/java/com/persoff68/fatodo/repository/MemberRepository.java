@@ -1,11 +1,11 @@
 package com.persoff68.fatodo.repository;
 
-import com.persoff68.fatodo.model.Member;
+import com.persoff68.fatodo.model.MemberEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member, UUID> {
+public interface MemberRepository extends JpaRepository<MemberEvent, UUID> {
 }

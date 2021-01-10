@@ -16,12 +16,12 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "ftd_chat_status")
+@Table(name = "ftd_chat_reaction")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(Status.StatusId.class)
-public class Status {
+@IdClass(Reaction.ReactionId.class)
+public class Reaction {
 
     @Id
     private UUID messageId;
@@ -38,23 +38,28 @@ public class Status {
 
     @Data
     @AllArgsConstructor
-    public static class StatusId implements Serializable {
+    public static class ReactionId implements Serializable {
         private UUID messageId;
         private UUID userId;
     }
 
     public enum Type {
-        READ
+        LIKE,
+        DISLIKE
     }
 
-    private Status(UUID messageId, UUID userId, Type type) {
+    private Reaction(UUID messageId, UUID userId, Type type) {
         this.messageId = messageId;
         this.userId = userId;
         this.type = type;
     }
 
-    public static Status of (UUID messageId, UUID userId, Type type) {
-        return new Status(messageId, userId, type);
+    public static Reaction of (UUID messageId, UUID userId) {
+        return new Reaction(messageId, userId, Type.LIKE);
+    }
+
+    public static Reaction of (UUID messageId, UUID userId, Type type) {
+        return new Reaction(messageId, userId, type);
     }
 
 }

@@ -1,19 +1,21 @@
 package com.persoff68.fatodo.service.helper;
 
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.Member;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.service.util.ChatUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
 public class PermissionHelper {
 
+
     public boolean isUserInChat(Chat chat, UUID userId) {
-        return chat.getMembers().stream()
-                .map(Member::getUserId)
-                .anyMatch(memberId -> memberId.equals(userId));
+        List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat);
+        return activeUserIdList.contains(userId);
     }
 
     public boolean isChatNotDirect(Chat chat) {

@@ -2,31 +2,29 @@ package com.persoff68.fatodo.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "ftd_chat_status")
+@Table(name = "ftd_chat_member_event")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(Status.StatusId.class)
-public class Status {
+@EqualsAndHashCode(callSuper = true)
+public class MemberEvent extends AbstractModel {
 
-    @Id
-    private UUID messageId;
+    @NotNull
+    private UUID chatId;
 
-    @Id
+    @NotNull
     private UUID userId;
 
     @NotNull
@@ -36,25 +34,16 @@ public class Status {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp = new Date();
 
-    @Data
-    @AllArgsConstructor
-    public static class StatusId implements Serializable {
-        private UUID messageId;
-        private UUID userId;
-    }
-
     public enum Type {
-        READ
+        ADD_MEMBER,
+        DELETE_MEMBER,
+        CLEAR_HISTORY
     }
 
-    private Status(UUID messageId, UUID userId, Type type) {
-        this.messageId = messageId;
+    public MemberEvent(UUID chatId, UUID userId, Type type) {
+        this.chatId = chatId;
         this.userId = userId;
         this.type = type;
-    }
-
-    public static Status of (UUID messageId, UUID userId, Type type) {
-        return new Status(messageId, userId, type);
     }
 
 }

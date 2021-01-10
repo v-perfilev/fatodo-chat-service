@@ -1,10 +1,11 @@
 package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.Member;
+import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
+import com.persoff68.fatodo.service.util.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,14 +30,11 @@ public class MemberService {
 
         permissionService.hasEditMembersPermission(chat, userId);
 
-        List<Member> memberList = chat.getMembers();
-        List<UUID> existingMemberUserIdList = memberList.stream()
-                .map(Member::getUserId)
-                .collect(Collectors.toList());
-        List<Member> newMemberList = userIdList.stream()
-                .filter(id -> !existingMemberUserIdList.contains(id))
+        List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat);
+        List<MemberEvent> newMemberList = userIdList.stream()
+                .filter(id -> !activeUserIdList.contains(id))
                 .distinct()
-                .map(id -> new Member(chat.getId(), id))
+                .map(id -> new MemberEvent(chat.getId(), id, MemberEvent.Type.ADD_MEMBER))
                 .collect(Collectors.toList());
 
         memberRepository.saveAll(newMemberList);
@@ -48,12 +46,14 @@ public class MemberService {
 
         permissionService.hasEditMembersPermission(chat, userId);
 
-        List<Member> memberList = chat.getMembers();
-        List<Member> memberToDeleteList = memberList.stream()
-                .filter(member -> userIdList.contains(member.getUserId()))
+        List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat);
+        List<MemberEvent> memberToDeleteList = userIdList.stream()
+                .filter(activeUserIdList::contains)
+                .distinct()
+                .map(id -> new MemberEvent(chat.getId(), id, MemberEvent.Type.DELETE_MEMBER))
                 .collect(Collectors.toList());
 
-        memberRepository.deleteAll(memberToDeleteList);
+        memberRepository.saveAll(memberToDeleteList);
     }
 
 

@@ -6,7 +6,8 @@
 
     <include file="db/changelog/20201220200000_create_chat_schema.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/20201220203000_create_chat_message_schema.xml" relativeToChangelogFile="false"/>
-    <include file="db/changelog/20201220210000_create_chat_member_schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/20201220210000_create_chat_member_event_schema.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/20210103180000_create_chat_status_schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/20210110140000_create_chat_reaction_schema.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

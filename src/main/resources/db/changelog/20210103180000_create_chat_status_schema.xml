@@ -13,7 +13,10 @@
             <column name="user_id" type="binary(16)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="read_at" type="timestamp">
+            <column name="type" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>

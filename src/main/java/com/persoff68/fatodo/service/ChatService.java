@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.Member;
+import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -58,11 +58,11 @@ public class ChatService {
         Chat chat = chatRepository.save(new Chat(isDirect));
 
         userIdList.add(userId);
-        List<Member> memberList = userIdList.stream()
+        List<MemberEvent> memberList = userIdList.stream()
                 .distinct()
-                .map(id -> new Member(chat.getId(), id))
+                .map(id -> new MemberEvent(chat.getId(), id, MemberEvent.Type.ADD_MEMBER))
                 .collect(Collectors.toList());
-        chat.setMembers(memberList);
+        chat.setMemberEvents(memberList);
 
         return chatRepository.save(chat);
     }

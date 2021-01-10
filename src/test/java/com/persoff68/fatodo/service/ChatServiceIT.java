@@ -2,20 +2,16 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.FatodoMessageServiceApplication;
 import com.persoff68.fatodo.builder.TestChat;
-import com.persoff68.fatodo.builder.TestMember;
+import com.persoff68.fatodo.builder.TestMemberEvent;
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.Member;
+import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
@@ -23,7 +19,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @SpringBootTest(classes = FatodoMessageServiceApplication.class)
@@ -45,7 +40,7 @@ public class ChatServiceIT {
     MockMvc mvc;
 
     @BeforeEach
-    public void setup()  throws Exception{
+    public void setup() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
         memberRepository.deleteAll();
@@ -57,33 +52,15 @@ public class ChatServiceIT {
         saveChat(USER_1_ID);
     }
 
-    @Test
-    @Transactional
-    public void testFindDirectByUsers() throws Exception {
-        Chat chat = chatService.getDirectByUserIds(USER_2_ID, USER_3_ID);
-        List<UUID> userIdList = chat.getMembers().stream().map(Member::getUserId).collect(Collectors.toList());
-        assertThat(userIdList).contains(USER_2_ID, USER_3_ID);
-    }
-
-    @Test
-    @Transactional
-    public void testFindAllByUser() throws Exception {
-        Pageable pageable = PageRequest.of(0, 10);
-        List<Chat> chatPage = chatService.getAllByUserId(USER_2_ID, pageable);
-        assertThat(chatPage.size()).isEqualTo(2);
-    }
-
     private Chat saveChat(UUID... userIds) {
         Chat chat = TestChat.defaultBuilder().build().toParent();
         chat = chatRepository.save(chat);
         UUID chatId = chat.getId();
-        List<Member> memberList = Arrays.stream(userIds)
-                .map(userId -> TestMember.defaultBuilder().chatId(chatId).userId(userId).build().toParent())
+        List<MemberEvent> memberEventList = Arrays.stream(userIds)
+                .map(userId -> TestMemberEvent.defaultBuilder().chatId(chatId).userId(userId).build().toParent())
                 .collect(Collectors.toList());
-        chat.setMembers(memberList);
+        chat.setMemberEvents(memberEventList);
         return chatRepository.save(chat);
     }
-
-//    private saveMessage()
 
 }
