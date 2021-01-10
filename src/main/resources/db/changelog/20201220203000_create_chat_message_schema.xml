@@ -17,7 +17,7 @@
             <column name="user_id" type="binary(16)">
                 <constraints nullable="false"/>
             </column>
-            <column name="text" type="varchar">
+            <column name="text" type="clob">
                 <constraints nullable="false"/>
             </column>
             <column name="forwarded_message_id" type="binary(16)"/>
