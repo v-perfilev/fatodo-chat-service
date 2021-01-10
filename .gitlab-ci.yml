@@ -1,4 +1,4 @@
-image: persoff68/alpine-openjdk-13-glibc
+image: persoff68/alpine-openjdk-15-glibc
 
 variables:
   MAVEN_CLI_OPTS: "-ntp --batch-mode -s etc/maven/settings.xml"

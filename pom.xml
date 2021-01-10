@@ -25,7 +25,7 @@
         <root.package>com.persoff68.fatodo</root.package>
         <contract.package>com.persoff68.fatodo.contract</contract.package>
         <!-- Dependency versions -->
-        <java.version>13</java.version>
+        <java.version>15</java.version>
         <spring-cloud.version>Hoxton.SR5</spring-cloud.version>
         <hikari.version>3.4.5</hikari.version>
         <h2.version>1.4.200</h2.version>
@@ -45,9 +45,9 @@
         <maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
         <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
         <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
-        <spring-cloud-contract-maven-plugin.version>2.2.2.RELEASE</spring-cloud-contract-maven-plugin.version>
+        <spring-cloud-contract-maven-plugin.version>3.0.0</spring-cloud-contract-maven-plugin.version>
         <!-- Plugin variables -->
         <jacoco.ut-report-folder>${project.build.directory}/jacoco/test</jacoco.ut-report-folder>
         <jacoco.ut-report-file>${jacoco.ut-report-folder}/test.exec</jacoco.ut-report-file>
