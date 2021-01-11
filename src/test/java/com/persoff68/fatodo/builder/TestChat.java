@@ -17,8 +17,9 @@ public class TestChat extends Chat {
                     String title,
                     boolean isDirect,
                     List<MemberEvent> members,
-                    List<Message> messages) {
-        super(title, isDirect, members, messages);
+                    List<Message> messages,
+                    Message lastAllowedMessage) {
+        super(title, isDirect, members, messages, lastAllowedMessage);
         super.id = id;
     }
 
