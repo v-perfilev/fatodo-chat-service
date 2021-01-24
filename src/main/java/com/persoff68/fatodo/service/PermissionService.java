@@ -22,17 +22,33 @@ public class PermissionService {
         permissionValidator.validateIsUserInChat(chat, userId);
     }
 
+    public void hasEditMessagePermission(Message message, UUID userId) {
+        permissionValidator.validateIsUserAuthor(message, userId);
+    }
+
     public void hasEditChatPermission(Chat chat, UUID userId) {
         permissionValidator.validateIsUserInChat(chat, userId);
+    }
+
+    public void hasLeaveChatPermission(Chat chat, UUID userId) {
+        permissionValidator.validateIsUserInChat(chat, userId);
+        permissionValidator.validateIsChatNonDirect(chat);
+    }
+
+    public void hasClearChatPermission(Chat chat, UUID userId) {
+        permissionValidator.validateWasUserInChat(chat, userId);
+        permissionValidator.validateIsNotChatDeleted(chat, userId);
+    }
+
+    public void hasDeleteChatPermission(Chat chat, UUID userId) {
+        permissionValidator.validateWasUserInChat(chat, userId);
+        permissionValidator.validateIsNotChatDeleted(chat, userId);
+        permissionValidator.validateIsChatNonDirect(chat);
     }
 
     public void hasEditMembersPermission(Chat chat, UUID userId) {
         permissionValidator.validateIsUserInChat(chat, userId);
         permissionValidator.validateIsChatNonDirect(chat);
-    }
-
-    public void hasEditMessagePermission(Message message, UUID userId) {
-        permissionValidator.validateIsUserAuthor(message, userId);
     }
 
 }

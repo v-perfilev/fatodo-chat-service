@@ -17,10 +17,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -78,7 +76,7 @@ public class ChatServiceIT {
             messageService.sendDirect(USER_2_ID, USER_3_ID, UUID.randomUUID().toString(), null);
         }
         for (int i = 0; i < 2; i++) {
-            messageService.send(USER_3_ID, thirdChat.getId(), UUID.randomUUID().toString(), null);
+            messageService.send( USER_3_ID,thirdChat.getId(), UUID.randomUUID().toString(), null);
         }
     }
 
@@ -91,23 +89,5 @@ public class ChatServiceIT {
         assertThat(chatMap.size()).isEqualTo(2);
     }
 
-//    @Test
-//    @Transactional
-//    public void tmpTest() {
-//        List<Chat> chatList = chatRepository.findAll();
-//        chatList.forEach(chat -> {
-//            List<Message> mList = chat.getMessages();
-//            System.out.println(mList);
-//            List<MemberEvent> eList = chat.getMemberEvents();
-//            System.out.println(eList);
-//        });
-//        List<Message> messageList = messageRepository.findAll();
-//        messageList.forEach(message -> {
-//            Chat chat = message.getChat();
-//            System.out.println(chat);
-//        });
-//        List<MemberEvent> memberEventList = memberEventRepository.findAll();
-//        assertThat(chatList.size()).isEqualTo(3);
-//    }
 
 }

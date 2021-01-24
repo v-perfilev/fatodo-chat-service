@@ -36,8 +36,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                                         end)
                                     over (partition by chat_id order by timestamp rows unbounded preceding) *
                                 min(case
-                                        when type like 'CLEAR_HISTORY' then 0
-                                        when type like 'DELETE_DIALOG' then 0
+                                        when type like 'CLEAR_CHAT' then 0
+                                        when type like 'DELETE_CHAT' then 0
                                         else 1
                                         end)
                                     over (partition by chat_id order by timestamp rows between current row and unbounded following) valid
@@ -79,8 +79,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                                         end)
                                     over (partition by chat_id order by timestamp rows unbounded preceding) *
                                 min(case
-                                        when type like 'CLEAR_HISTORY' then 0
-                                        when type like 'DELETE_DIALOG' then 0
+                                        when type like 'CLEAR_CHAT' then 0
+                                        when type like 'DELETE_CHAT' then 0
                                         else 1
                                         end)
                                     over (partition by chat_id order by timestamp rows between current row and unbounded following) valid
@@ -123,8 +123,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                                         end)
                                     over (partition by chat_id order by timestamp rows unbounded preceding) *
                                 min(case
-                                        when type like 'CLEAR_HISTORY' then 0
-                                        when type like 'DELETE_DIALOG' then 0
+                                        when type like 'CLEAR_CHAT' then 0
+                                        when type like 'DELETE_CHAT' then 0
                                         else 1
                                         end)
                                     over (partition by chat_id order by timestamp rows between current row and unbounded following) valid

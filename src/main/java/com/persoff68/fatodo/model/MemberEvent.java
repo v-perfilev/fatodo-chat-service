@@ -52,7 +52,8 @@ public class MemberEvent extends AbstractModel {
     public enum Type {
         ADD_MEMBER,
         DELETE_MEMBER,
-        CLEAR_HISTORY
+        CLEAR_CHAT,
+        DELETE_CHAT
     }
 
 }

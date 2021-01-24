@@ -18,15 +18,12 @@ public class ReactionService {
     private final MessageRepository messageRepository;
     private final PermissionService permissionService;
 
-    public void add(UUID userId, UUID messageId, Reaction.Type type) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReadMessagePermission(message.getChat(), userId);
-        Reaction.ReactionId id = new Reaction.ReactionId(messageId, userId);
-        Reaction reaction = reactionRepository.findById(id)
-                .orElse(new Reaction(messageId, userId));
-        reaction.setType(type);
-        reactionRepository.save(reaction);
+    public void setLike(UUID userId, UUID messageId) {
+        set(userId, messageId, Reaction.Type.LIKE);
+    }
+
+    public void setDislike(UUID userId, UUID messageId) {
+        set(userId, messageId, Reaction.Type.DISLIKE);
     }
 
     public void remove(UUID userId, UUID messageId) {
@@ -35,6 +32,17 @@ public class ReactionService {
         permissionService.hasReadMessagePermission(message.getChat(), userId);
         Reaction.ReactionId id = new Reaction.ReactionId(messageId, userId);
         reactionRepository.deleteById(id);
+    }
+
+    private void set(UUID userId, UUID messageId, Reaction.Type type) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(ModelNotFoundException::new);
+        permissionService.hasReadMessagePermission(message.getChat(), userId);
+        Reaction.ReactionId id = new Reaction.ReactionId(messageId, userId);
+        Reaction reaction = reactionRepository.findById(id)
+                .orElse(new Reaction(messageId, userId));
+        reaction.setType(type);
+        reactionRepository.save(reaction);
     }
 
 }

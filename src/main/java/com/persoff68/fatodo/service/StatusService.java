@@ -1,6 +1,5 @@
 package com.persoff68.fatodo.service;
 
-import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.Status;
 import com.persoff68.fatodo.repository.MessageRepository;
@@ -9,7 +8,6 @@ import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,6 +22,7 @@ public class StatusService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasReadMessagePermission(message.getChat(), userId);
+
         Status.StatusId id = new Status.StatusId(messageId, userId);
         boolean statusExists = statusRepository.existsById(id);
         if (!statusExists) {

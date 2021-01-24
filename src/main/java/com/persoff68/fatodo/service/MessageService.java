@@ -23,6 +23,7 @@ public class MessageService {
     public void sendDirect(UUID userId, UUID recipientId, String text, UUID forwardedMessageId) {
         userService.checkUserExists(recipientId);
         Chat chat = chatService.getDirectByUserIds(userId, recipientId);
+
         Message message = new Message(chat, userId, text, getForwardedById(userId, forwardedMessageId));
         messageRepository.save(message);
     }
@@ -31,6 +32,7 @@ public class MessageService {
     public void send(UUID userId, UUID chatId, String text, UUID forwardedMessageId) {
         Chat chat = chatService.getById(chatId);
         permissionService.hasSendMessagePermission(chat, userId);
+
         Message message = new Message(chat, userId, text, getForwardedById(userId, forwardedMessageId));
         messageRepository.save(message);
     }
@@ -39,6 +41,7 @@ public class MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasEditMessagePermission(message, userId);
+
         message.setText(text);
         message.setForwardedMessage(getForwardedById(userId, forwardedMessageId));
         messageRepository.save(message);
