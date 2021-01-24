@@ -2,42 +2,59 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
+import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.repository.ChatRepository;
+import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ChatService {
 
+    private final Collector<Message, ?, Map<Chat, Message>> chatMapCollector =
+            Collectors.toMap(
+                    Message::getChat,
+                    message -> message,
+                    (e1, e2) -> e1,
+                    LinkedHashMap::new
+            );
+
     private final ChatRepository chatRepository;
+    private final MessageRepository messageRepository;
     private final UserService userService;
     private final PermissionService permissionService;
 
-    public List<Chat> getAllByUserId(UUID userId, Pageable pageable) {
-        Page<Chat> chatPage = chatRepository.findAllByUserId(userId, pageable);
-        return chatPage.toList();
+    public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
+        Page<Message> messagePage = messageRepository.findLastMessagesByUserId(userId, pageable);
+        List<Message> messageList = messagePage.toList();
+        return messageList.stream()
+                .collect(chatMapCollector);
     }
 
-    public List<Chat> getAllNewByUserId(UUID userId, Date date) {
-        Instant oldestInstant = Instant.now().minus(10, ChronoUnit.MINUTES);
-        Date oldestDate = Date.from(oldestInstant);
-        if (date.before(oldestDate)) {
-            date = oldestDate;
-        }
-        return chatRepository.findAllNewByUserId(userId, date);
+    public Map<Chat, Message> getAllNewByUserId(UUID userId, Date date) {
+        List<Message> messageList = messageRepository.findNewLastMessagesByUserId(userId, date);
+        return messageList.stream()
+                .collect(chatMapCollector);
+    }
+
+    public Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
+        List<UUID> userIdList = List.of(firstUserId, secondUserId);
+        Supplier<Chat> createChatSupplier = () -> createDirect(firstUserId, secondUserId);
+        return chatRepository.findDirectChat(userIdList)
+                .orElseGet(createChatSupplier);
     }
 
     public Chat getById(UUID chatId) {
@@ -45,26 +62,16 @@ public class ChatService {
                 .orElseThrow(ModelNotFoundException::new);
     }
 
-    public Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
+    public Chat createDirect(UUID firstUserId, UUID secondUserId) {
+        userService.checkUserExists(secondUserId);
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
-        List<UUID> secondUserIdList = Collections.singletonList(secondUserId);
-        Supplier<Chat> createChatSupplier = () -> create(firstUserId, secondUserIdList, true);
-        return chatRepository.findDirectChat(userIdList)
-                .orElseGet(createChatSupplier);
+        return create(userIdList, true);
     }
 
-    public Chat create(UUID userId, List<UUID> userIdList, boolean isDirect) {
+    public Chat createNonDirect(UUID userId, List<UUID> userIdList) {
         userService.checkUsersExist(userIdList);
-        Chat chat = chatRepository.save(new Chat(isDirect));
-
         userIdList.add(userId);
-        List<MemberEvent> memberList = userIdList.stream()
-                .distinct()
-                .map(id -> new MemberEvent(chat.getId(), id, MemberEvent.Type.ADD_MEMBER))
-                .collect(Collectors.toList());
-        chat.setMemberEvents(memberList);
-
-        return chatRepository.save(chat);
+        return create(userIdList, false);
     }
 
     public void rename(UUID chatId, UUID userId, String title) {
@@ -75,6 +82,18 @@ public class ChatService {
 
         chat.setTitle(title);
         chatRepository.save(chat);
+    }
+
+    private Chat create(List<UUID> userIdList, boolean isDirect) {
+        Chat chat = chatRepository.save(new Chat(isDirect));
+
+        List<MemberEvent> memberList = userIdList.stream()
+                .distinct()
+                .map(id -> new MemberEvent(chat, id, MemberEvent.Type.ADD_MEMBER))
+                .collect(Collectors.toList());
+        chat.setMemberEvents(memberList);
+
+        return chatRepository.save(chat);
     }
 
 }

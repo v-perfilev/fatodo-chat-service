@@ -1,17 +1,16 @@
 package com.persoff68.fatodo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -23,11 +22,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@ToString(exclude = "chat")
 public class Message extends AbstractAuditingModel {
 
     @NotNull
-    @Column(name = "chat_id")
-    private UUID chatId;
+    @ManyToOne
+    private Chat chat;
 
     @NotNull
     private UUID userId;
@@ -35,9 +35,10 @@ public class Message extends AbstractAuditingModel {
     @NotNull
     private String text;
 
-    private UUID forwardedMessageId;
-
     private boolean isEvent = false;
+
+    @OneToOne
+    private Message forwardedMessage;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Status> statuses;
@@ -45,25 +46,11 @@ public class Message extends AbstractAuditingModel {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Reaction> reactions;
 
-    @ManyToOne
-    @JoinColumn(name = "chat_id", insertable = false, updatable = false)
-    @JsonIgnore
-    private Chat chat;
-
-    public Message(UUID chatId, UUID userId, String text, UUID forwardedMessageId, boolean isEvent) {
-        this.chatId = chatId;
+    public Message(Chat chat, UUID userId, String text, Message forwardedMessage) {
+        this.chat = chat;
         this.userId = userId;
         this.text = text;
-        this.forwardedMessageId = forwardedMessageId;
-        this.isEvent = isEvent;
-    }
-
-    public static Message of(UUID chatId, UUID userId, String text, UUID forwardedMessageId) {
-        return new Message(chatId, userId, text, forwardedMessageId, false);
-    }
-
-    public static Message of(UUID chatId, UUID userId, String text, UUID forwardedMessageId, boolean isEvent) {
-        return new Message(chatId, userId, text, forwardedMessageId, isEvent);
+        this.forwardedMessage = forwardedMessage;
     }
 
 }

@@ -6,6 +6,7 @@ import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -18,34 +19,46 @@ public class MessageService {
     private final UserService userService;
     private final PermissionService permissionService;
 
+    @Transactional
     public void sendDirect(UUID userId, UUID recipientId, String text, UUID forwardedMessageId) {
         userService.checkUserExists(recipientId);
         Chat chat = chatService.getDirectByUserIds(userId, recipientId);
-        Message message = Message.of(chat.getId(), userId, text, forwardedMessageId);
+        Message message = new Message(chat, userId, text, getForwardedById(userId, forwardedMessageId));
         messageRepository.save(message);
     }
 
+    @Transactional
     public void send(UUID userId, UUID chatId, String text, UUID forwardedMessageId) {
         Chat chat = chatService.getById(chatId);
         permissionService.hasSendMessagePermission(chat, userId);
-        Message message = Message.of(chat.getId(), userId, text, forwardedMessageId);
+        Message message = new Message(chat, userId, text, getForwardedById(userId, forwardedMessageId));
         messageRepository.save(message);
     }
 
     public void edit(UUID userId, UUID messageId, String text, UUID forwardedMessageId) {
-        Message message = messageRepository.findByIdAndUserId(messageId, userId)
+        Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasEditMessagePermission(message, userId);
         message.setText(text);
-        message.setForwardedMessageId(forwardedMessageId);
+        message.setForwardedMessage(getForwardedById(userId, forwardedMessageId));
         messageRepository.save(message);
     }
 
     public void delete(UUID userId, UUID messageId) {
-        Message message = messageRepository.findByIdAndUserId(messageId, userId)
+        Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasEditMessagePermission(message, userId);
         messageRepository.delete(message);
+    }
+
+    private Message getForwardedById(UUID userId, UUID messageId) {
+        if (messageId == null) {
+            return null;
+        }
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(ModelNotFoundException::new);
+        permissionService.hasReadMessagePermission(message.getChat(), userId);
+        return message;
     }
 
 }

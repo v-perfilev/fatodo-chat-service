@@ -23,9 +23,7 @@ public class StatusService {
     public void markMessageAsRead(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        Chat chat = Optional.of(message.getChat())
-                .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReadMessagePermission(chat, userId);
+        permissionService.hasReadMessagePermission(message.getChat(), userId);
         Status.StatusId id = new Status.StatusId(messageId, userId);
         boolean statusExists = statusRepository.existsById(id);
         if (!statusExists) {

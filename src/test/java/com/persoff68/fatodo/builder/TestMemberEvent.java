@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.builder;
 
+import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
 import lombok.Builder;
 
@@ -11,11 +12,11 @@ public class TestMemberEvent extends MemberEvent {
 
     @Builder
     public TestMemberEvent(UUID id,
-                           @NotNull UUID chatId,
+                           @NotNull Chat chat,
                            @NotNull UUID userId,
                            @NotNull Type type,
                            @NotNull Date timestamp) {
-        super(chatId, userId, type, timestamp);
+        super(chat, userId, type, timestamp);
         super.id = id;
     }
 
@@ -26,7 +27,7 @@ public class TestMemberEvent extends MemberEvent {
     public MemberEvent toParent() {
         MemberEvent member = new MemberEvent();
         member.setId(getId());
-        member.setChatId(getChatId());
+        member.setChat(getChat());
         member.setUserId(getUserId());
         member.setType(getType());
         member.setTimestamp(getTimestamp());

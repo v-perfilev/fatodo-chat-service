@@ -1,10 +1,13 @@
 package com.persoff68.fatodo.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
@@ -19,7 +22,6 @@ import java.util.UUID;
 @Table(name = "ftd_chat_reaction")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @IdClass(Reaction.ReactionId.class)
 public class Reaction {
 
@@ -30,11 +32,17 @@ public class Reaction {
     private UUID userId;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp = new Date();
+
+    public Reaction(UUID messageId, UUID userId) {
+        this.messageId = messageId;
+        this.userId = userId;
+    }
 
     @Data
     @AllArgsConstructor
@@ -46,20 +54,6 @@ public class Reaction {
     public enum Type {
         LIKE,
         DISLIKE
-    }
-
-    private Reaction(UUID messageId, UUID userId, Type type) {
-        this.messageId = messageId;
-        this.userId = userId;
-        this.type = type;
-    }
-
-    public static Reaction of (UUID messageId, UUID userId) {
-        return new Reaction(messageId, userId, Type.LIKE);
-    }
-
-    public static Reaction of (UUID messageId, UUID userId, Type type) {
-        return new Reaction(messageId, userId, type);
     }
 
 }

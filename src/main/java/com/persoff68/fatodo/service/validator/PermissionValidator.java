@@ -22,9 +22,9 @@ public class PermissionValidator {
         }
     }
 
-    public void validateIsChatDirect(Chat chat) {
-        boolean isChatNotDirect = permissionHelper.isChatNotDirect(chat);
-        if (!isChatNotDirect) {
+    public void validateIsChatNonDirect(Chat chat) {
+        boolean isChatNonDirect = permissionHelper.isChatNonDirect(chat);
+        if (!isChatNonDirect) {
             throw new PermissionException();
         }
     }

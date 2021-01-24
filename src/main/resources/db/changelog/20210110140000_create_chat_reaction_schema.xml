@@ -7,9 +7,12 @@
     <changeSet id="00000000000005" author="persoff68">
 
         <createTable tableName="ftd_chat_reaction">
+
             <column name="message_id" type="binary(16)">
-                <constraints primaryKey="true" nullable="false"/>
+                <constraints primaryKey="true" foreignKeyName="fk_reaction_message" references="ftd_chat_message(id)"
+                             nullable="false"/>
             </column>
+
             <column name="user_id" type="binary(16)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

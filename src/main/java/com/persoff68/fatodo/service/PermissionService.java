@@ -28,7 +28,7 @@ public class PermissionService {
 
     public void hasEditMembersPermission(Chat chat, UUID userId) {
         permissionValidator.validateIsUserInChat(chat, userId);
-        permissionValidator.validateIsChatDirect(chat);
+        permissionValidator.validateIsChatNonDirect(chat);
     }
 
     public void hasEditMessagePermission(Message message, UUID userId) {

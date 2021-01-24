@@ -12,8 +12,9 @@
             </column>
 
             <column name="chat_id" type="binary(16)">
-                <constraints nullable="false"/>
+                <constraints foreignKeyName="fk_member_event_chat" references="ftd_chat(id)" nullable="false"/>
             </column>
+
             <column name="user_id" type="binary(16)">
                 <constraints nullable="false"/>
             </column>

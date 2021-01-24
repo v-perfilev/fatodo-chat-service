@@ -3,7 +3,6 @@ package com.persoff68.fatodo.service.helper;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.service.util.ChatUtils;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class PermissionHelper {
         return activeUserIdList.contains(userId);
     }
 
-    public boolean isChatNotDirect(Chat chat) {
+    public boolean isChatNonDirect(Chat chat) {
         return !chat.isDirect();
     }
 
