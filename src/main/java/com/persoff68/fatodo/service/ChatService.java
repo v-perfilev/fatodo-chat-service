@@ -65,10 +65,10 @@ public class ChatService {
         return create(userIdList, false);
     }
 
+    @Transactional
     public void rename(UUID chatId, UUID userId, String title) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
-
         permissionService.hasEditChatPermission(chat, userId);
 
         chat.setTitle(title);

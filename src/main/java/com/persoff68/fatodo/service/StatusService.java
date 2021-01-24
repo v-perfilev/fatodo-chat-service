@@ -7,7 +7,9 @@ import com.persoff68.fatodo.repository.StatusRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.UUID;
 
 @Service
@@ -17,7 +19,9 @@ public class StatusService {
     private final StatusRepository statusRepository;
     private final MessageRepository messageRepository;
     private final PermissionService permissionService;
+    private final EntityManager entityManager;
 
+    @Transactional
     public void markMessageAsRead(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -28,6 +32,7 @@ public class StatusService {
         if (!statusExists) {
             Status status = new Status(messageId, userId, Status.Type.READ);
             statusRepository.save(status);
+            entityManager.refresh(message);
         }
     }
 

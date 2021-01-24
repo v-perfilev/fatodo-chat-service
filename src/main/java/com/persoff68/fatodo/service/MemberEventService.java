@@ -8,7 +8,9 @@ import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,6 +23,7 @@ public class MemberEventService {
     private final MemberEventRepository memberEventRepository;
     private final UserService userService;
     private final PermissionService permissionService;
+    private final EntityManager entityManager;
 
     public void addUsersUnsafe(Chat chat, List<UUID> userIdList) {
         userService.checkUsersExist(userIdList);
@@ -31,8 +34,10 @@ public class MemberEventService {
                 .collect(Collectors.toList());
 
         memberEventRepository.saveAll(newMemberList);
+        entityManager.refresh(chat);
     }
 
+    @Transactional
     public void addUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
         userService.checkUsersExist(userIdList);
 
@@ -48,8 +53,10 @@ public class MemberEventService {
                 .collect(Collectors.toList());
 
         memberEventRepository.saveAll(newMemberList);
+        entityManager.refresh(chat);
     }
 
+    @Transactional
     public void removeUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -63,8 +70,10 @@ public class MemberEventService {
                 .collect(Collectors.toList());
 
         memberEventRepository.saveAll(memberToDeleteList);
+        entityManager.refresh(chat);
     }
 
+    @Transactional
     public void leaveChat(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -73,8 +82,10 @@ public class MemberEventService {
 
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEvent.Type.CLEAR_CHAT);
         memberEventRepository.save(memberEvent);
+        entityManager.refresh(chat);
     }
 
+    @Transactional
     public void clearChat(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -83,8 +94,10 @@ public class MemberEventService {
 
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEvent.Type.CLEAR_CHAT);
         memberEventRepository.save(memberEvent);
+        entityManager.refresh(chat);
     }
 
+    @Transactional
     public void deleteChat(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -93,6 +106,7 @@ public class MemberEventService {
 
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEvent.Type.DELETE_CHAT);
         memberEventRepository.save(memberEvent);
+        entityManager.refresh(chat);
     }
 
 }

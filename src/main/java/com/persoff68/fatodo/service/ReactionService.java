@@ -7,7 +7,9 @@ import com.persoff68.fatodo.repository.ReactionRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.UUID;
 
 @Service
@@ -17,6 +19,7 @@ public class ReactionService {
     private final ReactionRepository reactionRepository;
     private final MessageRepository messageRepository;
     private final PermissionService permissionService;
+    private final EntityManager entityManager;
 
     public void setLike(UUID userId, UUID messageId) {
         set(userId, messageId, Reaction.Type.LIKE);
@@ -26,15 +29,18 @@ public class ReactionService {
         set(userId, messageId, Reaction.Type.DISLIKE);
     }
 
+    @Transactional
     public void remove(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasReadMessagePermission(message.getChat(), userId);
         Reaction.ReactionId id = new Reaction.ReactionId(messageId, userId);
         reactionRepository.deleteById(id);
+        entityManager.refresh(message);
     }
 
-    private void set(UUID userId, UUID messageId, Reaction.Type type) {
+    @Transactional
+    protected void set(UUID userId, UUID messageId, Reaction.Type type) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasReadMessagePermission(message.getChat(), userId);
@@ -43,6 +49,7 @@ public class ReactionService {
                 .orElse(new Reaction(messageId, userId));
         reaction.setType(type);
         reactionRepository.save(reaction);
+        entityManager.refresh(message);
     }
 
 }
