@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
@@ -30,11 +32,20 @@ public class Status {
     private UUID userId;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp = new Date();
+
+
+    public Status(UUID messageId, UUID userId, Type type) {
+        this.messageId = messageId;
+        this.userId = userId;
+        this.type = type;
+    }
+
 
     @Data
     @AllArgsConstructor
@@ -45,16 +56,6 @@ public class Status {
 
     public enum Type {
         READ
-    }
-
-    private Status(UUID messageId, UUID userId, Type type) {
-        this.messageId = messageId;
-        this.userId = userId;
-        this.type = type;
-    }
-
-    public static Status of (UUID messageId, UUID userId, Type type) {
-        return new Status(messageId, userId, type);
     }
 
 }

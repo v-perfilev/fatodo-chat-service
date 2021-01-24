@@ -39,10 +39,12 @@ public class Reaction {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp = new Date();
 
+
     public Reaction(UUID messageId, UUID userId) {
         this.messageId = messageId;
         this.userId = userId;
     }
+
 
     @Data
     @AllArgsConstructor

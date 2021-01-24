@@ -26,7 +26,7 @@ public class StatusService {
         Status.StatusId id = new Status.StatusId(messageId, userId);
         boolean statusExists = statusRepository.existsById(id);
         if (!statusExists) {
-            Status status = Status.of(messageId, userId, Status.Type.READ);
+            Status status = new Status(messageId, userId, Status.Type.READ);
             statusRepository.save(status);
         }
     }
