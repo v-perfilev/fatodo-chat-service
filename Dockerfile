@@ -14,7 +14,6 @@ RUN ./mvnw install -Dmaven.test.skip=true
 
 # DEPLOY
 FROM openjdk:15-alpine
-VOLUME /app
 COPY --from=build /build/target/fatodo.jar /app/app.jar
 
 # wait tool layer
