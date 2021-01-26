@@ -31,8 +31,7 @@ public class ChatService {
 
     public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findLastMessagesByUserId(userId, pageable);
-        List<Message> messageList = messagePage.toList();
-        return messageList.stream()
+        return messagePage.toList().stream()
                 .collect(ChatUtils.chatMapCollector);
     }
 
@@ -50,9 +49,11 @@ public class ChatService {
                 .orElseGet(createChatSupplier);
     }
 
-    public Chat getById(UUID chatId) {
-        return chatRepository.findById(chatId)
+    public Chat getById(UUID userId, UUID chatId) {
+        Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
+        permissionService.hasReadMessagePermission(chat, userId);
+        return chat;
     }
 
     public Chat createDirect(UUID firstUserId, UUID secondUserId) {

@@ -43,6 +43,7 @@ public class MemberEventService {
 
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
+
         permissionService.hasEditMembersPermission(chat, userId);
 
         List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat);
@@ -60,6 +61,7 @@ public class MemberEventService {
     public void removeUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
+
         permissionService.hasEditMembersPermission(chat, userId);
 
         List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat);

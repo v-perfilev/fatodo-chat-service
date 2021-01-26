@@ -33,7 +33,7 @@ public class MessageService {
 
     @Transactional
     public void send(UUID userId, UUID chatId, String text, UUID forwardedMessageId) {
-        Chat chat = chatService.getById(chatId);
+        Chat chat = chatService.getById(userId, chatId);
         permissionService.hasSendMessagePermission(chat, userId);
 
         Message message = new Message(chat, userId, text, getForwardedById(userId, forwardedMessageId));

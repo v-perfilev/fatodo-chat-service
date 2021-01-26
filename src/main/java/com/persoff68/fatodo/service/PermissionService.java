@@ -15,7 +15,7 @@ public class PermissionService {
     private final PermissionValidator permissionValidator;
 
     public void hasReadMessagePermission(Chat chat, UUID userId) {
-        permissionValidator.validateIsUserInChat(chat, userId);
+        permissionValidator.validateWasUserInChat(chat, userId);
     }
 
     public void hasSendMessagePermission(Chat chat, UUID userId) {
