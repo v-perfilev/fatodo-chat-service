@@ -6,14 +6,12 @@ import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.ChatUtils;
-import com.persoff68.fatodo.service.util.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,15 +28,8 @@ public class ChatService {
     private final PermissionService permissionService;
 
     public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
-        Page<Message> messagePage = messageRepository.findLastMessagesByUserId(userId, pageable);
+        Page<Message> messagePage = messageRepository.findAllByUserId(userId, pageable);
         return messagePage.toList().stream()
-                .collect(ChatUtils.chatMapCollector);
-    }
-
-    public Map<Chat, Message> getAllNewByUserId(UUID userId, Date date) {
-        TimeUtils.checkIfOldRequest(date);
-        List<Message> messageList = messageRepository.findNewLastMessagesByUserId(userId, date);
-        return messageList.stream()
                 .collect(ChatUtils.chatMapCollector);
     }
 

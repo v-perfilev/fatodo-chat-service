@@ -5,10 +5,13 @@ import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -20,6 +23,11 @@ public class MessageService {
     private final UserService userService;
     private final PermissionService permissionService;
     private final EntityManager entityManager;
+
+    public List<Message> getAllByUserIdAndChatId(UUID userId, UUID chatId, Pageable pageable) {
+        Page<Message> messagePage = messageRepository.findAllByChatIdAndUserId(chatId, userId, pageable);
+        return messagePage.toList();
+    }
 
     @Transactional
     public void sendDirect(UUID userId, UUID recipientId, String text, UUID forwardedMessageId) {

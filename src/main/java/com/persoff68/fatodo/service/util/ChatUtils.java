@@ -21,13 +21,12 @@ public class ChatUtils {
     private ChatUtils() {
     }
 
-    public static Collector<Message, ?, Map<Chat, Message>> chatMapCollector =
-            Collectors.toMap(
-                    Message::getChat,
-                    message -> message,
-                    (e1, e2) -> e1,
-                    LinkedHashMap::new
-            );
+    public static Collector<Message, ?, Map<Chat, Message>> chatMapCollector = Collectors.toMap(
+            Message::getChat,
+            message -> message,
+            (e1, e2) -> e1,
+            LinkedHashMap::new
+    );
 
     public static boolean isUserInChat(Chat chat, UUID userId) {
         List<UUID> activeUserIdLIst = getActiveUserIdList(chat);
