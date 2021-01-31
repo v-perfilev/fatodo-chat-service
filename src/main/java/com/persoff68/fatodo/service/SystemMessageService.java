@@ -33,7 +33,7 @@ public class SystemMessageService {
                 .distinct()
                 .map(id -> Message.stub(chat, id))
                 .collect(Collectors.toList())
-                : Collections.singletonList(Message.stub(chat, null));
+                : Collections.emptyList();
 
         messageRepository.saveAll(messageList);
         messageRepository.flush();

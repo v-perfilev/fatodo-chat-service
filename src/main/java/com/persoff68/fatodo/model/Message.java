@@ -61,7 +61,7 @@ public class Message extends AbstractAuditingModel {
     public static Message stub(Chat chat, UUID userId) {
         Message message = new Message();
         message.chat = chat;
-        message.userId = Optional.ofNullable(userId).orElse(AppConstants.SYSTEM_ID);
+        message.userId = userId;
         message.isStub = true;
         return message;
     }
