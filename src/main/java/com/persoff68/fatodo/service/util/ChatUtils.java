@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
+import com.persoff68.fatodo.model.MemberEventType;
 import com.persoff68.fatodo.model.Message;
 
 import java.util.Comparator;
@@ -48,21 +49,21 @@ public class ChatUtils {
                 .max(Comparator.comparing(MemberEvent::getTimestamp));
 
         return lastMemberEventOptional
-                .map(memberEvent -> memberEvent.getType().equals(MemberEvent.Type.DELETE_CHAT))
+                .map(memberEvent -> memberEvent.getType().equals(MemberEventType.DELETE_CHAT))
                 .orElse(false);
     }
 
     public static List<UUID> getActiveUserIdList(Chat chat) {
         List<MemberEvent> memberEventList = chat.getMemberEvents();
 
-        Table<UUID, MemberEvent.Type, Integer> memberEventCountTable = getMemberEventCountTable(memberEventList);
+        Table<UUID, MemberEventType, Integer> memberEventCountTable = getMemberEventCountTable(memberEventList);
 
         return memberEventCountTable.rowMap().entrySet().stream()
                 .filter(entry -> {
-                    Map<MemberEvent.Type, Integer> countMap = entry.getValue();
-                    int addEventCount = Optional.ofNullable(countMap.get(MemberEvent.Type.ADD_MEMBER))
+                    Map<MemberEventType, Integer> countMap = entry.getValue();
+                    int addEventCount = Optional.ofNullable(countMap.get(MemberEventType.ADD_MEMBER))
                             .orElse(0);
-                    int deleteEventCount = Optional.ofNullable(countMap.get(MemberEvent.Type.DELETE_MEMBER))
+                    int deleteEventCount = Optional.ofNullable(countMap.get(MemberEventType.DELETE_MEMBER))
                             .orElse(0);
                     return addEventCount > deleteEventCount;
                 })
@@ -70,7 +71,7 @@ public class ChatUtils {
                 .collect(Collectors.toList());
     }
 
-    private static Table<UUID, MemberEvent.Type, Integer> getMemberEventCountTable(List<MemberEvent> memberEventList) {
+    private static Table<UUID, MemberEventType, Integer> getMemberEventCountTable(List<MemberEvent> memberEventList) {
         return memberEventList.stream()
                 .collect(Tables.toTable(
                         MemberEvent::getUserId,

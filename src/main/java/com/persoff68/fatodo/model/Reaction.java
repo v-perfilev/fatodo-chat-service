@@ -1,7 +1,5 @@
 package com.persoff68.fatodo.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +12,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -22,7 +19,7 @@ import java.util.UUID;
 @Table(name = "ftd_chat_reaction")
 @Data
 @NoArgsConstructor
-@IdClass(Reaction.ReactionId.class)
+@IdClass(ReactionId.class)
 public class Reaction {
 
     @Id
@@ -33,7 +30,7 @@ public class Reaction {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private Type type;
+    private ReactionType type;
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
@@ -43,19 +40,6 @@ public class Reaction {
     public Reaction(UUID messageId, UUID userId) {
         this.messageId = messageId;
         this.userId = userId;
-    }
-
-
-    @Data
-    @AllArgsConstructor
-    public static class ReactionId implements Serializable {
-        private UUID messageId;
-        private UUID userId;
-    }
-
-    public enum Type {
-        LIKE,
-        DISLIKE
     }
 
 }

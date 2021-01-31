@@ -37,23 +37,16 @@ public class MemberEvent extends AbstractModel {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private Type type;
+    private MemberEventType type;
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp = new Date();
 
-    public MemberEvent(Chat chat, UUID userId, Type type) {
+    public MemberEvent(Chat chat, UUID userId, MemberEventType type) {
         this.chat = chat;
         this.userId = userId;
         this.type = type;
-    }
-
-    public enum Type {
-        ADD_MEMBER,
-        DELETE_MEMBER,
-        CLEAR_CHAT,
-        DELETE_CHAT
     }
 
 }

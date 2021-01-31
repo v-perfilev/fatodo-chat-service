@@ -13,7 +13,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -22,7 +21,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(Status.StatusId.class)
+@IdClass(StatusId.class)
 public class Status {
 
     @Id
@@ -33,29 +32,17 @@ public class Status {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private Type type;
+    private StatusType type;
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp = new Date();
 
 
-    public Status(UUID messageId, UUID userId, Type type) {
+    public Status(UUID messageId, UUID userId, StatusType type) {
         this.messageId = messageId;
         this.userId = userId;
         this.type = type;
-    }
-
-
-    @Data
-    @AllArgsConstructor
-    public static class StatusId implements Serializable {
-        private UUID messageId;
-        private UUID userId;
-    }
-
-    public enum Type {
-        READ
     }
 
 }

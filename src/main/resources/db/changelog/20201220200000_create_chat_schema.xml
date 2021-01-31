@@ -12,6 +12,7 @@
             </column>
 
             <column name="title" type="varchar(128)"/>
+
             <column name="is_direct" type="boolean">
                 <constraints nullable="false"/>
             </column>

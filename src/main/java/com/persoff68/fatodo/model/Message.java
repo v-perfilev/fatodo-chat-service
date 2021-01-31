@@ -1,5 +1,7 @@
 package com.persoff68.fatodo.model;
 
+import com.persoff68.fatodo.config.constant.AppConstants;
+import com.persoff68.fatodo.security.util.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,13 +34,13 @@ public class Message extends AbstractAuditingModel {
     @NotNull
     private UUID userId;
 
-    @NotNull
     private String text;
-
-    private boolean isEvent = false;
 
     @OneToOne
     private Message forwardedMessage;
+
+    private boolean isEvent = false;
+    private boolean isStub = false;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Status> statuses;
@@ -51,6 +53,14 @@ public class Message extends AbstractAuditingModel {
         this.userId = userId;
         this.text = text;
         this.forwardedMessage = forwardedMessage;
+    }
+
+    public Message(Chat chat, String text, boolean isEvent, boolean isStub) {
+        this.chat = chat;
+        this.userId = AppConstants.SYSTEM_ID;
+        this.text = text;
+        this.isEvent = isEvent;
+        this.isStub = isStub;
     }
 
 }

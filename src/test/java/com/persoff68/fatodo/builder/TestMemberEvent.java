@@ -2,6 +2,7 @@ package com.persoff68.fatodo.builder;
 
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
+import com.persoff68.fatodo.model.MemberEventType;
 import lombok.Builder;
 
 import javax.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ public class TestMemberEvent extends MemberEvent {
     public TestMemberEvent(UUID id,
                            @NotNull Chat chat,
                            @NotNull UUID userId,
-                           @NotNull Type type,
+                           @NotNull MemberEventType type,
                            @NotNull Date timestamp) {
         super(chat, userId, type, timestamp);
         super.id = id;

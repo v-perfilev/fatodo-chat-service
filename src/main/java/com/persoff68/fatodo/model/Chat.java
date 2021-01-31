@@ -9,6 +9,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,13 +22,13 @@ public class Chat extends AbstractAuditingModel {
 
     private String title;
 
-    private boolean isDirect;
+    private boolean isDirect = false;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-    private List<MemberEvent> memberEvents;
+    private List<MemberEvent> memberEvents = new ArrayList<>();
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
 
     public Chat(boolean isDirect) {

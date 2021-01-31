@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ChatService {
 
     private final ChatRepository chatRepository;
@@ -40,7 +42,12 @@ public class ChatService {
                 .orElseGet(createChatSupplier);
     }
 
-    public Chat getById(UUID userId, UUID chatId) {
+    public Chat getById(UUID chatId) {
+        return chatRepository.findById(chatId)
+                .orElseThrow(ModelNotFoundException::new);
+    }
+
+    public Chat getByUserIdAndId(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasReadMessagePermission(chat, userId);
@@ -53,11 +60,11 @@ public class ChatService {
     }
 
     public Chat createNonDirect(UUID userId, List<UUID> userIdList) {
-        userIdList.add(userId);
-        return create(userIdList, false);
+        List<UUID> allUserIdList = new ArrayList<>(userIdList);
+        allUserIdList.add(userId);
+        return create(allUserIdList, false);
     }
 
-    @Transactional
     public void rename(UUID chatId, UUID userId, String title) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -67,11 +74,10 @@ public class ChatService {
         chatRepository.save(chat);
     }
 
-    @Transactional
     protected Chat create(List<UUID> userIdList, boolean isDirect) {
         userService.checkUsersExist(userIdList);
-        Chat chat = chatRepository.save(new Chat(isDirect));
-        memberEventService.addUsersUnsafe(chat, userIdList);
+        Chat chat = chatRepository.saveAndFlush(new Chat(isDirect));
+        memberEventService.addUsersUnsafe(chat.getId(), userIdList);
         return chat;
     }
 

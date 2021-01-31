@@ -13,9 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MessageService {
 
     private final MessageRepository messageRepository;
@@ -26,10 +28,11 @@ public class MessageService {
 
     public List<Message> getAllByUserIdAndChatId(UUID userId, UUID chatId, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findAllByChatIdAndUserId(chatId, userId, pageable);
-        return messagePage.toList();
+        return messagePage.toList().stream()
+                .filter(m -> !m.isStub())
+                .collect(Collectors.toList());
     }
 
-    @Transactional
     public void sendDirect(UUID userId, UUID recipientId, String text, UUID forwardedMessageId) {
         userService.checkUserExists(recipientId);
         Chat chat = chatService.getDirectByUserIds(userId, recipientId);
@@ -39,9 +42,8 @@ public class MessageService {
         entityManager.refresh(chat);
     }
 
-    @Transactional
     public void send(UUID userId, UUID chatId, String text, UUID forwardedMessageId) {
-        Chat chat = chatService.getById(userId, chatId);
+        Chat chat = chatService.getByUserIdAndId(userId, chatId);
         permissionService.hasSendMessagePermission(chat, userId);
 
         Message message = new Message(chat, userId, text, getForwardedById(userId, forwardedMessageId));
@@ -49,7 +51,6 @@ public class MessageService {
         entityManager.refresh(chat);
     }
 
-    @Transactional
     public void edit(UUID userId, UUID messageId, String text, UUID forwardedMessageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -62,7 +63,6 @@ public class MessageService {
         entityManager.refresh(chat);
     }
 
-    @Transactional
     public void delete(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
