@@ -50,24 +50,27 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                 select m.*
                 from ftd_chat_message as m
                 where id in (select id from message_id)
+                  and m.is_stub = false
                 order by m.created_at desc 
             """, nativeQuery = true)
     Page<Message> findAllByChatIdAndUserId(UUID chatId, UUID userId, Pageable pageable);
 
     @Query(value = """
                 with unified as (
-                    select m.id, m.chat_id, m.created_at as timestamp, null as type
+                    select m.id, m.chat_id, m.user_id, m.is_stub, m.created_at as timestamp, null as type
                     from ftd_chat_message as m
                              right join ftd_chat_member_event as e on m.chat_id = e.chat_id
                     where e.user_id = ?1
                     union
-                    select id, chat_id, timestamp, type
+                    select id, chat_id, null as user_id, null as is_stub, timestamp, type
                     from ftd_chat_member_event
                     where user_id = ?1),
                 
                      validated as (
                          select id,
                                 chat_id,
+                                user_id,
+                                is_stub,
                                 timestamp,
                                 type,
                                 sum(case
@@ -89,7 +92,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                                                     over (partition by chat_id order by timestamp rows between unbounded preceding and unbounded following) last_id
                          from validated
                          where type is null
-                           and valid = 1)
+                           and valid = 1
+                           and (is_stub = false or (is_stub = true and user_id = ?1)))
                 
                 select m.*
                 from ftd_chat_message as m

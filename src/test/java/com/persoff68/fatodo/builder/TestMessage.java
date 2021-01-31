@@ -22,7 +22,11 @@ public class TestMessage extends Message {
                        boolean isEvent,
                        List<Status> statuses,
                        List<Reaction> reactions) {
-        super(chat, userId, text, forwardedMessage);
+        super();
+        super.setChat(chat);
+        super.setUserId(userId);
+        super.setText(text);
+        super.setForwardedMessage(forwardedMessage);
         super.setId(id);
         super.setEvent(isEvent);
         super.setStatuses(statuses);

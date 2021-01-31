@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +24,19 @@ public class SystemMessageService {
     private final ChatRepository chatRepository;
     private final EntityManager entityManager;
 
-    public void createStubMessage(UUID chatId) {
+    public void createStubMessages(UUID chatId, List<UUID> userIdList) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
-        Message message = new Message(chat, null, false, true);
-        messageRepository.save(message);
+
+        List<Message> messageList = userIdList != null && !userIdList.isEmpty()
+                ? userIdList.stream()
+                .distinct()
+                .map(id -> Message.stub(chat, id))
+                .collect(Collectors.toList())
+                : Collections.singletonList(Message.stub(chat, null));
+
+        messageRepository.saveAll(messageList);
+        messageRepository.flush();
         entityManager.refresh(chat);
     }
 

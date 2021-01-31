@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class MemberEventService {
         memberEventRepository.flush();
         entityManager.refresh(chat);
 
-        systemMessageService.createStubMessage(chatId);
+        systemMessageService.createStubMessages(chatId, userIdList);
     }
 
     public void addUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
@@ -65,7 +66,7 @@ public class MemberEventService {
         memberEventRepository.flush();
         entityManager.refresh(chat);
 
-        systemMessageService.createStubMessage(chatId);
+        systemMessageService.createStubMessages(chatId, userIdList);
     }
 
     public void removeUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
@@ -95,8 +96,6 @@ public class MemberEventService {
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.DELETE_MEMBER);
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
-
-        systemMessageService.createStubMessage(chatId);
     }
 
     public void clearChat(UUID userId, UUID chatId) {
@@ -109,7 +108,7 @@ public class MemberEventService {
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
 
-        systemMessageService.createStubMessage(chatId);
+        systemMessageService.createStubMessages(chatId, Collections.singletonList(userId));
     }
 
     public void deleteChat(UUID userId, UUID chatId) {

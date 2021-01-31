@@ -37,7 +37,7 @@ public class MessageService {
         userService.checkUserExists(recipientId);
         Chat chat = chatService.getDirectByUserIds(userId, recipientId);
 
-        Message message = new Message(chat, userId, text, getForwardedById(userId, forwardedMessageId));
+        Message message = Message.of(chat, userId, text, getForwardedById(userId, forwardedMessageId));
         messageRepository.save(message);
         entityManager.refresh(chat);
     }
@@ -46,7 +46,7 @@ public class MessageService {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
         permissionService.hasSendMessagePermission(chat, userId);
 
-        Message message = new Message(chat, userId, text, getForwardedById(userId, forwardedMessageId));
+        Message message = Message.of(chat, userId, text, getForwardedById(userId, forwardedMessageId));
         messageRepository.save(message);
         entityManager.refresh(chat);
     }
