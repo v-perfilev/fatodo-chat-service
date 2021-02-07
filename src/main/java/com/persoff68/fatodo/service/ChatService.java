@@ -35,13 +35,6 @@ public class ChatService {
                 .collect(ChatUtils.chatMapCollector);
     }
 
-    public Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
-        List<UUID> userIdList = List.of(firstUserId, secondUserId);
-        Supplier<Chat> createChatSupplier = () -> createDirect(firstUserId, secondUserId);
-        return chatRepository.findDirectChat(userIdList)
-                .orElseGet(createChatSupplier);
-    }
-
     public Chat getByUserIdAndId(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -54,19 +47,26 @@ public class ChatService {
         return create(userIdList, true);
     }
 
-    public Chat createNonDirect(UUID userId, List<UUID> userIdList) {
+    public Chat createIndirect(UUID userId, List<UUID> userIdList) {
         List<UUID> allUserIdList = new ArrayList<>(userIdList);
         allUserIdList.add(userId);
         return create(allUserIdList, false);
     }
 
-    public void rename(UUID chatId, UUID userId, String title) {
+    public Chat rename(UUID userId, UUID chatId, String title) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasEditChatPermission(chat, userId);
+        permissionService.hasRenameChatPermission(chat, userId);
 
         chat.setTitle(title);
-        chatRepository.save(chat);
+        return chatRepository.save(chat);
+    }
+
+    Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
+        List<UUID> userIdList = List.of(firstUserId, secondUserId);
+        Supplier<Chat> createChatSupplier = () -> createDirect(firstUserId, secondUserId);
+        return chatRepository.findDirectChat(userIdList)
+                .orElseGet(createChatSupplier);
     }
 
     protected Chat create(List<UUID> userIdList, boolean isDirect) {

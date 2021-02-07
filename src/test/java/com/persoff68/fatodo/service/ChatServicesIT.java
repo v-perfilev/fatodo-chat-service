@@ -65,7 +65,7 @@ public class ChatServicesIT {
 
         // create chats
         chatService.createDirect(USER_1_ID, USER_2_ID);
-        secondChat = chatService.createNonDirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID));
+        secondChat = chatService.createIndirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID));
 
     }
 

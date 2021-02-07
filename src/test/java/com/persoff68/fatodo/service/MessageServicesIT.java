@@ -72,7 +72,7 @@ public class MessageServicesIT {
 
         // create chats
         firstChat = chatService.createDirect(USER_1_ID, USER_2_ID);
-        secondChat = chatService.createNonDirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID));
+        secondChat = chatService.createIndirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID));
 
         // init with messages
         for (int i = 0; i < 5; i++) {
