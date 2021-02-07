@@ -1,13 +1,13 @@
 package com.persoff68.fatodo.model.mapper;
 
-import com.persoff68.fatodo.model.Message;
-import com.persoff68.fatodo.model.dto.MessageDTO;
+import com.persoff68.fatodo.model.Chat;
+import com.persoff68.fatodo.model.dto.ChatDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface MessageMapper {
+public interface ChatMapper {
 
-    MessageDTO pojoToDTO(Message message);
+    ChatDTO pojoToDTO(Chat chat);
 
 }
