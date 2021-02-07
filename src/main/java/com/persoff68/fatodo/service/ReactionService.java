@@ -36,6 +36,7 @@ public class ReactionService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasReadMessagePermission(message.getChat(), userId);
+
         ReactionId id = new ReactionId(messageId, userId);
         reactionRepository.deleteById(id);
         entityManager.refresh(message);
@@ -45,6 +46,7 @@ public class ReactionService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasReadMessagePermission(message.getChat(), userId);
+
         ReactionId id = new ReactionId(messageId, userId);
         Reaction reaction = reactionRepository.findById(id)
                 .orElse(new Reaction(messageId, userId));

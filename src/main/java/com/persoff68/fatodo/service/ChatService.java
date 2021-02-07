@@ -42,11 +42,6 @@ public class ChatService {
                 .orElseGet(createChatSupplier);
     }
 
-    public Chat getById(UUID chatId) {
-        return chatRepository.findById(chatId)
-                .orElseThrow(ModelNotFoundException::new);
-    }
-
     public Chat getByUserIdAndId(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
