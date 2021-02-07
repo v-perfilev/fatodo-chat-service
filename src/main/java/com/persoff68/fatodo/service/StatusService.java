@@ -24,7 +24,7 @@ public class StatusService {
     private final PermissionService permissionService;
     private final EntityManager entityManager;
 
-    public void markMessageAsRead(UUID userId, UUID messageId) {
+    public void markAsRead(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasReadMessagePermission(message.getChat(), userId);
