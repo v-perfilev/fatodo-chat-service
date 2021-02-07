@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(MessageController.ENDPOINT)
+@RequestMapping(ChatController.ENDPOINT)
 @RequiredArgsConstructor
-public class MessageController {
-    static final String ENDPOINT = "/api/message";
+public class ChatController {
+    static final String ENDPOINT = "/api/chat";
 
 }
