@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class ChatController {
     static final String ENDPOINT = "/api/chat";
 
-    private static final int DEFAULT_LIMIT = 50;
+    private static final int DEFAULT_LIMIT = 20;
 
     private final ChatService chatService;
     private final ChatMessageMapper chatMessageMapper;

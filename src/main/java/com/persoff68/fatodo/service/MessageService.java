@@ -33,25 +33,27 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
-    public void sendDirect(UUID userId, UUID recipientId, String text, UUID forwardedMessageId) {
+    public Message sendDirect(UUID userId, UUID recipientId, String text, UUID forwardedMessageId) {
         userService.checkUserExists(recipientId);
         Chat chat = chatService.getDirectByUserIds(userId, recipientId);
 
         Message message = Message.of(chat, userId, text, getForwardedById(userId, forwardedMessageId));
-        messageRepository.save(message);
+        message = messageRepository.save(message);
         entityManager.refresh(chat);
+        return message;
     }
 
-    public void send(UUID userId, UUID chatId, String text, UUID forwardedMessageId) {
+    public Message send(UUID userId, UUID chatId, String text, UUID forwardedMessageId) {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
         permissionService.hasSendMessagePermission(chat, userId);
 
         Message message = Message.of(chat, userId, text, getForwardedById(userId, forwardedMessageId));
-        messageRepository.save(message);
+        message = messageRepository.save(message);
         entityManager.refresh(chat);
+        return message;
     }
 
-    public void edit(UUID userId, UUID messageId, String text, UUID forwardedMessageId) {
+    public Message edit(UUID userId, UUID messageId, String text, UUID forwardedMessageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         Chat chat = message.getChat();
@@ -59,8 +61,9 @@ public class MessageService {
 
         message.setText(text);
         message.setForwardedMessage(getForwardedById(userId, forwardedMessageId));
-        messageRepository.save(message);
+        message = messageRepository.save(message);
         entityManager.refresh(chat);
+        return message;
     }
 
     public void delete(UUID userId, UUID messageId) {
