@@ -16,9 +16,9 @@ public class TestChat extends Chat {
     public TestChat(UUID id,
                     String title,
                     boolean isDirect,
-                    List<MemberEvent> members,
+                    List<MemberEvent> memberEvents,
                     List<Message> messages) {
-        super(title, isDirect, members, messages);
+        super(title, isDirect, memberEvents, messages);
         super.id = id;
     }
 
@@ -26,7 +26,7 @@ public class TestChat extends Chat {
         return TestChat.builder()
                 .title(DEFAULT_VALUE)
                 .isDirect(true)
-                .members(new ArrayList<>())
+                .memberEvents(new ArrayList<>())
                 .messages(new ArrayList<>());
     }
 

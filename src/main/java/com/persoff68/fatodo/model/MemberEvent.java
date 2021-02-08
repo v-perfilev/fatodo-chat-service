@@ -28,7 +28,6 @@ import java.util.UUID;
 @ToString(exclude = "chat")
 public class MemberEvent extends AbstractModel {
 
-    @NotNull
     @ManyToOne
     private Chat chat;
 

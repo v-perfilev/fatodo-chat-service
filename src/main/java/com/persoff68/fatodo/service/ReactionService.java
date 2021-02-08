@@ -35,7 +35,7 @@ public class ReactionService {
     public void remove(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReadMessagePermission(message.getChat(), userId);
+        permissionService.hasReactOnMessagePermission(message, userId);
 
         ReactionId id = new ReactionId(messageId, userId);
         reactionRepository.deleteById(id);
@@ -45,7 +45,7 @@ public class ReactionService {
     protected void set(UUID userId, UUID messageId, ReactionType type) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReadMessagePermission(message.getChat(), userId);
+        permissionService.hasReactOnMessagePermission(message, userId);
 
         ReactionId id = new ReactionId(messageId, userId);
         Reaction reaction = reactionRepository.findById(id)

@@ -9,6 +9,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -37,7 +38,6 @@ public class Status {
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp = new Date();
-
 
     public Status(UUID messageId, UUID userId, StatusType type) {
         this.messageId = messageId;

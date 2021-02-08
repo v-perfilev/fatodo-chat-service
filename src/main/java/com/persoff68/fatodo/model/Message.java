@@ -28,7 +28,6 @@ import java.util.UUID;
 @ToString(exclude = "chat")
 public class Message extends AbstractAuditingModel {
 
-    @NotNull
     @ManyToOne
     private Chat chat;
 

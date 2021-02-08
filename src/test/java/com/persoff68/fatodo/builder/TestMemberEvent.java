@@ -22,7 +22,9 @@ public class TestMemberEvent extends MemberEvent {
     }
 
     public static TestMemberEventBuilder defaultBuilder() {
-        return TestMemberEvent.builder();
+        return TestMemberEvent.builder()
+                .type(MemberEventType.ADD_MEMBER)
+                .timestamp(new Date());
     }
 
     public MemberEvent toParent() {

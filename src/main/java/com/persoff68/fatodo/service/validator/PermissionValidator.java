@@ -47,4 +47,11 @@ public class PermissionValidator {
             throw new PermissionException();
         }
     }
+
+    public void validateIsNotUserAuthor(Message message, UUID userId) {
+        boolean isUserAuthor = message.getUserId().equals(userId);
+        if (isUserAuthor) {
+            throw new PermissionException();
+        }
+    }
 }

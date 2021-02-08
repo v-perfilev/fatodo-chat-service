@@ -38,7 +38,7 @@ public class ChatService {
     public Chat getByUserIdAndId(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReadMessagePermission(chat, userId);
+        permissionService.hasReadChatPermission(chat, userId);
         return chat;
     }
 

@@ -82,7 +82,7 @@ public class MessageService {
         }
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReadMessagePermission(message.getChat(), userId);
+        permissionService.hasReadChatPermission(message.getChat(), userId);
         return message;
     }
 
