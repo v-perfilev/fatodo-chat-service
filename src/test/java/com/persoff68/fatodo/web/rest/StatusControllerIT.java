@@ -12,8 +12,10 @@ import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.Status;
+import com.persoff68.fatodo.model.StatusType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
+import com.persoff68.fatodo.repository.StatusRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -42,10 +45,10 @@ public class StatusControllerIT {
     private static final String USER_ID_2 = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
     private static final String USER_ID_3 = "71bae736-415b-474c-9865-29043cbc8d0c";
 
-    private static final String MESSAGE_ID_1 = "d17c5f24-4ba4-47e4-8f93-11f098e93b3c";
-    private static final String MESSAGE_ID_2 = "3f4ed8ad-eecc-49c9-a6ad-cfd81a0e4847";
-    private static final String MESSAGE_ID_3 = "b8685cb0-b3c3-4ed4-9ecc-e803d20cdcef";
-    private static final String MESSAGE_ID_4 = "4d50aca1-6003-43e3-8237-385854a0557e";
+    private Message message1;
+    private Message message2;
+    private Message message3;
+    private Message message4;
 
     @Autowired
     WebApplicationContext context;
@@ -53,6 +56,8 @@ public class StatusControllerIT {
     ChatRepository chatRepository;
     @Autowired
     MessageRepository messageRepository;
+    @Autowired
+    StatusRepository statusRepository;
     @Autowired
     ObjectMapper objectMapper;
 
@@ -67,14 +72,16 @@ public class StatusControllerIT {
 
         chatRepository.deleteAll();
         messageRepository.deleteAll();
+        statusRepository.deleteAll();
 
         Chat chat1 = createDirectChat(USER_ID_1, USER_ID_2);
-        createMessage(chat1, USER_ID_1, MESSAGE_ID_1);
-        createMessage(chat1, USER_ID_2, MESSAGE_ID_2);
-        createMessage(chat1, USER_ID_2, MESSAGE_ID_3, USER_ID_1);
+        message1 = createMessage(chat1, USER_ID_2);
+        message2 = createMessage(chat1, USER_ID_1);
+        message3 = createMessage(chat1, USER_ID_2);
+        createStatuses(message3.getId(), USER_ID_1);
 
         Chat chat2 = createDirectChat(USER_ID_2, USER_ID_3);
-        createMessage(chat2, USER_ID_2, MESSAGE_ID_4);
+        message4 = createMessage(chat2, USER_ID_2);
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
     }
@@ -82,9 +89,16 @@ public class StatusControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetRead_ok() throws Exception {
-        String url = ENDPOINT + "/" + MESSAGE_ID_1 + "/read";
+        String messageId = message1.getId().toString();
+        String url = ENDPOINT + "/" + messageId + "/read";
         mvc.perform(get(url))
                 .andExpect(status().isOk());
+        List<Status> statusList = statusRepository.findAll();
+        boolean statusExists = statusList.stream()
+                .anyMatch(status -> status.getMessageId().toString().equals(messageId)
+                        && status.getUserId().toString().equals(USER_ID_1)
+                        && status.getType().equals(StatusType.READ));
+        assertThat(statusExists).isTrue();
     }
 
 
@@ -98,15 +112,18 @@ public class StatusControllerIT {
         return chatRepository.save(chat);
     }
 
-    private void createMessage(Chat chat, String userId, String messageId, String... readUserIds) {
-        List<Status> statusList = Arrays.stream(readUserIds)
-                .map(id -> TestStatus.defaultBuilder()
-                        .userId(UUID.fromString(id)).build().toParent())
-                .collect(Collectors.toList());
+    private Message createMessage(Chat chat, String userId) {
         Message message = TestMessage.defaultBuilder()
-                .id(UUID.fromString(messageId)).chat(chat).userId(UUID.fromString(userId))
-                .statuses(statusList).build().toParent();
-        messageRepository.save(message);
+                .chat(chat).userId(UUID.fromString(userId))
+                .build().toParent();
+        return messageRepository.save(message);
     }
 
+    private void createStatuses(UUID messageId, String... readUserIds) {
+        List<Status> statusList = Arrays.stream(readUserIds)
+                .map(id -> TestStatus.defaultBuilder()
+                        .messageId(messageId).userId(UUID.fromString(id)).build().toParent())
+                .collect(Collectors.toList());
+        statusRepository.saveAll(statusList);
+    }
 }
