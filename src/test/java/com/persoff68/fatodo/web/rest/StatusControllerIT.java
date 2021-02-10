@@ -14,6 +14,7 @@ import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.Status;
 import com.persoff68.fatodo.model.StatusType;
 import com.persoff68.fatodo.repository.ChatRepository;
+import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.repository.StatusRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -55,6 +57,8 @@ public class StatusControllerIT {
     @Autowired
     ChatRepository chatRepository;
     @Autowired
+    MemberEventRepository memberEventRepository;
+    @Autowired
     MessageRepository messageRepository;
     @Autowired
     StatusRepository statusRepository;
@@ -71,16 +75,19 @@ public class StatusControllerIT {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
         chatRepository.deleteAll();
+        memberEventRepository.deleteAll();
         messageRepository.deleteAll();
         statusRepository.deleteAll();
 
-        Chat chat1 = createDirectChat(USER_ID_1, USER_ID_2);
+        Chat chat1 = createDirectChat();
+        createMemberEvents(chat1, USER_ID_1, USER_ID_2);
         message1 = createMessage(chat1, USER_ID_2);
         message2 = createMessage(chat1, USER_ID_1);
         message3 = createMessage(chat1, USER_ID_2);
         createStatuses(message3.getId(), USER_ID_1);
 
-        Chat chat2 = createDirectChat(USER_ID_2, USER_ID_3);
+        Chat chat2 = createDirectChat();
+        createMemberEvents(chat2, USER_ID_2, USER_ID_3);
         message4 = createMessage(chat2, USER_ID_2);
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
@@ -101,15 +108,62 @@ public class StatusControllerIT {
         assertThat(statusExists).isTrue();
     }
 
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSetRead_ok_ignoreIfRead() throws Exception {
+        String messageId = message3.getId().toString();
+        String url = ENDPOINT + "/" + messageId + "/read";
+        mvc.perform(get(url))
+                .andExpect(status().isOk());
+    }
 
-    private Chat createDirectChat(String... userIds) {
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSetRead_badRequest_ownMessage() throws Exception {
+        String messageId = message2.getId().toString();
+        String url = ENDPOINT + "/" + messageId + "/read";
+        mvc.perform(get(url))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSetRead_badRequest_noPermissions() throws Exception {
+        String messageId = message4.getId().toString();
+        String url = ENDPOINT + "/" + messageId + "/read";
+        mvc.perform(get(url))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSetRead_badRequest_notFound() throws Exception {
+        String messageId = UUID.randomUUID().toString();
+        String url = ENDPOINT + "/" + messageId + "/read";
+        mvc.perform(get(url))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testSetRead_unauthorized() throws Exception {
+        String messageId = message1.getId().toString();
+        String url = ENDPOINT + "/" + messageId + "/read";
+        mvc.perform(get(url))
+                .andExpect(status().isUnauthorized());
+    }
+
+    private Chat createDirectChat() {
+        Chat chat = TestChat.defaultBuilder().isDirect(true).build().toParent();
+        return chatRepository.save(chat);
+    }
+
+    private void createMemberEvents(Chat chat, String... userIds) {
         List<MemberEvent> memberEventList = Arrays.stream(userIds)
                 .map(id -> TestMemberEvent.defaultBuilder()
-                        .userId(UUID.fromString(id)).build().toParent())
+                        .chat(chat).userId(UUID.fromString(id)).build().toParent())
                 .collect(Collectors.toList());
-
-        Chat chat = TestChat.defaultBuilder().memberEvents(memberEventList).build().toParent();
-        return chatRepository.save(chat);
+        memberEventRepository.saveAll(memberEventList);
     }
 
     private Message createMessage(Chat chat, String userId) {
