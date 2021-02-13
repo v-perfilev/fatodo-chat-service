@@ -72,7 +72,7 @@ public class ChatController {
     }
 
     @PostMapping("/rename/{chatId}")
-    public ResponseEntity<ChatDTO> createIndirect(@PathVariable UUID chatId, @RequestBody String title) {
+    public ResponseEntity<ChatDTO> rename(@PathVariable UUID chatId, @RequestBody String title) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Chat chat = chatService.rename(userId, chatId, title);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
