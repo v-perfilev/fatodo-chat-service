@@ -4,6 +4,7 @@ import com.persoff68.fatodo.security.exception.UnauthorizedException;
 import com.persoff68.fatodo.security.util.SecurityUtils;
 import com.persoff68.fatodo.service.ReactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,25 +21,25 @@ public class ReactionController {
 
     private final ReactionService reactionService;
 
-    @GetMapping("/{messageId}/like")
+    @GetMapping("/like/{messageId}")
     public ResponseEntity<Void> setLike(@PathVariable UUID messageId) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         reactionService.setLike(userId, messageId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/{messageId}/dislike")
+    @GetMapping("/dislike/{messageId}")
     public ResponseEntity<Void> setDislike(@PathVariable UUID messageId) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         reactionService.setDislike(userId, messageId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/{messageId}/none")
+    @GetMapping("/none/{messageId}")
     public ResponseEntity<Void> setNone(@PathVariable UUID messageId) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         reactionService.remove(userId, messageId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }

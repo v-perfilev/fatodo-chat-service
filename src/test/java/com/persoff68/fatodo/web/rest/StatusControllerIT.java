@@ -97,9 +97,9 @@ public class StatusControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetRead_ok() throws Exception {
         String messageId = message1.getId().toString();
-        String url = ENDPOINT + "/" + messageId + "/read";
+        String url = ENDPOINT + "/read/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         List<Status> statusList = statusRepository.findAll();
         boolean statusExists = statusList.stream()
                 .anyMatch(status -> status.getMessageId().toString().equals(messageId)
@@ -112,16 +112,16 @@ public class StatusControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetRead_ok_ignoreIfRead() throws Exception {
         String messageId = message3.getId().toString();
-        String url = ENDPOINT + "/" + messageId + "/read";
+        String url = ENDPOINT + "/read/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetRead_badRequest_ownMessage() throws Exception {
         String messageId = message2.getId().toString();
-        String url = ENDPOINT + "/" + messageId + "/read";
+        String url = ENDPOINT + "/read/" + messageId;
         mvc.perform(get(url))
                 .andExpect(status().isBadRequest());
     }
@@ -130,7 +130,7 @@ public class StatusControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetRead_badRequest_noPermissions() throws Exception {
         String messageId = message4.getId().toString();
-        String url = ENDPOINT + "/" + messageId + "/read";
+        String url = ENDPOINT + "/read/" + messageId;
         mvc.perform(get(url))
                 .andExpect(status().isBadRequest());
     }
@@ -139,7 +139,7 @@ public class StatusControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetRead_badRequest_notFound() throws Exception {
         String messageId = UUID.randomUUID().toString();
-        String url = ENDPOINT + "/" + messageId + "/read";
+        String url = ENDPOINT + "/read/" + messageId;
         mvc.perform(get(url))
                 .andExpect(status().isNotFound());
     }
@@ -148,7 +148,7 @@ public class StatusControllerIT {
     @WithAnonymousUser
     void testSetRead_unauthorized() throws Exception {
         String messageId = message1.getId().toString();
-        String url = ENDPOINT + "/" + messageId + "/read";
+        String url = ENDPOINT + "/read/" + messageId;
         mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
