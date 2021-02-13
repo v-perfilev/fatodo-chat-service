@@ -79,7 +79,7 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUser_ok_one() throws Exception {
+    public void testAddUsers_ok_one() throws Exception {
         String url = ENDPOINT + "/add/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -97,7 +97,7 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUser_ok_many() throws Exception {
+    public void testAddUsers_ok_many() throws Exception {
         String url = ENDPOINT + "/add/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3), UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -116,7 +116,7 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUser_notFound_user() throws Exception {
+    public void testAddUsers_notFound_user() throws Exception {
         when(userServiceClient.doesIdExist(any())).thenReturn(false);
         String url = ENDPOINT + "/add/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.randomUUID());
@@ -128,7 +128,7 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUser_notFound_chat() throws Exception {
+    public void testAddUsers_notFound_chat() throws Exception {
         String url = ENDPOINT + "/add/" + UUID.randomUUID().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -139,7 +139,7 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUser_badRequest_noPermissions() throws Exception {
+    public void testAddUsers_badRequest_noPermissions() throws Exception {
         String url = ENDPOINT + "/add/" + chat2.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -150,7 +150,7 @@ public class MemberControllerIT {
 
     @Test
     @WithAnonymousUser
-    void testAddUser_unauthorized() throws Exception {
+    void testAddUsers_unauthorized() throws Exception {
         String url = ENDPOINT + "/add/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -158,6 +158,93 @@ public class MemberControllerIT {
                 .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    public void testRemoveUsers_ok_one() throws Exception {
+        createMemberEvents(chat1, USER_ID_3, USER_ID_4);
+        String url = ENDPOINT + "/remove/" + chat1.getId().toString();
+        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
+        String requestBody = objectMapper.writeValueAsString(userIdList);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isOk());
+        List<MemberEvent> memberEventList = memberEventRepository.findAll();
+        List<MemberEvent> filteredMemberEventList = memberEventList.stream()
+                .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
+                        && (memberEvent.getType().equals(MemberEventType.ADD_MEMBER)
+                        || memberEvent.getType().equals(MemberEventType.DELETE_MEMBER))
+                        && memberEvent.getUserId().equals(UUID.fromString(USER_ID_3)))
+                .collect(Collectors.toList());
+        assertThat(filteredMemberEventList.size()).isEqualTo(2);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    public void testRemoveUsers_ok_many() throws Exception {
+        createMemberEvents(chat1, USER_ID_3, USER_ID_4);
+        String url = ENDPOINT + "/remove/" + chat1.getId().toString();
+        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3), UUID.fromString(USER_ID_4));
+        String requestBody = objectMapper.writeValueAsString(userIdList);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isOk());
+        List<MemberEvent> memberEventList = memberEventRepository.findAll();
+        List<MemberEvent> filteredMemberEventList = memberEventList.stream()
+                .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
+                        && (memberEvent.getType().equals(MemberEventType.ADD_MEMBER)
+                        || memberEvent.getType().equals(MemberEventType.DELETE_MEMBER))
+                        && (memberEvent.getUserId().equals(UUID.fromString(USER_ID_3))
+                        || memberEvent.getUserId().equals(UUID.fromString(USER_ID_4))))
+                .collect(Collectors.toList());
+        assertThat(filteredMemberEventList.size()).isEqualTo(4);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    public void testRemoveUsers_notFound_user() throws Exception {
+        String url = ENDPOINT + "/remove/" + chat1.getId().toString();
+        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
+        String requestBody = objectMapper.writeValueAsString(userIdList);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    public void testRemoveUsers_notFound_chat() throws Exception {
+        String url = ENDPOINT + "/remove/" + UUID.randomUUID().toString();
+        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
+        String requestBody = objectMapper.writeValueAsString(userIdList);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    public void testRemoveUsers_badRequest_noPermissions() throws Exception {
+        String url = ENDPOINT + "/remove/" + chat2.getId().toString();
+        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
+        String requestBody = objectMapper.writeValueAsString(userIdList);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testRemoveUsers_unauthorized() throws Exception {
+        String url = ENDPOINT + "/remove/" + chat1.getId().toString();
+        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
+        String requestBody = objectMapper.writeValueAsString(userIdList);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
 
     private Chat createIndirectChat() {
         Chat chat = TestChat.defaultBuilder().isDirect(false).build().toParent();

@@ -82,6 +82,10 @@ public class MemberEventService {
                 .map(id -> new MemberEvent(chat, id, MemberEventType.DELETE_MEMBER))
                 .collect(Collectors.toList());
 
+        if (memberToDeleteList.isEmpty()) {
+            throw new ModelNotFoundException();
+        }
+
         memberEventRepository.saveAll(memberToDeleteList);
         memberEventRepository.flush();
         entityManager.refresh(chat);
