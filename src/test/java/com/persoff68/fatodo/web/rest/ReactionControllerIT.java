@@ -143,7 +143,7 @@ public class ReactionControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetLike_badRequest_notFound() throws Exception {
+    void testSetLike_notFound() throws Exception {
         String messageId = UUID.randomUUID().toString();
         String url = ENDPOINT + "/like/" + messageId;
         mvc.perform(get(url))
@@ -196,7 +196,7 @@ public class ReactionControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetDislike_badRequest_notFound() throws Exception {
+    void testSetDislike_notFound() throws Exception {
         String messageId = UUID.randomUUID().toString();
         String url = ENDPOINT + "/dislike/" + messageId;
         mvc.perform(get(url))

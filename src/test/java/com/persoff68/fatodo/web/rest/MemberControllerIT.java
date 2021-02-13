@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -242,6 +243,126 @@ public class MemberControllerIT {
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testLeave_ok() throws Exception {
+        String url = ENDPOINT + "/leave/" + chat1.getId().toString();
+        mvc.perform(get(url))
+                .andExpect(status().isOk());
+        List<MemberEvent> memberEventList = memberEventRepository.findAll();
+        List<MemberEvent> filteredMemberEventList = memberEventList.stream()
+                .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
+                        && memberEvent.getType().equals(MemberEventType.DELETE_MEMBER)
+                        && memberEvent.getUserId().equals(UUID.fromString(USER_ID_1)))
+                .collect(Collectors.toList());
+        assertThat(filteredMemberEventList.size()).isEqualTo(1);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testLeave_badRequest_noPermissions() throws Exception {
+        String url = ENDPOINT + "/leave/" + chat2.getId().toString();
+        mvc.perform(get(url))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testLeave_notFound() throws Exception {
+        String url = ENDPOINT + "/leave/" + UUID.randomUUID();
+        mvc.perform(get(url))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testLeave_unauthorized() throws Exception {
+        String url = ENDPOINT + "/leave/" + chat1.getId().toString();
+        mvc.perform(get(url))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testClear_ok() throws Exception {
+        String url = ENDPOINT + "/clear/" + chat1.getId().toString();
+        mvc.perform(get(url))
+                .andExpect(status().isOk());
+        List<MemberEvent> memberEventList = memberEventRepository.findAll();
+        List<MemberEvent> filteredMemberEventList = memberEventList.stream()
+                .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
+                        && memberEvent.getType().equals(MemberEventType.CLEAR_CHAT)
+                        && memberEvent.getUserId().equals(UUID.fromString(USER_ID_1)))
+                .collect(Collectors.toList());
+        assertThat(filteredMemberEventList.size()).isEqualTo(1);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testClear_badRequest_noPermissions() throws Exception {
+        String url = ENDPOINT + "/clear/" + chat2.getId().toString();
+        mvc.perform(get(url))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testClear_notFound() throws Exception {
+        String url = ENDPOINT + "/clear/" + UUID.randomUUID();
+        mvc.perform(get(url))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testClear_unauthorized() throws Exception {
+        String url = ENDPOINT + "/clear/" + chat1.getId().toString();
+        mvc.perform(get(url))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testDelete_ok() throws Exception {
+        String url = ENDPOINT + "/delete/" + chat1.getId().toString();
+        mvc.perform(get(url))
+                .andExpect(status().isOk());
+        List<MemberEvent> memberEventList = memberEventRepository.findAll();
+        List<MemberEvent> filteredMemberEventList = memberEventList.stream()
+                .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
+                        && memberEvent.getType().equals(MemberEventType.DELETE_CHAT)
+                        && memberEvent.getUserId().equals(UUID.fromString(USER_ID_1)))
+                .collect(Collectors.toList());
+        assertThat(filteredMemberEventList.size()).isEqualTo(1);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testDelete_badRequest_noPermissions() throws Exception {
+        String url = ENDPOINT + "/delete/" + chat2.getId().toString();
+        mvc.perform(get(url))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testDelete_notFound() throws Exception {
+        String url = ENDPOINT + "/delete/" + UUID.randomUUID();
+        mvc.perform(get(url))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testDelete_unauthorized() throws Exception {
+        String url = ENDPOINT + "/delete/" + chat1.getId().toString();
+        mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
 
