@@ -1,16 +1,16 @@
 package com.persoff68.fatodo.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.persoff68.fatodo.FatodoMessageServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestChat;
-import com.persoff68.fatodo.builder.TestMemberEvent;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
+import com.persoff68.fatodo.service.MemberEventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +52,8 @@ public class ChatControllerIT {
     @Autowired
     MemberEventRepository memberEventRepository;
     @Autowired
+    MemberEventService memberEventService;
+    @Autowired
     ObjectMapper objectMapper;
 
     @MockBean
@@ -63,6 +65,8 @@ public class ChatControllerIT {
     public void setup() {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
+        when(userServiceClient.doesIdExist(any())).thenReturn(true);
+
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
 
@@ -73,8 +77,37 @@ public class ChatControllerIT {
 
         chat2 = createIndirectChat();
         createMemberEvents(chat2, USER_ID_2, USER_ID_3);
+    }
 
-        when(userServiceClient.doesIdExist(any())).thenReturn(true);
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testGetAllPageable_ok_withoutParams() throws Exception {
+        ResultActions resultActions = mvc.perform(get(ENDPOINT))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
+        List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
+        assertThat(resultDTOList.size()).isEqualTo(ChatController.DEFAULT_SIZE);
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testGetAllPageable_ok_withParams() throws Exception {
+        String url = ENDPOINT + "?offset=15&size=10";
+        ResultActions resultActions = mvc.perform(get(url))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
+        List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
+        assertThat(resultDTOList.size()).isEqualTo(5);
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testGetAllPageable_unauthorized() throws Exception {
+        mvc.perform(get(ENDPOINT))
+                .andExpect(status().isUnauthorized());
     }
 
 
@@ -113,17 +146,17 @@ public class ChatControllerIT {
                 .andExpect(status().isUnauthorized());
     }
 
+
     private Chat createIndirectChat() {
         Chat chat = TestChat.defaultBuilder().isDirect(false).build().toParent();
         return chatRepository.save(chat);
     }
 
     private void createMemberEvents(Chat chat, String... userIds) {
-        List<MemberEvent> memberEventList = Arrays.stream(userIds)
-                .map(id -> TestMemberEvent.defaultBuilder()
-                        .chat(chat).userId(UUID.fromString(id)).build().toParent())
+        List<UUID> userIdList = Arrays.stream(userIds)
+                .map(UUID::fromString)
                 .collect(Collectors.toList());
-        memberEventRepository.saveAll(memberEventList);
+        memberEventService.addUsersUnsafe(chat.getId(), userIdList);
     }
 
 }
