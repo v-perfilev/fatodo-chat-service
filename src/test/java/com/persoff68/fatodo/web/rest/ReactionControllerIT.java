@@ -290,4 +290,5 @@ public class ReactionControllerIT {
                 .messageId(messageId).userId(UUID.fromString(userId)).type(type).build().toParent();
         reactionRepository.save(reaction);
     }
+
 }
