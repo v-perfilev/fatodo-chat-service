@@ -6,6 +6,7 @@ import com.persoff68.fatodo.FatodoMessageServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.builder.TestMessage;
+import com.persoff68.fatodo.builder.TestMessageVM;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
@@ -14,11 +15,13 @@ import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.MemberEventService;
+import com.persoff68.fatodo.web.rest.vm.MessageVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -27,6 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,7 +38,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -132,6 +139,198 @@ public class MessageControllerIT {
     void testGetAllByUserIdPageable_unauthorized() throws Exception {
         String url = ENDPOINT + "/" + chat1.getId().toString();
         mvc.perform(get(url))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSendDirect_ok() throws Exception {
+        String url = ENDPOINT + "/direct/" + USER_ID_3;
+        MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        ResultActions resultActions = mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isCreated());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        MessageDTO resultDTO = objectMapper.readValue(resultString, MessageDTO.class);
+        assertThat(resultDTO.getUserId()).isEqualTo(UUID.fromString(USER_ID_1));
+        assertThat(resultDTO.getText()).isEqualTo(vm.getText());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSendDirect_notFound() throws Exception {
+        when(userServiceClient.doesIdExist(any())).thenReturn(false);
+        String url = ENDPOINT + "/direct/" + UUID.randomUUID().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testSendDirect_unauthorized() throws Exception {
+        when(userServiceClient.doesIdExist(any())).thenReturn(false);
+        String url = ENDPOINT + "/direct/" + UUID.randomUUID().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSend_ok() throws Exception {
+        String url = ENDPOINT + "/" + chat1.getId().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        ResultActions resultActions = mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isCreated());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        MessageDTO resultDTO = objectMapper.readValue(resultString, MessageDTO.class);
+        assertThat(resultDTO.getUserId()).isEqualTo(UUID.fromString(USER_ID_1));
+        assertThat(resultDTO.getText()).isEqualTo(vm.getText());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSend_badRequest_noPermissions() throws Exception {
+        String url = ENDPOINT + "/" + chat2.getId().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSend_notFound() throws Exception {
+        String url = ENDPOINT + "/" + UUID.randomUUID().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testSend_unauthorized() throws Exception {
+        String url = ENDPOINT + "/" + chat1.getId().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testEdit_ok() throws Exception {
+        String url = ENDPOINT + "/" + message1.getId().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        ResultActions resultActions = mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        MessageDTO resultDTO = objectMapper.readValue(resultString, MessageDTO.class);
+        assertThat(resultDTO.getUserId()).isEqualTo(UUID.fromString(USER_ID_1));
+        assertThat(resultDTO.getText()).isEqualTo(vm.getText());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testEdit_badRequest_notOwner() throws Exception {
+        String url = ENDPOINT + "/" + message2.getId().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testEdit_badRequest_wrongChat() throws Exception {
+        String url = ENDPOINT + "/" + message3.getId().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testEdit_notFound() throws Exception {
+        String url = ENDPOINT + "/" + UUID.randomUUID().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testEdit_unauthorized() throws Exception {
+        String url = ENDPOINT + "/" + message1.getId().toString();
+        MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
+        String requestBody = objectMapper.writeValueAsString(vm);
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testDelete_ok() throws Exception {
+        String url = ENDPOINT + "/" + message1.getId().toString();
+        mvc.perform(delete(url))
+                .andExpect(status().isOk());
+        Optional<Message> messageOptional = messageRepository.findById(message1.getId());
+        assertThat(messageOptional).isEmpty();
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testDelete_badRequest_notOwner() throws Exception {
+        String url = ENDPOINT + "/" + message2.getId().toString();
+        mvc.perform(delete(url))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testDelete_badRequest_wrongChat() throws Exception {
+        String url = ENDPOINT + "/" + message3.getId().toString();
+        mvc.perform(delete(url))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testDelete_notFound() throws Exception {
+        String url = ENDPOINT + "/" + UUID.randomUUID().toString();
+        mvc.perform(delete(url))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testDelete_unauthorized() throws Exception {
+        String url = ENDPOINT + "/" + message1.getId().toString();
+        mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());
     }
 
