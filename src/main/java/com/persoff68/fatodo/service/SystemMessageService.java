@@ -35,6 +35,13 @@ public class SystemMessageService {
                 .collect(Collectors.toList())
                 : Collections.emptyList();
 
+        // workaround needed for correct work with message repository
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            // skip if error
+        }
+
         messageRepository.saveAll(messageList);
         messageRepository.flush();
         entityManager.refresh(chat);

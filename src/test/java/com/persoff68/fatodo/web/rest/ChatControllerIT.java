@@ -72,7 +72,7 @@ public class ChatControllerIT {
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             chat1 = createChat(false);
             createMemberEvents(chat1, USER_ID_1, USER_ID_2);
         }
@@ -93,13 +93,13 @@ public class ChatControllerIT {
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
         List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(ChatController.DEFAULT_SIZE);
+        assertThat(resultDTOList.size()).isEqualTo(11);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetAllPageable_ok_withParams() throws Exception {
-        String url = ENDPOINT + "?offset=15&size=10";
+        String url = ENDPOINT + "?offset=5&size=10";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -294,7 +294,7 @@ public class ChatControllerIT {
 
     private Chat createChat(boolean isDirect) {
         Chat chat = TestChat.defaultBuilder().isDirect(isDirect).build().toParent();
-        return chatRepository.save(chat);
+        return chatRepository.saveAndFlush(chat);
     }
 
     private void createMemberEvents(Chat chat, String... userIds) {

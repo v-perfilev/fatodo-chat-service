@@ -48,15 +48,10 @@ public class ChatController {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Pageable pageRequest = OffsetPageRequest.of(offset, size);
         Map<Chat, Message> chatMap = chatService.getAllByUserId(userId, pageRequest);
-        try {
-            List<ChatDTO> chatDtoList = chatMap.entrySet().stream()
-                    .map(entry -> chatMapper.pojoToDTO(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(chatDtoList);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        List<ChatDTO> chatDtoList = chatMap.entrySet().stream()
+                .map(entry -> chatMapper.pojoToDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(chatDtoList);
     }
 
     @GetMapping("/{chatId}")
