@@ -10,8 +10,7 @@ public class TestReaction extends Reaction {
 
     @Builder
     public TestReaction(UUID messageId, UUID userId, ReactionType type) {
-        super(messageId, userId);
-        super.setType(type);
+        super(messageId, userId, type);
     }
 
 

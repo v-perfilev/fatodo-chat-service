@@ -33,7 +33,7 @@ public class ChatService {
     public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findAllByUserId(userId, pageable);
         return messagePage.toList().stream()
-                .collect(ChatUtils.chatMapCollector);
+                .collect(ChatUtils.CHAT_MAP_COLLECTOR);
     }
 
     public Chat getByUserIdAndId(UUID userId, UUID chatId) {

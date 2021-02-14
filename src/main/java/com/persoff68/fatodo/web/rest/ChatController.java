@@ -1,7 +1,6 @@
 package com.persoff68.fatodo.web.rest;
 
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.model.mapper.ChatMapper;

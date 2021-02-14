@@ -49,7 +49,7 @@ public class ReactionService {
 
         ReactionId id = new ReactionId(messageId, userId);
         Reaction reaction = reactionRepository.findById(id)
-                .orElse(new Reaction(messageId, userId));
+                .orElse(new Reaction(messageId, userId, type));
         reaction.setType(type);
         reactionRepository.save(reaction);
         entityManager.refresh(message);

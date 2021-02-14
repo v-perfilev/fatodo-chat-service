@@ -38,7 +38,7 @@ public class SystemMessageService {
         // workaround needed for correct work with message repository
         try {
             Thread.sleep(10);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             // skip if error
         }
 

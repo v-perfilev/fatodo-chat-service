@@ -22,7 +22,7 @@ public class ChatUtils {
     private ChatUtils() {
     }
 
-    public static Collector<Message, ?, Map<Chat, Message>> chatMapCollector = Collectors.toMap(
+    public static final Collector<Message, ?, Map<Chat, Message>> CHAT_MAP_COLLECTOR = Collectors.toMap(
             Message::getChat,
             message -> message,
             (e1, e2) -> e1,
