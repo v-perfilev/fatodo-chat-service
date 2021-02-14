@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -32,6 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoMessageServiceApplication.class)
@@ -71,12 +73,15 @@ public class ChatControllerIT {
         memberEventRepository.deleteAll();
 
         for (int i = 0; i < 20; i++) {
-            chat1 = createIndirectChat();
+            chat1 = createChat(false);
             createMemberEvents(chat1, USER_ID_1, USER_ID_2);
         }
 
-        chat2 = createIndirectChat();
+        chat2 = createChat(false);
         createMemberEvents(chat2, USER_ID_2, USER_ID_3);
+
+        Chat directChat = createChat(true);
+        createMemberEvents(directChat, USER_ID_1, USER_ID_2);
     }
 
 
@@ -100,7 +105,7 @@ public class ChatControllerIT {
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
         List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(5);
+        assertThat(resultDTOList.size()).isEqualTo(6);
     }
 
     @Test
@@ -147,8 +152,148 @@ public class ChatControllerIT {
     }
 
 
-    private Chat createIndirectChat() {
-        Chat chat = TestChat.defaultBuilder().isDirect(false).build().toParent();
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testCreateDirect_ok() throws Exception {
+        String url = ENDPOINT + "/create-direct";
+        UUID userId = UUID.fromString(USER_ID_3);
+        String requestBody = objectMapper.writeValueAsString(userId);
+        ResultActions resultActions = mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isCreated());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
+        assertThat(resultDTO.getMembers()).contains(UUID.fromString(USER_ID_1), UUID.fromString(USER_ID_3));
+        assertThat(resultDTO.isDirect()).isTrue();
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testCreateDirect_badRequest_alreadyExists() throws Exception {
+        String url = ENDPOINT + "/create-direct";
+        UUID userId = UUID.fromString(USER_ID_2);
+        String requestBody = objectMapper.writeValueAsString(userId);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testCreateDirect_notFound() throws Exception {
+        when(userServiceClient.doesIdExist(any())).thenReturn(false);
+        String url = ENDPOINT + "/create-direct";
+        UUID userId = UUID.randomUUID();
+        String requestBody = objectMapper.writeValueAsString(userId);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testCreateDirect_unauthorized() throws Exception {
+        String url = ENDPOINT + "/create-direct";
+        UUID userId = UUID.fromString(USER_ID_2);
+        String requestBody = objectMapper.writeValueAsString(userId);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testCreateIndirect_ok() throws Exception {
+        String url = ENDPOINT + "/create-indirect";
+        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_2), UUID.fromString(USER_ID_3));
+        String requestBody = objectMapper.writeValueAsString(userIdList);
+        ResultActions resultActions = mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isCreated());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
+        assertThat(resultDTO.getMembers()).contains(
+                UUID.fromString(USER_ID_1),
+                UUID.fromString(USER_ID_2),
+                UUID.fromString(USER_ID_3));
+        assertThat(resultDTO.isDirect()).isFalse();
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testCreateIndirect_notFound() throws Exception {
+        when(userServiceClient.doesIdExist(any())).thenReturn(false);
+        String url = ENDPOINT + "/create-indirect";
+        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_2), UUID.fromString(USER_ID_3));
+        String requestBody = objectMapper.writeValueAsString(userIdList);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
+
+    @Test
+    @WithAnonymousUser
+    void testCreateIndirect_unauthorized() throws Exception {
+        String url = ENDPOINT + "/create-indirect";
+        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_2), UUID.fromString(USER_ID_3));
+        String requestBody = objectMapper.writeValueAsString(userIdList);
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testRename_ok() throws Exception {
+        String url = ENDPOINT + "/rename/" + chat1.getId().toString();
+        String requestBody = "test_name";
+        ResultActions resultActions = mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
+        assertThat(resultDTO.getId()).isEqualTo(chat1.getId());
+        assertThat(resultDTO.getTitle()).isEqualTo(requestBody);
+    }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testRename_badRequest_noPermissions() throws Exception {
+        String url = ENDPOINT + "/rename/" + chat2.getId().toString();
+        String requestBody = "test_name";
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testRename_notFound() throws Exception {
+        String url = ENDPOINT + "/rename/" + UUID.randomUUID().toString();
+        String requestBody = "test_name";
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testRename_unauthorized() throws Exception {
+        String url = ENDPOINT + "/rename/" + chat1.getId().toString();
+        String requestBody = "test_name";
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    private Chat createChat(boolean isDirect) {
+        Chat chat = TestChat.defaultBuilder().isDirect(isDirect).build().toParent();
         return chatRepository.save(chat);
     }
 

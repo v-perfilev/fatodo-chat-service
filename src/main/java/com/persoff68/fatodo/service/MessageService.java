@@ -35,7 +35,7 @@ public class MessageService {
 
     public Message sendDirect(UUID userId, UUID recipientId, String text, UUID forwardedMessageId) {
         userService.checkUserExists(recipientId);
-        Chat chat = chatService.getDirectByUserIds(userId, recipientId);
+        Chat chat = chatService.getOrCreateDirectByUserIds(userId, recipientId);
 
         Message message = Message.of(chat, userId, text, getForwardedById(userId, forwardedMessageId));
         message = messageRepository.save(message);

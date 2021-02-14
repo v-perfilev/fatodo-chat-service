@@ -4,6 +4,7 @@ import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
+import com.persoff68.fatodo.service.exception.ModelAlreadyExistsException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.ChatUtils;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,10 @@ public class ChatService {
     }
 
     public Chat createDirect(UUID firstUserId, UUID secondUserId) {
+        Chat chat = getDirectByUserIds(firstUserId, secondUserId);
+        if (chat != null) {
+            throw new ModelAlreadyExistsException();
+        }
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         return create(userIdList, true);
     }
@@ -62,7 +67,7 @@ public class ChatService {
         return chatRepository.save(chat);
     }
 
-    Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
+    Chat getOrCreateDirectByUserIds(UUID firstUserId, UUID secondUserId) {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         Supplier<Chat> createChatSupplier = () -> createDirect(firstUserId, secondUserId);
         return chatRepository.findDirectChat(userIdList)
@@ -74,6 +79,12 @@ public class ChatService {
         Chat chat = chatRepository.saveAndFlush(new Chat(isDirect));
         memberEventService.addUsersUnsafe(chat.getId(), userIdList);
         return chat;
+    }
+
+    protected Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
+        List<UUID> userIdList = List.of(firstUserId, secondUserId);
+        return chatRepository.findDirectChat(userIdList)
+                .orElse(null);
     }
 
 }
