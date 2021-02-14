@@ -47,7 +47,8 @@
         <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
         <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
-        <maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
+        <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
+        <maven-checkstyle-toolkit.version>8.40</maven-checkstyle-toolkit.version>
         <spring-cloud-contract-maven-plugin.version>3.0.0</spring-cloud-contract-maven-plugin.version>
         <!-- Plugin variables -->
         <jacoco.ut-report-folder>${project.build.directory}/jacoco/test</jacoco.ut-report-folder>
@@ -531,6 +532,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>${maven-checkstyle-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${maven-checkstyle-toolkit.version}</version>
+                        </dependency>
+                    </dependencies>
                     <configuration>
                         <configLocation>${basedir}/etc/checkstyle/checkstyle.xml</configLocation>
                         <encoding>UTF-8</encoding>
