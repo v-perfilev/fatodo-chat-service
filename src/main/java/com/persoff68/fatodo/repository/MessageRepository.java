@@ -14,7 +14,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     String UNIFIED_CHAT_USER = """
             unified as (
-                    select id, chat_id, m.user_id, m.is_stub, created_at as timestamp, null as type
+                    select id, chat_id, user_id, is_stub, created_at as timestamp, null as type
                     from ftd_chat_message
                     where chat_id = ?1
                     union
@@ -64,6 +64,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                          from validated
                          where type is null 
                            and valid = 1
+                           and is_stub = false
                         )
             """;
 
@@ -77,21 +78,17 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             """;
 
     @Query(value = "with " + UNIFIED_CHAT_USER + ", " + VALIDATED + ", " + MESSAGE_ID_ALL + """
-            select m.*
+                select m.*
                 from ftd_chat_message as m
                 where id in (select id from message_id)
-                  and m.is_stub = false
                 order by m.created_at desc 
             """, countQuery = "with " + UNIFIED_CHAT_USER + ", " + VALIDATED + ", " + MESSAGE_ID_ALL + """
-            select count(*)
-                from ftd_chat_message as m
-                where id in (select id from message_id)
-                  and m.is_stub = false
-                order by m.created_at desc 
+                select count(*) 
+                from message_id 
             """, nativeQuery = true)
     Page<Message> findAllByChatIdAndUserId(UUID chatId, UUID userId, Pageable pageable);
 
-    
+
     @Query(value = "with " + UNIFIED_USER + ", " + VALIDATED + ", " + MESSAGE_ID_LAST + """
                 select m.*
                 from ftd_chat_message as m

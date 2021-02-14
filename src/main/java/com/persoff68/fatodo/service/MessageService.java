@@ -27,6 +27,9 @@ public class MessageService {
     private final EntityManager entityManager;
 
     public List<Message> getAllByUserIdAndChatId(UUID userId, UUID chatId, Pageable pageable) {
+        Chat chat = chatService.getByUserIdAndId(userId, chatId);
+        permissionService.hasReadChatPermission(chat, userId);
+
         Page<Message> messagePage = messageRepository.findAllByChatIdAndUserId(chatId, userId, pageable);
         return messagePage.toList().stream()
                 .filter(m -> !m.isStub())
