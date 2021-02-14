@@ -15,7 +15,7 @@ import java.util.UUID;
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, UUID> {
 
-    @Query("""
+    @Query(value = """
             select c from Chat c where c.isDirect = true and c.id in
             (select e.chat.id from MemberEvent e where e.userId in ?1
             group by e.chat.id having count(e.chat.id) = 2)
