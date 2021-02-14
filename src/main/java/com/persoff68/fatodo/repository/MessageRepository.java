@@ -54,7 +54,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                                         when type like 'DELETE_CHAT' then 0
                                         else 1
                                         end)
-                                    over (partition by chat_id order by timestamp rows between current row and unbounded following) valid
+                                    over (partition by chat_id order by timestamp 
+                                    rows between current row and unbounded following) valid
                          from unified)
             """;
 
@@ -70,7 +71,9 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     String MESSAGE_ID_LAST = """
             message_id as (
-                         select distinct last_value(id) over (partition by chat_id order by timestamp rows between unbounded preceding and unbounded following) id
+                         select distinct last_value(id) 
+                            over (partition by chat_id order by timestamp 
+                            rows between unbounded preceding and unbounded following) id
                          from validated
                          where type is null
                            and valid = 1

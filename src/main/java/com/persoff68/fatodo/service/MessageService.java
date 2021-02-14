@@ -59,13 +59,12 @@ public class MessageService {
     public Message edit(UUID userId, UUID messageId, String text, UUID forwardedMessageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        Chat chat = message.getChat();
         permissionService.hasEditMessagePermission(message, userId);
 
         message.setText(text);
         message.setForwardedMessage(getForwardedById(userId, forwardedMessageId));
         message = messageRepository.save(message);
-        entityManager.refresh(chat);
+        entityManager.refresh(message.getChat());
         return message;
     }
 
