@@ -155,11 +155,9 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateDirect_ok() throws Exception {
-        String url = ENDPOINT + "/create-direct";
         UUID userId = UUID.fromString(USER_ID_3);
-        String requestBody = objectMapper.writeValueAsString(userId);
-        ResultActions resultActions = mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/create-direct/" + userId;
+        ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
@@ -170,11 +168,9 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateDirect_badRequest_alreadyExists() throws Exception {
-        String url = ENDPOINT + "/create-direct";
         UUID userId = UUID.fromString(USER_ID_2);
-        String requestBody = objectMapper.writeValueAsString(userId);
-        mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/create-direct/" + userId;
+        mvc.perform(get(url))
                 .andExpect(status().isBadRequest());
     }
 
@@ -182,22 +178,18 @@ public class ChatControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateDirect_notFound() throws Exception {
         when(userServiceClient.doesIdExist(any())).thenReturn(false);
-        String url = ENDPOINT + "/create-direct";
         UUID userId = UUID.randomUUID();
-        String requestBody = objectMapper.writeValueAsString(userId);
-        mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/create-direct/" + userId;
+        mvc.perform(get(url))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithAnonymousUser
     void testCreateDirect_unauthorized() throws Exception {
-        String url = ENDPOINT + "/create-direct";
         UUID userId = UUID.fromString(USER_ID_2);
-        String requestBody = objectMapper.writeValueAsString(userId);
-        mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/create-direct/" + userId;
+        mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
 

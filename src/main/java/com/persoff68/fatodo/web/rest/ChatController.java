@@ -61,8 +61,8 @@ public class ChatController {
         return ResponseEntity.ok(chatDTO);
     }
 
-    @PostMapping("/create-direct")
-    public ResponseEntity<ChatDTO> createDirect(@RequestBody UUID secondUserId) {
+    @GetMapping(value = "/create-direct/{secondUserId}")
+    public ResponseEntity<ChatDTO> createDirect(@PathVariable UUID secondUserId) {
         UUID firstUserId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Chat chat = chatService.createDirect(firstUserId, secondUserId);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
