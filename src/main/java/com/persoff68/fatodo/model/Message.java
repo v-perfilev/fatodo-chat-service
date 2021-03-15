@@ -25,7 +25,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@ToString(exclude = "chat")
+@ToString(exclude = {"chat"})
 public class Message extends AbstractAuditingModel {
 
     @ManyToOne
@@ -42,10 +42,10 @@ public class Message extends AbstractAuditingModel {
     private boolean isEvent = false;
     private boolean isStub = false;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "messageId", targetEntity = Status.class)
     private List<Status> statuses = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "messageId", targetEntity = Reaction.class)
     private List<Reaction> reactions = new ArrayList<>();
 
     public static Message of(Chat chat, UUID userId, String text, Message forwardedMessage) {

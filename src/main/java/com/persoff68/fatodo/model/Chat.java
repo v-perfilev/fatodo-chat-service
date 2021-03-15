@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
@@ -24,10 +25,10 @@ public class Chat extends AbstractAuditingModel {
 
     private boolean isDirect = false;
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "chat")
     private List<MemberEvent> memberEvents = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "chat")
     private List<Message> messages = new ArrayList<>();
 
 
