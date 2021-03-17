@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -17,7 +18,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class WebSocketInterceptor implements ChannelInterceptor {
+public class WebSocketFilter implements ChannelInterceptor {
 
     private final AppProperties appProperties;
     private final JwtTokenProvider jwtTokenProvider;
@@ -28,9 +29,9 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
             String jwt = getJwtFromAccessor(accessor);
             boolean hasJwt = StringUtils.hasText(jwt) && jwtTokenProvider.validateJwt(jwt);
-
             if (hasJwt) {
                 UsernamePasswordAuthenticationToken authentication = jwtTokenProvider.getAuthenticationFromJwt(jwt);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
                 accessor.setUser(authentication);
             }
         }

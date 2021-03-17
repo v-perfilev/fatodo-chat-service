@@ -1,6 +1,6 @@
 package com.persoff68.fatodo.config;
 
-import com.persoff68.fatodo.security.filter.WebSocketInterceptor;
+import com.persoff68.fatodo.security.filter.WebSocketFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -17,12 +17,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
-    private final WebSocketInterceptor webSocketInterceptor;
+    private final WebSocketFilter webSocketInterceptor;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
+        config.enableSimpleBroker("/chat", "/user");
         config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user");
     }
 
     @Override
