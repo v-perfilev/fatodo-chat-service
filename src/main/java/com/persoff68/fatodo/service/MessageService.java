@@ -25,6 +25,7 @@ public class MessageService {
     private final UserService userService;
     private final PermissionService permissionService;
     private final EntityManager entityManager;
+    private final WsEventService wsEventService;
 
     public List<Message> getAllByUserIdAndChatId(UUID userId, UUID chatId, Pageable pageable) {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
@@ -53,6 +54,9 @@ public class MessageService {
         Message message = Message.of(chat, userId, text, getForwardedById(userId, forwardedMessageId));
         message = messageRepository.save(message);
         entityManager.refresh(chat);
+
+        wsEventService.sendChatEvent("persoff68", chat);
+
         return message;
     }
 
