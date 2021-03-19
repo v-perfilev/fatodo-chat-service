@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 @Component
@@ -24,7 +25,7 @@ public class WebSocketFilter implements ChannelInterceptor {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+    public Message<?> preSend(@Nonnull Message<?> message, @Nonnull MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
             String jwt = getJwtFromAccessor(accessor);
