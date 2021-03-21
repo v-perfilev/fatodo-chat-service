@@ -25,7 +25,7 @@ public class MessageService {
     private final UserService userService;
     private final PermissionService permissionService;
     private final EntityManager entityManager;
-    private final WsEventService wsEventService;
+    private final WsService wsService;
 
     public List<Message> getAllByUserIdAndChatId(UUID userId, UUID chatId, Pageable pageable) {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
@@ -55,8 +55,7 @@ public class MessageService {
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 
-        wsEventService.sendChatEvent("persoff68", chat);
-
+        wsService.sendMessageEvent(chat, message);
         return message;
     }
 
@@ -69,6 +68,8 @@ public class MessageService {
         message.setForwardedMessage(getForwardedById(userId, forwardedMessageId));
         message = messageRepository.save(message);
         entityManager.refresh(message.getChat());
+
+        wsService.sendMessageEvent(message.getChat(), message);
         return message;
     }
 
@@ -80,6 +81,8 @@ public class MessageService {
 
         messageRepository.delete(message);
         entityManager.refresh(chat);
+
+        // TODO send delete message event
     }
 
     private Message getForwardedById(UUID userId, UUID messageId) {
