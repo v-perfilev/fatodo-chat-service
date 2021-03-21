@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.model.mapper;
 
+import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
@@ -11,6 +12,7 @@ import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring",
@@ -30,6 +32,9 @@ public abstract class MessageMapper {
         if (message == null) {
             return null;
         }
+        Chat chat = message.getChat();
+        UUID chatId = chat != null ? chat.getId() : null;
+
         MessageDTO forwardedMessageDTO = pojoToDTO(message.getForwardedMessage());
         List<ReactionDTO> reactionDTOList = message.getReactions().stream()
                 .map(reactionMapper::pojoToDTO)
@@ -38,6 +43,7 @@ public abstract class MessageMapper {
                 .map(statusMapper::pojoToDTO)
                 .collect(Collectors.toList());
         MessageDTO dto = defaultPojoToDTO(message);
+        dto.setChatId(chatId);
         dto.setForwardedMessage(forwardedMessageDTO);
         dto.setReactions(reactionDTOList);
         dto.setStatuses(statusDTOList);
