@@ -9,6 +9,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MessageDTO extends AbstractAuditingDTO {
+    private UUID id;
 
     private UUID chatId;
     private UUID userId;
