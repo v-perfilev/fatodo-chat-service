@@ -1,6 +1,6 @@
 package com.persoff68.fatodo.model.dto;
 
-import com.persoff68.fatodo.model.StatusType;
+import com.persoff68.fatodo.model.constant.StatusType;
 import lombok.Data;
 
 import java.io.Serializable;

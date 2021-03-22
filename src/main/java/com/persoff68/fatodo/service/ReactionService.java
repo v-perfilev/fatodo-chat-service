@@ -3,7 +3,7 @@ package com.persoff68.fatodo.service;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.Reaction;
 import com.persoff68.fatodo.model.ReactionId;
-import com.persoff68.fatodo.model.ReactionType;
+import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;

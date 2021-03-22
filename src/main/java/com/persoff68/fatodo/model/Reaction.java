@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.model;
 
+import com.persoff68.fatodo.model.constant.ReactionType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

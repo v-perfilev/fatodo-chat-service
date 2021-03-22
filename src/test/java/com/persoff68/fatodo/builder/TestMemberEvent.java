@@ -2,7 +2,7 @@ package com.persoff68.fatodo.builder;
 
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
-import com.persoff68.fatodo.model.MemberEventType;
+import com.persoff68.fatodo.model.constant.MemberEventType;
 import lombok.Builder;
 
 import javax.validation.constraints.NotNull;

@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.builder;
 
 import com.persoff68.fatodo.model.Status;
-import com.persoff68.fatodo.model.StatusType;
+import com.persoff68.fatodo.model.constant.StatusType;
 import lombok.Builder;
 
 import java.util.UUID;

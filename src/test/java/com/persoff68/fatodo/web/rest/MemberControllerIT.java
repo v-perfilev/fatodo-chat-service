@@ -8,7 +8,7 @@ import com.persoff68.fatodo.builder.TestMemberEvent;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
-import com.persoff68.fatodo.model.MemberEventType;
+import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import org.junit.jupiter.api.BeforeEach;

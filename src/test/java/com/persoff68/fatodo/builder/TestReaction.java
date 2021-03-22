@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.builder;
 
 import com.persoff68.fatodo.model.Reaction;
-import com.persoff68.fatodo.model.ReactionType;
+import com.persoff68.fatodo.model.constant.ReactionType;
 import lombok.Builder;
 
 import java.util.UUID;
