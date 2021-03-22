@@ -28,6 +28,7 @@ public class MemberEventService {
     private final UserService userService;
     private final PermissionService permissionService;
     private final EntityManager entityManager;
+    private final WsService wsService;
 
     public void addUsersUnsafe(UUID chatId, List<UUID> userIdList) {
         userService.checkUsersExist(userIdList);
@@ -67,6 +68,8 @@ public class MemberEventService {
         entityManager.refresh(chat);
 
         systemMessageService.createStubMessages(chatId, userIdList);
+
+        wsService.sendChatUpdateEvent(chat);
     }
 
     public void removeUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
@@ -89,6 +92,8 @@ public class MemberEventService {
         memberEventRepository.saveAll(memberToDeleteList);
         memberEventRepository.flush();
         entityManager.refresh(chat);
+
+        wsService.sendChatUpdateEvent(chat);
     }
 
     public void leaveChat(UUID userId, UUID chatId) {
@@ -100,6 +105,8 @@ public class MemberEventService {
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.DELETE_MEMBER);
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
+
+        wsService.sendChatUpdateEvent(chat);
     }
 
     public void clearChat(UUID userId, UUID chatId) {
@@ -124,6 +131,8 @@ public class MemberEventService {
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.DELETE_CHAT);
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
+
+        wsService.sendChatDeleteEvent(chat);
     }
 
 }

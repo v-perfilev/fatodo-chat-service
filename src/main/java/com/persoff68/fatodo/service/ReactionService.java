@@ -23,6 +23,7 @@ public class ReactionService {
     private final MessageRepository messageRepository;
     private final PermissionService permissionService;
     private final EntityManager entityManager;
+    private final WsService wsService;
 
     public void setLike(UUID userId, UUID messageId) {
         set(userId, messageId, ReactionType.LIKE);
@@ -40,6 +41,8 @@ public class ReactionService {
         ReactionId id = new ReactionId(messageId, userId);
         reactionRepository.deleteById(id);
         entityManager.refresh(message);
+
+        wsService.sendMessageUpdateEvent(message);
     }
 
     protected void set(UUID userId, UUID messageId, ReactionType type) {
@@ -53,6 +56,8 @@ public class ReactionService {
         reaction.setType(type);
         reactionRepository.save(reaction);
         entityManager.refresh(message);
+
+        wsService.sendMessageUpdateEvent(message);
     }
 
 }

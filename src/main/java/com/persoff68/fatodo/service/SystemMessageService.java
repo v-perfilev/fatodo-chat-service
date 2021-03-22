@@ -47,4 +47,27 @@ public class SystemMessageService {
         entityManager.refresh(chat);
     }
 
+    public void createEventMessages(UUID chatId, List<UUID> userIdList) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(ModelNotFoundException::new);
+
+        List<Message> messageList = userIdList != null && !userIdList.isEmpty()
+                ? userIdList.stream()
+                .distinct()
+                .map(id -> Message.stub(chat, id))
+                .collect(Collectors.toList())
+                : Collections.emptyList();
+
+        // workaround needed for correct work with message repository
+        try {
+            Thread.sleep(10);
+        } catch (Exception e) {
+            // skip if error
+        }
+
+        messageRepository.saveAll(messageList);
+        messageRepository.flush();
+        entityManager.refresh(chat);
+    }
+
 }

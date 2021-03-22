@@ -39,6 +39,7 @@ public class Message extends AbstractAuditingModel {
     @OneToOne
     private Message forwardedMessage;
 
+    private boolean isDeleted = false;
     private boolean isEvent = false;
     private boolean isStub = false;
 

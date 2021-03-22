@@ -44,6 +44,8 @@ public class MessageService {
         Message message = Message.of(chat, userId, text, getForwardedById(userId, forwardedMessageId));
         message = messageRepository.save(message);
         entityManager.refresh(chat);
+
+        wsService.sendMessageNewEvent(message);
         return message;
     }
 
@@ -55,7 +57,7 @@ public class MessageService {
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 
-        wsService.sendMessageEvent(chat, message);
+        wsService.sendMessageNewEvent(message);
         return message;
     }
 
@@ -69,20 +71,37 @@ public class MessageService {
         message = messageRepository.save(message);
         entityManager.refresh(message.getChat());
 
-        wsService.sendMessageEvent(message.getChat(), message);
+        wsService.sendMessageUpdateEvent(message);
+        if (isMessageLastInChat(message)) {
+            wsService.sendChatLastMessageEvent(message);
+        }
+
         return message;
     }
 
     public void delete(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        Chat chat = message.getChat();
         permissionService.hasEditMessagePermission(message, userId);
 
-        messageRepository.delete(message);
-        entityManager.refresh(chat);
+        message.setText(null);
+        message.setForwardedMessage(null);
+        message.setDeleted(true);
+        message = messageRepository.save(message);
+        entityManager.refresh(message.getChat());
 
-        // TODO send delete message event
+        wsService.sendMessageDeleteEvent(message);
+
+        wsService.sendMessageUpdateEvent(message);
+        if (isMessageLastInChat(message)) {
+            wsService.sendChatLastMessageEvent(message);
+        }
+    }
+
+    public boolean isMessageLastInChat(Message message) {
+        UUID messageId = message.getId();
+        UUID chatId = message.getChat() != null ? message.getChat().getId() : null;
+        return messageId != null && chatId != null && messageRepository.isMessageIdLastInChat(messageId, chatId);
     }
 
     private Message getForwardedById(UUID userId, UUID messageId) {

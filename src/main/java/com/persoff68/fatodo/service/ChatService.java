@@ -29,6 +29,7 @@ public class ChatService {
     private final UserService userService;
     private final MemberEventService memberEventService;
     private final PermissionService permissionService;
+    private final WsService wsService;
 
     public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findAllByUserId(userId, pageable);
@@ -64,7 +65,10 @@ public class ChatService {
         permissionService.hasRenameChatPermission(chat, userId);
 
         chat.setTitle(title);
-        return chatRepository.save(chat);
+        chat = chatRepository.save(chat);
+
+        wsService.sendChatUpdateEvent(chat);
+        return chat;
     }
 
     Chat getOrCreateDirectByUserIds(UUID firstUserId, UUID secondUserId) {
@@ -78,6 +82,8 @@ public class ChatService {
         userService.checkUsersExist(userIdList);
         Chat chat = chatRepository.saveAndFlush(new Chat(isDirect));
         memberEventService.addUsersUnsafe(chat.getId(), userIdList);
+
+        wsService.sendChatNewEvent(chat);
         return chat;
     }
 

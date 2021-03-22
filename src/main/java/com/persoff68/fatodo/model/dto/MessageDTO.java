@@ -15,6 +15,7 @@ public class MessageDTO extends AbstractAuditingDTO {
     private String text;
     private MessageDTO forwardedMessage;
 
+    private boolean isDeleted;
     private boolean isEvent;
 
     private List<StatusDTO> statuses;

@@ -23,6 +23,7 @@ public class StatusService {
     private final MessageRepository messageRepository;
     private final PermissionService permissionService;
     private final EntityManager entityManager;
+    private final WsService wsService;
 
     public void markAsRead(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
@@ -35,6 +36,8 @@ public class StatusService {
             Status status = new Status(messageId, userId, StatusType.READ);
             statusRepository.save(status);
             entityManager.refresh(message);
+
+            wsService.sendMessageUpdateEvent(message);
         }
     }
 

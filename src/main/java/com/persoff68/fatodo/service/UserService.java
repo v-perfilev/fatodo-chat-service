@@ -1,7 +1,9 @@
 package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.client.UserServiceClient;
+import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
+import com.persoff68.fatodo.service.util.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,11 @@ public class UserService {
                 throw new ModelNotFoundException();
             }
         });
+    }
+
+    public List<String> getUsernamesFromChat(Chat chat) {
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
+        return userServiceClient.getAllUsernamesByIds(userIdList);
     }
 
 }

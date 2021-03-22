@@ -103,4 +103,10 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             """, nativeQuery = true)
     Page<Message> findAllByUserId(UUID userId, Pageable pageable);
 
+    @Query(value = """
+            select if(m.id = ?1, true, false) from ftd_chat_message as m 
+            where m.chat_id = ?2 and m.is_stub = false order by m.created_at desc limit 1
+            """, nativeQuery = true)
+    boolean isMessageIdLastInChat(UUID id, UUID chatId);
+
 }
