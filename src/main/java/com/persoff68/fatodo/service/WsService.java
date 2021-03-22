@@ -46,10 +46,6 @@ public class WsService {
         sendMessageEvent(message, WsDestination.MESSAGE_UPDATE.getValue());
     }
 
-    public void sendMessageDeleteEvent(Message message) {
-        sendMessageEvent(message, WsDestination.MESSAGE_DELETE.getValue());
-    }
-
 
     private void sendChatEvent(Chat chat, String destination) {
         List<String> usernameList = userService.getUsernamesFromChat(chat);

@@ -90,8 +90,6 @@ public class MessageService {
         message = messageRepository.save(message);
         entityManager.refresh(message.getChat());
 
-        wsService.sendMessageDeleteEvent(message);
-
         wsService.sendMessageUpdateEvent(message);
         if (isMessageLastInChat(message)) {
             wsService.sendChatLastMessageEvent(message);
