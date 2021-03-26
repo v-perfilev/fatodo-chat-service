@@ -46,6 +46,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         wsService.sendMessageNewEvent(message);
+        wsService.sendChatLastMessageEvent(chat, message);
         return message;
     }
 
@@ -58,6 +59,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         wsService.sendMessageNewEvent(message);
+        wsService.sendChatLastMessageEvent(chat, message);
         return message;
     }
 
@@ -69,11 +71,12 @@ public class MessageService {
         message.setText(text);
         message.setForwardedMessage(getForwardedById(userId, forwardedMessageId));
         message = messageRepository.save(message);
-        entityManager.refresh(message.getChat());
+        Chat chat = message.getChat();
+        entityManager.refresh(chat);
 
         wsService.sendMessageUpdateEvent(message);
         if (isMessageLastInChat(message)) {
-            wsService.sendChatLastMessageEvent(message);
+            wsService.sendChatLastMessageEvent(chat, message);
         }
 
         return message;
@@ -88,11 +91,12 @@ public class MessageService {
         message.setForwardedMessage(null);
         message.setDeleted(true);
         message = messageRepository.save(message);
-        entityManager.refresh(message.getChat());
+        Chat chat = message.getChat();
+        entityManager.refresh(chat);
 
         wsService.sendMessageUpdateEvent(message);
         if (isMessageLastInChat(message)) {
-            wsService.sendChatLastMessageEvent(message);
+            wsService.sendChatLastMessageEvent(chat, message);
         }
     }
 
