@@ -30,10 +30,6 @@ public class WsService {
         sendChatEvent(chat, WsDestination.CHAT_UPDATE.getValue());
     }
 
-    public void sendChatDeleteEvent(Chat chat) {
-        sendChatEvent(chat, WsDestination.CHAT_DELETE.getValue());
-    }
-
     public void sendChatLastMessageEvent(Chat chat, Message message) {
         sendChatWithMessageEvent(chat, message, WsDestination.CHAT_LAST_MESSAGE.getValue());
     }

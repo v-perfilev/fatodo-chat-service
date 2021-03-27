@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.exception.ModelAlreadyExistsException;
@@ -30,6 +31,7 @@ public class ChatService {
     private final MemberEventService memberEventService;
     private final PermissionService permissionService;
     private final WsService wsService;
+    private final SystemMessageService systemMessageService;
 
     public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findAllByUserId(userId, pageable);
@@ -50,13 +52,29 @@ public class ChatService {
             throw new ModelAlreadyExistsException();
         }
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
-        return create(userIdList, true);
+        Chat createdChat = create(userIdList, true);
+
+        systemMessageService.createIdEventMessage(
+                firstUserId,
+                createdChat.getId(),
+                EventMessageType.CREATE_DIRECT_CHAT,
+                secondUserId);
+
+        return createdChat;
     }
 
     public Chat createIndirect(UUID userId, List<UUID> userIdList) {
         List<UUID> allUserIdList = new ArrayList<>(userIdList);
         allUserIdList.add(userId);
-        return create(allUserIdList, false);
+        Chat createdChat = create(allUserIdList, false);
+
+        systemMessageService.createIdListEventMessage(
+                userId,
+                createdChat.getId(),
+                EventMessageType.CREATE_CHAT,
+                userIdList);
+
+        return createdChat;
     }
 
     public Chat rename(UUID userId, UUID chatId, String title) {
@@ -68,6 +86,8 @@ public class ChatService {
         chat = chatRepository.save(chat);
 
         wsService.sendChatUpdateEvent(chat);
+        systemMessageService.createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title);
+
         return chat;
     }
 

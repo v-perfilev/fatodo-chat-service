@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
+import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
@@ -68,8 +69,13 @@ public class MemberEventService {
         entityManager.refresh(chat);
 
         systemMessageService.createStubMessages(chatId, userIdList);
-
         wsService.sendChatUpdateEvent(chat);
+        systemMessageService.createIdListEventMessage(
+                userId,
+                chatId,
+                EventMessageType.ADD_MEMBERS,
+                userIdList
+        );
     }
 
     public void removeUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
@@ -94,6 +100,12 @@ public class MemberEventService {
         entityManager.refresh(chat);
 
         wsService.sendChatUpdateEvent(chat);
+        systemMessageService.createIdListEventMessage(
+                userId,
+                chatId,
+                EventMessageType.DELETE_MEMBERS,
+                userIdList
+        );
     }
 
     public void leaveChat(UUID userId, UUID chatId) {
@@ -132,7 +144,8 @@ public class MemberEventService {
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
 
-        wsService.sendChatDeleteEvent(chat);
+        wsService.sendChatUpdateEvent(chat);
+        systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
     }
 
 }
