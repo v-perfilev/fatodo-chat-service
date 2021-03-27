@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +17,9 @@ public class MessageDTO extends AbstractAuditingDTO {
     private String text;
     private MessageDTO forwardedMessage;
 
+    @JsonProperty("isDeleted")
     private boolean isDeleted;
+    @JsonProperty("isEvent")
     private boolean isEvent;
 
     private List<StatusDTO> statuses;

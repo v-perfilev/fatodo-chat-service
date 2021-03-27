@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -54,11 +55,12 @@ public class ChatService {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         Chat createdChat = create(userIdList, true);
 
-        systemMessageService.createIdEventMessage(
+        systemMessageService.createIdsEventMessage(
                 firstUserId,
                 createdChat.getId(),
                 EventMessageType.CREATE_DIRECT_CHAT,
-                secondUserId);
+                Collections.singletonList(secondUserId)
+        );
 
         return createdChat;
     }
@@ -68,11 +70,12 @@ public class ChatService {
         allUserIdList.add(userId);
         Chat createdChat = create(allUserIdList, false);
 
-        systemMessageService.createIdListEventMessage(
+        systemMessageService.createIdsEventMessage(
                 userId,
                 createdChat.getId(),
                 EventMessageType.CREATE_CHAT,
-                userIdList);
+                userIdList
+        );
 
         return createdChat;
     }

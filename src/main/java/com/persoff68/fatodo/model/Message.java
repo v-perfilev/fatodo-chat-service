@@ -1,7 +1,5 @@
 package com.persoff68.fatodo.model;
 
-import com.google.common.collect.Lists;
-import com.persoff68.fatodo.model.constant.EventMessageType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -66,21 +64,13 @@ public class Message extends AbstractAuditingModel {
         return message;
     }
 
-    public static Message event(Chat chat, UUID userId, EventMessageType type, List<String> params) {
+    public static Message event(Chat chat, UUID userId, String text) {
         Message message = new Message();
         message.chat = chat;
         message.userId = userId;
-        message.text = buildEventText(type, params);
+        message.text = text;
         message.isEvent = true;
         return message;
-    }
-
-    public static String buildEventText(EventMessageType type, List<String> params) {
-        List<String> textList = Lists.newArrayList(type.toString());
-        if (params != null) {
-            textList.addAll(params);
-        }
-        return String.join(",", textList);
     }
 
 }

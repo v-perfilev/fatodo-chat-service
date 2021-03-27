@@ -70,7 +70,7 @@ public class MemberEventService {
 
         systemMessageService.createStubMessages(chatId, userIdList);
         wsService.sendChatUpdateEvent(chat);
-        systemMessageService.createIdListEventMessage(
+        systemMessageService.createIdsEventMessage(
                 userId,
                 chatId,
                 EventMessageType.ADD_MEMBERS,
@@ -100,7 +100,7 @@ public class MemberEventService {
         entityManager.refresh(chat);
 
         wsService.sendChatUpdateEvent(chat);
-        systemMessageService.createIdListEventMessage(
+        systemMessageService.createIdsEventMessage(
                 userId,
                 chatId,
                 EventMessageType.DELETE_MEMBERS,
