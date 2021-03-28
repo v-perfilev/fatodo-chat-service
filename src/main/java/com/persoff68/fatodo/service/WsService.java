@@ -32,8 +32,12 @@ public class WsService {
         sendChatEvent(chat, WsDestination.CHAT_UPDATE.getValue());
     }
 
-    public void sendChatLastMessageEvent(Chat chat, Message message) {
-        sendChatWithMessageEvent(chat, message, WsDestination.CHAT_LAST_MESSAGE.getValue());
+    public void sendChatLastMessageEvent(Message message) {
+        sendChatWithMessageEvent(message, WsDestination.CHAT_LAST_MESSAGE.getValue());
+    }
+
+    public void sendChatLastMessageUpdateEvent(Message message) {
+        sendChatWithMessageEvent(message, WsDestination.CHAT_LAST_MESSAGE_UPDATE.getValue());
     }
 
     public void sendMessageNewEvent(Message message) {
@@ -59,9 +63,9 @@ public class WsService {
         usernameList.forEach(username -> messagingTemplate.convertAndSendToUser(username, destination, chatDTO));
     }
 
-    private void sendChatWithMessageEvent(Chat chat, Message lastMessage, String destination) {
-        List<String> usernameList = userService.getUsernamesFromChat(chat);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat, lastMessage);
+    private void sendChatWithMessageEvent(Message lastMessage, String destination) {
+        List<String> usernameList = userService.getUsernamesFromChat(lastMessage.getChat());
+        ChatDTO chatDTO = chatMapper.pojoToDTO(lastMessage.getChat(), lastMessage);
         usernameList.forEach(username -> messagingTemplate.convertAndSendToUser(username, destination, chatDTO));
     }
 

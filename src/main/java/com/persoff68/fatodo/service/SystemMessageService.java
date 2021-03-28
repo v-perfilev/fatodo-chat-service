@@ -88,7 +88,7 @@ public class SystemMessageService {
             entityManager.refresh(chat);
 
             wsService.sendMessageNewEvent(message);
-            wsService.sendChatLastMessageEvent(chat, message);
+            wsService.sendChatLastMessageEvent(message);
         } catch (IOException e) {
             log.error(e.getMessage());
         }

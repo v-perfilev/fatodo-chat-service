@@ -85,4 +85,11 @@ public class ChatController {
         return ResponseEntity.ok(chatDTO);
     }
 
+    @GetMapping("/unread-messages-map")
+    public ResponseEntity<Map<UUID, Integer>> getUnreadMessagesMap() {
+        UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
+        Map<UUID, Integer> unreadMessagesMap = chatService.getUnreadMessagesMap(userId);
+        return ResponseEntity.ok(unreadMessagesMap);
+    }
+
 }
