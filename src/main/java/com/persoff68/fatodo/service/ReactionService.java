@@ -42,7 +42,7 @@ public class ReactionService {
         reactionRepository.deleteById(id);
         entityManager.refresh(message);
 
-        wsService.sendMessageUpdateEvent(message);
+        wsService.sendMessageReactionEvent(message);
     }
 
     protected void set(UUID userId, UUID messageId, ReactionType type) {
@@ -54,10 +54,10 @@ public class ReactionService {
         Reaction reaction = reactionRepository.findById(id)
                 .orElse(new Reaction(messageId, userId, type));
         reaction.setType(type);
-        reactionRepository.save(reaction);
+        reactionRepository.saveAndFlush(reaction);
         entityManager.refresh(message);
 
-        wsService.sendMessageUpdateEvent(message);
+        wsService.sendMessageReactionEvent(message);
     }
 
 }

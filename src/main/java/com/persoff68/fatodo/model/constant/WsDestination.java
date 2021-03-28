@@ -5,7 +5,9 @@ public enum WsDestination {
     CHAT_UPDATE("/chat/update"),
     CHAT_LAST_MESSAGE("/chat/last-message"),
     MESSAGE_NEW("/message/new"),
-    MESSAGE_UPDATE("/message/update");
+    MESSAGE_UPDATE("/message/update"),
+    MESSAGE_STATUS("/message/status"),
+    MESSAGE_REACTION("/message/reaction");
 
     private final String value;
 

@@ -34,10 +34,10 @@ public class StatusService {
         boolean statusExists = statusRepository.existsById(id);
         if (!statusExists) {
             Status status = new Status(messageId, userId, StatusType.READ);
-            statusRepository.save(status);
+            statusRepository.saveAndFlush(status);
             entityManager.refresh(message);
 
-            wsService.sendMessageUpdateEvent(message);
+            wsService.sendMessageStatusEvent(message);
         }
     }
 
