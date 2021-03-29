@@ -1,11 +1,13 @@
 package com.persoff68.fatodo.service;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.persoff68.fatodo.model.AbstractModel;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
-import com.persoff68.fatodo.repository.projection.ChatMessagesStats;
 import com.persoff68.fatodo.service.exception.ModelAlreadyExistsException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.ChatUtils;
@@ -17,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -118,13 +119,9 @@ public class ChatService {
                 .orElse(null);
     }
 
-    public Map<UUID, Integer> getUnreadMessagesMap(UUID userId) {
-        List<ChatMessagesStats> unreadMessageCountList = messageRepository.findAllUnreadMessages(userId);
-        Map<UUID, Integer> unreadMessagesMap = new HashMap<>();
-        unreadMessageCountList.forEach(stats -> {
-            UUID chatId = UUID.nameUUIDFromBytes(stats.getChatId());
-            unreadMessagesMap.put(chatId, stats.getMessagesCount());
-        });
-        return unreadMessagesMap;
+    public Multimap<UUID, UUID> getUnreadMessagesMap(UUID userId) {
+        List<Message> unreadMessageList = messageRepository.findAllUnreadMessages(userId);
+        Multimap<UUID, Message> unreadMessageMultimap = Multimaps.index(unreadMessageList, m -> m.getChat().getId());
+        return Multimaps.transformValues(unreadMessageMultimap, AbstractModel::getId);
     }
 }

@@ -151,11 +151,10 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     @Query(value = "with "
             + UNIFIED_ALL_UNREAD_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + UNREAD_MESSAGE_IDS + """
-                select m.chat_id as chatId, count(*) as messagesCount
+                select m.*
                 from ftd_chat_message as m
                 where id in (select id from message_id)
-                group by m.chat_id
             """, nativeQuery = true)
-    List<ChatMessagesStats> findAllUnreadMessages(UUID userId);
+    List<Message> findAllUnreadMessages(UUID userId);
 
 }

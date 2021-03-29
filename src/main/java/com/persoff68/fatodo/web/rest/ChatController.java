@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.web.rest;
 
+import com.google.common.collect.Multimap;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.ChatDTO;
@@ -86,10 +87,10 @@ public class ChatController {
     }
 
     @GetMapping("/unread-messages-map")
-    public ResponseEntity<Map<UUID, Integer>> getUnreadMessagesMap() {
+    public ResponseEntity<Multimap<UUID, UUID>> getUnreadMessagesMap() {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Map<UUID, Integer> unreadMessagesMap = chatService.getUnreadMessagesMap(userId);
-        return ResponseEntity.ok(unreadMessagesMap);
+        Multimap<UUID, UUID> unreadMessageIdMultimap = chatService.getUnreadMessagesMap(userId);
+        return ResponseEntity.ok(unreadMessageIdMultimap);
     }
 
 }
