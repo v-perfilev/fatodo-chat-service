@@ -121,7 +121,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                 select m.*
                 from ftd_chat_message as m
                 where id in (select id from message_id)
-                order by m.created_at 
+                order by m.created_at desc 
             """, countQuery = "with "
             + UNIFIED_ONE_CHAT_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + MESSAGE_IDS + """
                 select count(*) 
