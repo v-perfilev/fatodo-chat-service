@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,7 +57,8 @@ public class MessageController {
     }
 
     @PostMapping("/direct/{recipientId}")
-    public ResponseEntity<MessageDTO> sendDirect(@PathVariable UUID recipientId, @RequestBody MessageVM messageVM) {
+    public ResponseEntity<MessageDTO> sendDirect(@PathVariable UUID recipientId,
+                                                 @Valid @RequestBody MessageVM messageVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Message message = messageService
                 .sendDirect(userId, recipientId, messageVM.getText(), messageVM.getForwardedMessageId());
@@ -65,7 +67,8 @@ public class MessageController {
     }
 
     @PostMapping("/{chatId}")
-    public ResponseEntity<MessageDTO> send(@PathVariable UUID chatId, @RequestBody MessageVM messageVM) {
+    public ResponseEntity<MessageDTO> send(@PathVariable UUID chatId,
+                                           @Valid @RequestBody MessageVM messageVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Message message = messageService
                 .send(userId, chatId, messageVM.getText(), messageVM.getForwardedMessageId());
@@ -74,7 +77,8 @@ public class MessageController {
     }
 
     @PutMapping("/{messageId}")
-    public ResponseEntity<MessageDTO> edit(@PathVariable UUID messageId, @RequestBody MessageVM messageVM) {
+    public ResponseEntity<MessageDTO> edit(@PathVariable UUID messageId,
+                                           @Valid @RequestBody MessageVM messageVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Message message = messageService
                 .edit(userId, messageId, messageVM.getText(), messageVM.getForwardedMessageId());
