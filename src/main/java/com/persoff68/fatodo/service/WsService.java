@@ -1,90 +1,87 @@
 package com.persoff68.fatodo.service;
 
+import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
-import com.persoff68.fatodo.model.constant.WsDestination;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
+import com.persoff68.fatodo.model.dto.WsChatEventDTO;
+import com.persoff68.fatodo.model.dto.WsMessageEventDTO;
+import com.persoff68.fatodo.model.dto.WsReactionsEventDTO;
+import com.persoff68.fatodo.model.dto.WsStatusesEventDTO;
 import com.persoff68.fatodo.model.mapper.ChatMapper;
 import com.persoff68.fatodo.model.mapper.MessageMapper;
+import com.persoff68.fatodo.service.util.ChatUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class WsService {
 
-    private final UserService userService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final WsServiceClient wsServiceClient;
     private final ChatMapper chatMapper;
     private final MessageMapper messageMapper;
 
     public void sendChatNewEvent(Chat chat) {
-        sendChatEvent(chat, WsDestination.CHAT_NEW.getValue());
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
+        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
+        wsServiceClient.sendChatNewEvent(eventDTO);
     }
 
     public void sendChatUpdateEvent(Chat chat) {
-        sendChatEvent(chat, WsDestination.CHAT_UPDATE.getValue());
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
+        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
+        wsServiceClient.sendChatUpdateEvent(eventDTO);
     }
 
     public void sendChatLastMessageEvent(Message message) {
-        sendChatWithMessageEvent(message, WsDestination.CHAT_LAST_MESSAGE.getValue());
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
+        ChatDTO chatDTO = chatMapper.pojoToDTO(message.getChat(), message);
+        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
+        wsServiceClient.sendChatLastMessageEvent(eventDTO);
     }
 
     public void sendChatLastMessageUpdateEvent(Message message) {
-        sendChatWithMessageEvent(message, WsDestination.CHAT_LAST_MESSAGE_UPDATE.getValue());
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
+        ChatDTO chatDTO = chatMapper.pojoToDTO(message.getChat(), message);
+        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
+        wsServiceClient.sendChatLastMessageUpdateEvent(eventDTO);
     }
 
     public void sendMessageNewEvent(Message message) {
-        sendMessageEvent(message, WsDestination.MESSAGE_NEW.getValue());
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
+        MessageDTO messageDTO = messageMapper.pojoToDTO(message);
+        WsMessageEventDTO eventDTO = new WsMessageEventDTO(userIdList, messageDTO);
+        wsServiceClient.sendMessageNewEvent(eventDTO);
     }
 
     public void sendMessageUpdateEvent(Message message) {
-        sendMessageEvent(message, WsDestination.MESSAGE_UPDATE.getValue());
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
+        MessageDTO messageDTO = messageMapper.pojoToDTO(message);
+        WsMessageEventDTO eventDTO = new WsMessageEventDTO(userIdList, messageDTO);
+        wsServiceClient.sendMessageUpdateEvent(eventDTO);
     }
 
     public void sendMessageStatusEvent(Message message) {
-        sendStatusEvent(message, WsDestination.MESSAGE_STATUS.getValue());
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
+        StatusesDTO statusesDTO = messageMapper.pojoToStatusesDTO(message);
+        WsStatusesEventDTO eventDTO = new WsStatusesEventDTO(userIdList, statusesDTO);
+        wsServiceClient.sendStatusesEvent(eventDTO);
     }
 
     public void sendMessageReactionEvent(Message message) {
-        sendReactionEvent(message, WsDestination.MESSAGE_REACTION.getValue());
-    }
-
-
-    private void sendChatEvent(Chat chat, String destination) {
-        List<String> usernameList = userService.getUsernamesFromChat(chat);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
-        usernameList.forEach(username -> messagingTemplate.convertAndSendToUser(username, destination, chatDTO));
-    }
-
-    private void sendChatWithMessageEvent(Message lastMessage, String destination) {
-        List<String> usernameList = userService.getUsernamesFromChat(lastMessage.getChat());
-        ChatDTO chatDTO = chatMapper.pojoToDTO(lastMessage.getChat(), lastMessage);
-        usernameList.forEach(username -> messagingTemplate.convertAndSendToUser(username, destination, chatDTO));
-    }
-
-    private void sendMessageEvent(Message message, String destination) {
-        List<String> usernameList = userService.getUsernamesFromChat(message.getChat());
-        MessageDTO messageDTO = messageMapper.pojoToDTO(message);
-        usernameList.forEach(username -> messagingTemplate.convertAndSendToUser(username, destination, messageDTO));
-    }
-
-    private void sendStatusEvent(Message message, String destination) {
-        List<String> usernameList = userService.getUsernamesFromChat(message.getChat());
-        StatusesDTO statusesDTO = messageMapper.pojoToStatusesDTO(message);
-        usernameList.forEach(username -> messagingTemplate.convertAndSendToUser(username, destination, statusesDTO));
-    }
-
-    private void sendReactionEvent(Message message, String destination) {
-        List<String> usernameList = userService.getUsernamesFromChat(message.getChat());
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         ReactionsDTO reactionsDTO = messageMapper.pojoToReactionsDTO(message);
-        usernameList.forEach(username -> messagingTemplate.convertAndSendToUser(username, destination, reactionsDTO));
+        WsReactionsEventDTO eventDTO = new WsReactionsEventDTO(userIdList, reactionsDTO);
+        wsServiceClient.sendReactionsEvent(eventDTO);
     }
 
 }
