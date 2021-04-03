@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.persoff68.fatodo</groupId>
-    <artifactId>messageservice</artifactId>
+    <artifactId>chatservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>fatodo-message-service</name>
-    <description>Message service for Fatodo</description>
+    <name>fatodo-chat-service</name>
+    <description>Chat service for Fatodo</description>
 
     <properties>
         <!-- Common variables -->

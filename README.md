@@ -1,5 +1,5 @@
-# Fatodo message-service
-Spring app for message service
+# Fatodo chat-service
+Spring app for chat service
 
 ## Tests
 
