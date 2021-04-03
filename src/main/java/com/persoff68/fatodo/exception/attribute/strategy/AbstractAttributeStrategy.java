@@ -54,6 +54,8 @@ public abstract class AbstractAttributeStrategy implements AttributeStrategy {
     @Override
     public void addErrorDetails() {
         String message = exception.getMessage();
-        errorAttributes.put("message", message);
+        if (message != null) {
+            errorAttributes.put("message", message);
+        }
     }
 }
