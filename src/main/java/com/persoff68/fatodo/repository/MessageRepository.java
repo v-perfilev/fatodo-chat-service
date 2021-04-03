@@ -17,12 +17,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     String UNIFIED_ONE_CHAT_MESSAGES_AND_EVENTS = """
             unified as (
                     select id, chat_id, user_id, is_stub, is_event, 
-                           created_at as timestamp, null as type, null as read
+                           created_at as timestamp, null as type, null as is_read
                     from ftd_chat_message
                     where chat_id = ?1
                     union
                     select id, chat_id, null as user_id, null as is_stub, null as is_event,
-                           timestamp, type, null as read
+                           timestamp, type, null as is_read
                     from ftd_chat_member_event
                     where chat_id = ?1 and user_id = ?2)
             """;
@@ -30,13 +30,13 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     String UNIFIED_ALL_CHATS_MESSAGES_AND_EVENTS = """
             unified as (
                     select m.id, m.chat_id, m.user_id, m.is_stub, m.is_event,
-                           m.created_at as timestamp, null as type, null as read
+                           m.created_at as timestamp, null as type, null as is_read
                     from ftd_chat_message as m
                              right join ftd_chat_member_event as e on m.chat_id = e.chat_id
                     where e.user_id = ?1
                     union
                     select id, chat_id, null as user_id, null as is_stub, null as is_event,
-                           timestamp, type, null as read
+                           timestamp, type, null as is_read
                     from ftd_chat_member_event
                     where user_id = ?1)
             """;
@@ -44,7 +44,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     String UNIFIED_ALL_UNREAD_MESSAGES_AND_EVENTS = """
             unified as (
                     select m.id, m.chat_id, m.user_id, m.is_stub, m.is_event, 
-                           m.created_at as timestamp, null as type, s.type as read
+                           m.created_at as timestamp, null as type, s.type as is_read
                     from ftd_chat_message as m
                              left join ftd_chat_status as s on m.id = s.message_id 
                                 and s.user_id = ?1
@@ -53,7 +53,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                     where e.user_id = ?1 and m.user_id <> ?1
                     union
                     select id, chat_id, null as user_id, null as is_stub, null as is_event, 
-                           timestamp, type, null as read
+                           timestamp, type, null as is_read
                     from ftd_chat_member_event
                     where user_id = ?1)
             """;
@@ -67,7 +67,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                                 is_event,
                                 timestamp,
                                 type,
-                                read,
+                                is_read,
                                 sum(case
                                         when type like 'ADD_MEMBER' then 1
                                         when type like 'DELETE_MEMBER' then -1
@@ -113,7 +113,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                            and valid = 1
                            and is_stub = false
                            and is_event = false
-                           and read is null
+                           and is_read is null
                         )
             """;
 
