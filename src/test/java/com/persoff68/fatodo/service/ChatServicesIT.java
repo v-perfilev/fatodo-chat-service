@@ -1,6 +1,6 @@
 package com.persoff68.fatodo.service;
 
-import com.persoff68.fatodo.FatodoMessageServiceApplication;
+import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
-@SpringBootTest(classes = FatodoMessageServiceApplication.class)
+@SpringBootTest(classes = FatodoChatServiceApplication.class)
 public class ChatServicesIT {
 
     private static final UUID USER_1_ID = UUID.fromString("98a4f736-70c2-4c7d-b75b-f7a5ae7bbe8d");

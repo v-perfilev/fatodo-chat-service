@@ -21,7 +21,7 @@
         <maven.repo.username/>
         <maven.repo.password/>
         <!-- Classes and packages -->
-        <main.class>com.persoff68.fatodo.FatodoMessageServiceApplication</main.class>
+        <main.class>com.persoff68.fatodo.FatodoChatServiceApplication</main.class>
         <root.package>com.persoff68.fatodo</root.package>
         <contract.package>com.persoff68.fatodo.contract</contract.package>
         <!-- Dependency versions -->

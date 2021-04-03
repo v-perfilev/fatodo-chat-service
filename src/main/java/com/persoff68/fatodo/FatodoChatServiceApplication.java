@@ -10,11 +10,11 @@ import java.util.Properties;
 
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperties.class)
-public class FatodoMessageServiceApplication {
+public class FatodoChatServiceApplication {
 
     public static void main(String[] args) {
         Properties defaultProfileProperties = AppProfileUtils.getDefaultProfile();
-        SpringApplication app = new SpringApplication(FatodoMessageServiceApplication.class);
+        SpringApplication app = new SpringApplication(FatodoChatServiceApplication.class);
         app.setDefaultProperties(defaultProfileProperties);
         app.run();
     }

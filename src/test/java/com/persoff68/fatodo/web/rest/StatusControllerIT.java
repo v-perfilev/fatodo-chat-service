@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.persoff68.fatodo.FatodoMessageServiceApplication;
+import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.builder.TestMemberEvent;
@@ -39,7 +39,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = FatodoMessageServiceApplication.class)
+@SpringBootTest(classes = FatodoChatServiceApplication.class)
 public class StatusControllerIT {
     private static final String ENDPOINT = "/api/status";
 
