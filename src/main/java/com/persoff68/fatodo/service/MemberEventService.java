@@ -29,6 +29,7 @@ public class MemberEventService {
     private final UserService userService;
     private final PermissionService permissionService;
     private final EntityManager entityManager;
+    private final WsService wsService;
 
     public void addUsersUnsafe(UUID chatId, List<UUID> userIdList) {
         userService.checkUsersExist(userIdList);
@@ -67,6 +68,8 @@ public class MemberEventService {
 
         // STUB MESSAGE
         systemMessageService.createStubMessages(chatId, userIdList);
+        // WS
+        wsService.sendChatUpdateEvent(chat);
         // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 userId,
@@ -97,6 +100,8 @@ public class MemberEventService {
         memberEventRepository.flush();
         entityManager.refresh(chat);
 
+        // WS
+        wsService.sendChatUpdateEvent(chat);
         // SYSTEM MESSAGES
         systemMessageService.createIdsEventMessage(
                 userId,
@@ -112,6 +117,8 @@ public class MemberEventService {
 
         permissionService.hasLeaveChatPermission(chat, userId);
 
+        // WS
+        wsService.sendChatUpdateEvent(chat);
         // EVENT MESSAGE
         systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
 
@@ -140,6 +147,8 @@ public class MemberEventService {
 
         permissionService.hasDeleteChatPermission(chat, userId);
 
+        // WS
+        wsService.sendChatUpdateEvent(chat);
         // EVENT MESSAGE
         systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
 

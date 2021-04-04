@@ -35,6 +35,7 @@ public class ChatService {
     private final MemberEventService memberEventService;
     private final PermissionService permissionService;
     private final SystemMessageService systemMessageService;
+    private final WsService wsService;
 
     public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findAllByUserId(userId, pageable);
@@ -59,6 +60,8 @@ public class ChatService {
 
         // STUB MESSAGE
         systemMessageService.createStubMessages(chat.getId(), userIdList);
+        // WS
+        wsService.sendChatNewEvent(chat);
         // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 firstUserId,
@@ -77,6 +80,8 @@ public class ChatService {
 
         // STUB MESSAGES
         systemMessageService.createStubMessages(chat.getId(), allUserIdList);
+        // WS
+        wsService.sendChatNewEvent(chat);
         // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 userId,
@@ -96,6 +101,8 @@ public class ChatService {
         chat.setTitle(title);
         chat = chatRepository.save(chat);
 
+        // WS
+        wsService.sendChatUpdateEvent(chat);
         // EVENT MESSAGE
         systemMessageService.createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title);
 
