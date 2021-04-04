@@ -8,8 +8,8 @@ Contract.make {
     request {
         method POST()
         url($(
-                consumer(regex("/api/chat/" + uuid().toString())),
-                producer("/api/chat/b73e8418-ff4a-472b-893d-4e248ae93797")
+                consumer(regex("/api/message/" + uuid().toString())),
+                producer("/api/message/b73e8418-ff4a-472b-893d-4e248ae93797")
         ))
         headers {
             contentType applicationJson()

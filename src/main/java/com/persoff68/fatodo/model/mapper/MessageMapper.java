@@ -13,6 +13,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,13 +40,17 @@ public abstract class MessageMapper {
 
         MessageDTO forwardedMessageDTO = pojoToDTO(message.getForwardedMessage());
 
-        List<ReactionDTO> reactionDTOList = message.getReactions().stream()
+        List<ReactionDTO> reactionDTOList = message.getReactions() != null
+                ? message.getReactions().stream()
                 .map(reactionMapper::pojoToDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : Collections.emptyList();
 
-        List<StatusDTO> statusDTOList = message.getStatuses().stream()
+        List<StatusDTO> statusDTOList = message.getStatuses() != null
+                ?message.getStatuses().stream()
                 .map(statusMapper::pojoToDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : Collections.emptyList();
 
         MessageDTO dto = defaultPojoToDTO(message);
         dto.setChatId(chatId);
@@ -59,9 +64,11 @@ public abstract class MessageMapper {
         Chat chat = message.getChat();
         UUID chatId = chat != null ? chat.getId() : null;
 
-        List<StatusDTO> statusDTOList = message.getStatuses().stream()
+        List<StatusDTO> statusDTOList = message.getStatuses() != null
+                ?message.getStatuses().stream()
                 .map(statusMapper::pojoToDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : Collections.emptyList();
 
         StatusesDTO dto = new StatusesDTO();
         dto.setChatId(chatId);
@@ -74,9 +81,11 @@ public abstract class MessageMapper {
         Chat chat = message.getChat();
         UUID chatId = chat != null ? chat.getId() : null;
 
-        List<ReactionDTO> reactionDTOList = message.getReactions().stream()
+        List<ReactionDTO> reactionDTOList = message.getReactions() != null
+                ? message.getReactions().stream()
                 .map(reactionMapper::pojoToDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : Collections.emptyList();
 
         ReactionsDTO dto = new ReactionsDTO();
         dto.setChatId(chatId);
