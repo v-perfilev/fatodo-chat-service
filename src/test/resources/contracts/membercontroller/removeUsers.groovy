@@ -20,7 +20,7 @@ Contract.make {
         }
         body($(
                 consumer(regex(".+")),
-                producer([anyUuid()])
+                producer(["1b53a48c-2da5-4489-ac8a-e246c6445333"])
         ))
     }
     response {
