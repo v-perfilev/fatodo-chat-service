@@ -39,7 +39,7 @@ public class ReactionService {
         permissionService.hasReactOnMessagePermission(message, userId);
 
         ReactionId id = new ReactionId(messageId, userId);
-        reactionRepository.deleteById(id);
+        reactionRepository.findById(id).ifPresent(reactionRepository::delete);
         reactionRepository.flush();
 
         entityManager.refresh(message);
