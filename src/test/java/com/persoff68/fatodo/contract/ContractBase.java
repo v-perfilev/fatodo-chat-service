@@ -105,6 +105,7 @@ public abstract class ContractBase {
                 .build()
                 .toParent();
         memberEventRepository.saveAndFlush(memberEvent);
+        entityManager.refresh(chat);
     }
 
     private void createMessage(Chat chat, UUID messageId, UUID userId) {
@@ -116,6 +117,7 @@ public abstract class ContractBase {
                 .build()
                 .toParent();
         entityManager.merge(message);
+        entityManager.refresh(chat);
     }
 
     private void createReaction(UUID messageId, UUID userId) {

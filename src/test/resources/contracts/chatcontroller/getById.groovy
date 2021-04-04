@@ -9,7 +9,7 @@ Contract.make {
         method GET()
         url($(
                 consumer(regex("/api/chat/" + uuid().toString())),
-                producer("/api/chat/8f9a7cae-73c8-4ad6-b135-5bd109b51d2e")
+                producer("/api/chat/b73e8418-ff4a-472b-893d-4e248ae93797")
         ))
         headers {
             header 'Authorization': $(
@@ -24,7 +24,7 @@ Contract.make {
             contentType applicationJson()
         }
         body([
-                "id"      : "8f9a7cae-73c8-4ad6-b135-5bd109b51d2e",
+                "id"      : "b73e8418-ff4a-472b-893d-4e248ae93797",
                 "title"   : null,
                 "isDirect": false
         ])
