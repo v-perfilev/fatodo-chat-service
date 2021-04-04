@@ -4,7 +4,6 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.util.UUID;
@@ -14,8 +13,8 @@ import java.util.UUID;
 public abstract class AbstractModel {
 
     @Id
-    @GeneratedValue(generator = "UUID", strategy = GenerationType.IDENTITY)
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(generator = "custom-uuid")
+    @GenericGenerator(name = "custom-uuid", strategy = "com.persoff68.fatodo.model.generator.UpdatableUUIDGenerator")
     protected UUID id;
 
 }
