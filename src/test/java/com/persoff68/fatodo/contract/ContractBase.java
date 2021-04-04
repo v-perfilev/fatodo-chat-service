@@ -1,14 +1,33 @@
 package com.persoff68.fatodo.contract;
 
+import com.persoff68.fatodo.builder.TestChat;
+import com.persoff68.fatodo.builder.TestMemberEvent;
+import com.persoff68.fatodo.builder.TestMessage;
+import com.persoff68.fatodo.builder.TestReaction;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
+import com.persoff68.fatodo.model.Chat;
+import com.persoff68.fatodo.model.MemberEvent;
+import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.Reaction;
+import com.persoff68.fatodo.model.constant.MemberEventType;
+import com.persoff68.fatodo.model.constant.ReactionType;
+import com.persoff68.fatodo.repository.ChatRepository;
+import com.persoff68.fatodo.repository.MemberEventRepository;
+import com.persoff68.fatodo.repository.MessageRepository;
+import com.persoff68.fatodo.repository.ReactionRepository;
+import com.persoff68.fatodo.repository.StatusRepository;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.contract.verifier.messaging.boot.AutoConfigureMessageVerifier;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
+
+import javax.persistence.EntityManager;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -16,10 +35,28 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMessageVerifier
+@Transactional
 public abstract class ContractBase {
+    private static final UUID USER_ID = UUID.fromString("8f9a7cae-73c8-4ad6-b135-5bd109b51d2e");
+    private static final UUID CHAT_ID = UUID.fromString("b73e8418-ff4a-472b-893d-4e248ae93797");
+    private static final UUID MESSAGE_ID_1 = UUID.fromString("6796a82a-93c6-4fdf-bf5d-2da77ce2c338");
+    private static final UUID MESSAGE_ID_2 = UUID.fromString("6520f3e6-0a7f-4c32-b6f8-ba5ae3ed0bd1");
 
     @Autowired
     WebApplicationContext context;
+
+    @Autowired
+    ChatRepository chatRepository;
+    @Autowired
+    MessageRepository messageRepository;
+    @Autowired
+    MemberEventRepository memberEventRepository;
+    @Autowired
+    ReactionRepository reactionRepository;
+    @Autowired
+    StatusRepository statusRepository;
+    @Autowired
+    EntityManager entityManager;
 
     @MockBean
     UserServiceClient userServiceClient;
@@ -29,6 +66,19 @@ public abstract class ContractBase {
     @BeforeEach
     public void setup() {
         RestAssuredMockMvc.webAppContextSetup(context);
+
+        chatRepository.deleteAll();
+        messageRepository.deleteAll();
+        memberEventRepository.deleteAll();
+        reactionRepository.deleteAll();
+        statusRepository.deleteAll();
+
+        Chat chat = createChat(CHAT_ID);
+        createAddMemberEvent(chat, USER_ID);
+        createAddMemberEvent(chat, UUID.randomUUID());
+        createMessage(chat, MESSAGE_ID_1, USER_ID);
+        createMessage(chat, MESSAGE_ID_2, UUID.randomUUID());
+        createReaction(MESSAGE_ID_1, USER_ID);
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
 
@@ -40,6 +90,42 @@ public abstract class ContractBase {
         doNothing().when(wsServiceClient).sendMessageUpdateEvent(any());
         doNothing().when(wsServiceClient).sendStatusesEvent(any());
         doNothing().when(wsServiceClient).sendReactionsEvent(any());
+    }
+
+    private Chat createChat(UUID chatId) {
+        Chat chat = TestChat.defaultBuilder().id(chatId).build().toParent();
+        return entityManager.merge(chat);
+    }
+
+    private void createAddMemberEvent(Chat chat, UUID userId) {
+        MemberEvent memberEvent = TestMemberEvent.defaultBuilder()
+                .chat(chat)
+                .userId(userId)
+                .type(MemberEventType.ADD_MEMBER)
+                .build()
+                .toParent();
+        memberEventRepository.saveAndFlush(memberEvent);
+    }
+
+    private void createMessage(Chat chat, UUID messageId, UUID userId) {
+        Message message = TestMessage.defaultBuilder()
+                .chat(chat)
+                .id(messageId)
+                .userId(userId)
+                .text("test")
+                .build()
+                .toParent();
+        entityManager.merge(message);
+    }
+
+    private void createReaction(UUID messageId, UUID userId) {
+        Reaction reaction = TestReaction.defaultBuilder()
+                .messageId(messageId)
+                .userId(userId)
+                .type(ReactionType.LIKE)
+                .build()
+                .toParent();
+        reactionRepository.saveAndFlush(reaction);
     }
 
 }

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class TestChat extends Chat {
-    private static final String DEFAULT_VALUE = "test_value";
 
     @Builder
     public TestChat(UUID id,
@@ -24,8 +23,7 @@ public class TestChat extends Chat {
 
     public static TestChatBuilder defaultBuilder() {
         return TestChat.builder()
-                .title(DEFAULT_VALUE)
-                .isDirect(true)
+                .isDirect(false)
                 .memberEvents(new ArrayList<>())
                 .messages(new ArrayList<>());
     }
