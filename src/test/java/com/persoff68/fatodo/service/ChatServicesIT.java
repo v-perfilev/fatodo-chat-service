@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
@@ -118,6 +119,7 @@ public class ChatServicesIT {
     }
 
     @Test
+    @Transactional
     public void deleteAndGetAllChatsByUserIdTest() {
         beforeDeleteAndGetAllChatsByUserIdTest();
 

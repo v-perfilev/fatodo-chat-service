@@ -44,6 +44,7 @@ public class ReactionService {
 
         entityManager.refresh(message);
 
+        // WS
         wsService.sendMessageReactionEvent(message);
     }
 
@@ -59,6 +60,7 @@ public class ReactionService {
         reactionRepository.saveAndFlush(reaction);
         entityManager.refresh(message);
 
+        // WS
         wsService.sendMessageReactionEvent(message);
     }
 

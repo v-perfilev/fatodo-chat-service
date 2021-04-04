@@ -21,8 +21,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +59,8 @@ public class MemberControllerIT {
     MemberEventRepository memberEventRepository;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    EntityManager entityManager;
 
     @MockBean
     UserServiceClient userServiceClient;
@@ -72,11 +76,8 @@ public class MemberControllerIT {
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
 
-        chat1 = createIndirectChat();
-        createMemberEvents(chat1, USER_ID_1, USER_ID_2);
-
-        chat2 = createIndirectChat();
-        createMemberEvents(chat2, USER_ID_2, USER_ID_3);
+        chat1 = createIndirectChat(USER_ID_1, USER_ID_2);
+        chat2 = createIndirectChat(USER_ID_2, USER_ID_3);
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
@@ -261,7 +262,7 @@ public class MemberControllerIT {
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
                 .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
-                        && memberEvent.getType().equals(MemberEventType.DELETE_MEMBER)
+                        && memberEvent.getType().equals(MemberEventType.LEAVE_CHAT)
                         && memberEvent.getUserId().equals(UUID.fromString(USER_ID_1)))
                 .collect(Collectors.toList());
         assertThat(filteredMemberEventList.size()).isEqualTo(1);
@@ -341,7 +342,7 @@ public class MemberControllerIT {
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
                 .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
-                        && memberEvent.getType().equals(MemberEventType.DELETE_CHAT)
+                        && memberEvent.getType().equals(MemberEventType.DELETE_MEMBER)
                         && memberEvent.getUserId().equals(UUID.fromString(USER_ID_1)))
                 .collect(Collectors.toList());
         assertThat(filteredMemberEventList.size()).isEqualTo(1);
@@ -372,9 +373,11 @@ public class MemberControllerIT {
     }
 
 
-    private Chat createIndirectChat() {
+    private Chat createIndirectChat(String... userIds) {
         Chat chat = TestChat.defaultBuilder().isDirect(false).build().toParent();
-        return chatRepository.save(chat);
+        Chat savedChat = chatRepository.saveAndFlush(chat);
+        createMemberEvents(savedChat, userIds);
+        return savedChat;
     }
 
     private void createMemberEvents(Chat chat, String... userIds) {
@@ -383,6 +386,7 @@ public class MemberControllerIT {
                         .chat(chat).userId(UUID.fromString(id)).build().toParent())
                 .collect(Collectors.toList());
         memberEventRepository.saveAll(memberEventList);
+        memberEventRepository.flush();
     }
 
 }

@@ -1,7 +1,6 @@
 package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.client.WsServiceClient;
-import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
@@ -27,20 +26,6 @@ public class WsService {
     private final WsServiceClient wsServiceClient;
     private final ChatMapper chatMapper;
     private final MessageMapper messageMapper;
-
-    public void sendChatNewEvent(Chat chat) {
-        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
-        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
-        wsServiceClient.sendChatNewEvent(eventDTO);
-    }
-
-    public void sendChatUpdateEvent(Chat chat) {
-        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
-        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
-        wsServiceClient.sendChatUpdateEvent(eventDTO);
-    }
 
     public void sendChatLastMessageEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());

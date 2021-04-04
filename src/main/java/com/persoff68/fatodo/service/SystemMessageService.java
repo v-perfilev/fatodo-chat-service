@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,6 @@ public class SystemMessageService {
                 .collect(Collectors.toList())
                 : Collections.emptyList();
 
-        shortSleep();
 
         messageRepository.saveAll(messageList);
         messageRepository.flush();
@@ -82,24 +82,15 @@ public class SystemMessageService {
             String params = objectMapper.writeValueAsString(paramMap);
             Message message = Message.event(chat, userId, params);
 
-            shortSleep();
-
             messageRepository.saveAndFlush(message);
             entityManager.refresh(chat);
 
+            // WS
             wsService.sendMessageNewEvent(message);
             wsService.sendChatLastMessageEvent(message);
+
         } catch (IOException e) {
             log.error(e.getMessage());
-        }
-    }
-
-    private void shortSleep() {
-        // workaround needed for correct work with message repository
-        try {
-            Thread.sleep(10);
-        } catch (Exception e) {
-            // skip if error
         }
     }
 

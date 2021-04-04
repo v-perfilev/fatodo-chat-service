@@ -70,12 +70,13 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                                 sum(case
                                         when type like 'ADD_MEMBER' then 1
                                         when type like 'DELETE_MEMBER' then -1
+                                        when type like 'LEAVE_CHAT' then -1
                                         else 0
                                         end)
                                     over (partition by chat_id order by timestamp rows unbounded preceding) *
                                 min(case
+                                        when type like 'DELETE_MEMBER' then 0
                                         when type like 'CLEAR_CHAT' then 0
-                                        when type like 'DELETE_CHAT' then 0
                                         else 1
                                         end)
                                     over (partition by chat_id order by timestamp 

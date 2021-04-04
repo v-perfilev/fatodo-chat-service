@@ -34,7 +34,6 @@ public class ChatService {
     private final UserService userService;
     private final MemberEventService memberEventService;
     private final PermissionService permissionService;
-    private final WsService wsService;
     private final SystemMessageService systemMessageService;
 
     public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
@@ -51,36 +50,42 @@ public class ChatService {
     }
 
     public Chat createDirect(UUID firstUserId, UUID secondUserId) {
-        Chat chat = getDirectByUserIds(firstUserId, secondUserId);
-        if (chat != null) {
+        Chat oldChat = getDirectByUserIds(firstUserId, secondUserId);
+        if (oldChat != null) {
             throw new ModelAlreadyExistsException();
         }
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
-        Chat createdChat = create(userIdList, true);
+        Chat chat = create(userIdList, true);
 
+        // STUB MESSAGE
+        systemMessageService.createStubMessages(chat.getId(), userIdList);
+        // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 firstUserId,
-                createdChat.getId(),
+                chat.getId(),
                 EventMessageType.CREATE_DIRECT_CHAT,
                 Collections.singletonList(secondUserId)
         );
 
-        return createdChat;
+        return chat;
     }
 
     public Chat createIndirect(UUID userId, List<UUID> userIdList) {
         List<UUID> allUserIdList = new ArrayList<>(userIdList);
         allUserIdList.add(userId);
-        Chat createdChat = create(allUserIdList, false);
+        Chat chat = create(allUserIdList, false);
 
+        // STUB MESSAGES
+        systemMessageService.createStubMessages(chat.getId(), allUserIdList);
+        // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 userId,
-                createdChat.getId(),
+                chat.getId(),
                 EventMessageType.CREATE_CHAT,
                 userIdList
         );
 
-        return createdChat;
+        return chat;
     }
 
     public Chat rename(UUID userId, UUID chatId, String title) {
@@ -91,7 +96,7 @@ public class ChatService {
         chat.setTitle(title);
         chat = chatRepository.save(chat);
 
-        wsService.sendChatUpdateEvent(chat);
+        // EVENT MESSAGE
         systemMessageService.createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title);
 
         return chat;
@@ -108,8 +113,6 @@ public class ChatService {
         userService.checkUsersExist(userIdList);
         Chat chat = chatRepository.saveAndFlush(new Chat(isDirect));
         memberEventService.addUsersUnsafe(chat.getId(), userIdList);
-
-        wsService.sendChatNewEvent(chat);
         return chat;
     }
 

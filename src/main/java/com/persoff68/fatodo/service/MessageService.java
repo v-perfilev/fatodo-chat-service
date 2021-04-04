@@ -45,8 +45,10 @@ public class MessageService {
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 
+        // WS
         wsService.sendMessageNewEvent(message);
         wsService.sendChatLastMessageEvent(message);
+
         return message;
     }
 
@@ -58,8 +60,10 @@ public class MessageService {
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 
+        // WS
         wsService.sendMessageNewEvent(message);
         wsService.sendChatLastMessageEvent(message);
+
         return message;
     }
 
@@ -74,6 +78,7 @@ public class MessageService {
         Chat chat = message.getChat();
         entityManager.refresh(chat);
 
+        // WS
         wsService.sendMessageUpdateEvent(message);
         if (isMessageLastInChat(message)) {
             wsService.sendChatLastMessageUpdateEvent(message);
@@ -94,6 +99,7 @@ public class MessageService {
         Chat chat = message.getChat();
         entityManager.refresh(chat);
 
+        // WS
         wsService.sendMessageUpdateEvent(message);
         if (isMessageLastInChat(message)) {
             wsService.sendChatLastMessageUpdateEvent(message);

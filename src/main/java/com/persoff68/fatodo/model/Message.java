@@ -14,6 +14,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,9 +39,9 @@ public class Message extends AbstractAuditingModel {
     @OneToOne
     private Message forwardedMessage;
 
-    private boolean isDeleted = false;
     private boolean isEvent = false;
     private boolean isStub = false;
+    private boolean isDeleted = false;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "message")
     private List<Status> statuses = new ArrayList<>();
@@ -56,20 +58,20 @@ public class Message extends AbstractAuditingModel {
         return message;
     }
 
-    public static Message stub(Chat chat, UUID userId) {
-        Message message = new Message();
-        message.chat = chat;
-        message.userId = userId;
-        message.isStub = true;
-        return message;
-    }
-
     public static Message event(Chat chat, UUID userId, String text) {
         Message message = new Message();
         message.chat = chat;
         message.userId = userId;
         message.text = text;
         message.isEvent = true;
+        return message;
+    }
+
+    public static Message stub(Chat chat, UUID userId) {
+        Message message = new Message();
+        message.chat = chat;
+        message.userId = userId;
+        message.isStub = true;
         return message;
     }
 

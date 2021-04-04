@@ -10,12 +10,13 @@ import com.persoff68.fatodo.builder.TestMessageVM;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
+import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
-import com.persoff68.fatodo.service.MemberEventService;
 import com.persoff68.fatodo.web.rest.vm.MessageVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,8 +70,6 @@ public class MessageControllerIT {
     @Autowired
     MemberEventRepository memberEventRepository;
     @Autowired
-    MemberEventService memberEventService;
-    @Autowired
     ObjectMapper objectMapper;
 
     @MockBean
@@ -94,15 +93,13 @@ public class MessageControllerIT {
         messageRepository.deleteAll();
         memberEventRepository.deleteAll();
 
-        chat1 = createChat();
-        createMemberEvents(chat1, USER_ID_1, USER_ID_2);
+        chat1 = createChat(USER_ID_1, USER_ID_2);
         for (int i = 0; i < 10; i++) {
             message1 = createMessage(chat1, USER_ID_1);
             message2 = createMessage(chat1, USER_ID_2);
         }
 
-        chat2 = createChat();
-        createMemberEvents(chat2, USER_ID_2, USER_ID_3);
+        chat2 = createChat(USER_ID_2, USER_ID_3);
         for (int i = 0; i < 10; i++) {
             message3 = createMessage(chat2, USER_ID_2);
         }
@@ -340,16 +337,20 @@ public class MessageControllerIT {
     }
 
 
-    private Chat createChat() {
+    private Chat createChat(String... userIds) {
         Chat chat = TestChat.defaultBuilder().isDirect(false).build().toParent();
-        return chatRepository.saveAndFlush(chat);
+        chatRepository.saveAndFlush(chat);
+        createAddMemberEvents(chat, userIds);
+        return chat;
     }
 
-    private void createMemberEvents(Chat chat, String... userIds) {
-        List<UUID> userIdList = Arrays.stream(userIds)
+    private void createAddMemberEvents(Chat chat, String... userIds) {
+        List<MemberEvent> messageList = Arrays.stream(userIds)
                 .map(UUID::fromString)
+                .map(userId -> new MemberEvent(chat, userId, MemberEventType.ADD_MEMBER))
                 .collect(Collectors.toList());
-        memberEventService.addUsersUnsafe(chat.getId(), userIdList);
+        memberEventRepository.saveAll(messageList);
+        memberEventRepository.flush();
     }
 
     private Message createMessage(Chat chat, String userId) {
@@ -357,6 +358,5 @@ public class MessageControllerIT {
                 .chat(chat).userId(UUID.fromString(userId)).build().toParent();
         return messageRepository.saveAndFlush(message);
     }
-
 
 }

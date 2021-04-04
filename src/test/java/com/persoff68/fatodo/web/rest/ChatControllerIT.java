@@ -8,10 +8,13 @@ import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
+import com.persoff68.fatodo.model.MemberEvent;
+import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
-import com.persoff68.fatodo.service.MemberEventService;
+import com.persoff68.fatodo.repository.MessageRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +57,9 @@ public class ChatControllerIT {
     @Autowired
     ChatRepository chatRepository;
     @Autowired
-    MemberEventRepository memberEventRepository;
+    MessageRepository messageRepository;
     @Autowired
-    MemberEventService memberEventService;
+    MemberEventRepository memberEventRepository;
     @Autowired
     ObjectMapper objectMapper;
 
@@ -78,18 +81,11 @@ public class ChatControllerIT {
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
 
-        for (int i = 0; i < 10; i++) {
-            chat1 = createChat(false);
-            createMemberEvents(chat1, USER_ID_1, USER_ID_2);
-        }
+        chat1 = createChat(false, USER_ID_1, USER_ID_2);
+        chat2 = createChat(false, USER_ID_2, USER_ID_3);
+        createChat(true, USER_ID_1, USER_ID_2);
 
-        chat2 = createChat(false);
-        createMemberEvents(chat2, USER_ID_2, USER_ID_3);
-
-        Chat directChat = createChat(true);
-        createMemberEvents(directChat, USER_ID_1, USER_ID_2);
     }
-
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
@@ -99,19 +95,19 @@ public class ChatControllerIT {
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
         List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(11);
+        assertThat(resultDTOList.size()).isEqualTo(2);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetAllPageable_ok_withParams() throws Exception {
-        String url = ENDPOINT + "?offset=5&size=10";
+        String url = ENDPOINT + "?offset=1&size=10";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
         List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(6);
+        assertThat(resultDTOList.size()).isEqualTo(1);
     }
 
     @Test
@@ -290,16 +286,29 @@ public class ChatControllerIT {
     }
 
 
-    private Chat createChat(boolean isDirect) {
+    private Chat createChat(boolean isDirect, String... userIds) {
         Chat chat = TestChat.defaultBuilder().isDirect(isDirect).build().toParent();
-        return chatRepository.saveAndFlush(chat);
+        Chat savedChat = chatRepository.saveAndFlush(chat);
+        createAddMemberEvents(savedChat, userIds);
+        createStubMessages(savedChat, userIds);
+        return savedChat;
     }
 
-    private void createMemberEvents(Chat chat, String... userIds) {
-        List<UUID> userIdList = Arrays.stream(userIds)
+    private void createAddMemberEvents(Chat chat, String... userIds) {
+        List<MemberEvent> messageList = Arrays.stream(userIds)
                 .map(UUID::fromString)
+                .map(userId -> new MemberEvent(chat, userId, MemberEventType.ADD_MEMBER))
                 .collect(Collectors.toList());
-        memberEventService.addUsersUnsafe(chat.getId(), userIdList);
+        memberEventRepository.saveAll(messageList);
+        memberEventRepository.flush();
+    }
+
+    private void createStubMessages(Chat chat, String... userIds) {
+        List<Message> messageList = Arrays.stream(userIds)
+                .map(userId -> Message.stub(chat, UUID.fromString(userId)))
+                .collect(Collectors.toList());
+        messageRepository.saveAll(messageList);
+        messageRepository.flush();
     }
 
 }

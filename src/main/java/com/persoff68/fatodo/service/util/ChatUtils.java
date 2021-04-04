@@ -5,8 +5,8 @@ import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
-import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.constant.MemberEventType;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -49,7 +49,7 @@ public class ChatUtils {
                 .max(Comparator.comparing(MemberEvent::getTimestamp));
 
         return lastMemberEventOptional
-                .map(memberEvent -> memberEvent.getType().equals(MemberEventType.DELETE_CHAT))
+                .map(memberEvent -> memberEvent.getType().equals(MemberEventType.DELETE_MEMBER))
                 .orElse(false);
     }
 
@@ -65,7 +65,9 @@ public class ChatUtils {
                             .orElse(0);
                     int deleteEventCount = Optional.ofNullable(countMap.get(MemberEventType.DELETE_MEMBER))
                             .orElse(0);
-                    return addEventCount > deleteEventCount;
+                    int leaveEventCount = Optional.ofNullable(countMap.get(MemberEventType.LEAVE_CHAT))
+                            .orElse(0);
+                    return addEventCount > deleteEventCount + leaveEventCount;
                 })
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());

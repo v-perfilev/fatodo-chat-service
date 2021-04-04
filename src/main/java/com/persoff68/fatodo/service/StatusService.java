@@ -37,6 +37,7 @@ public class StatusService {
             statusRepository.saveAndFlush(status);
             entityManager.refresh(message);
 
+            // WS
             wsService.sendMessageStatusEvent(message);
         }
     }
