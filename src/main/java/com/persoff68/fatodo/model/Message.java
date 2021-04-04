@@ -41,10 +41,10 @@ public class Message extends AbstractAuditingModel {
     private boolean isEvent = false;
     private boolean isStub = false;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "messageId", targetEntity = Status.class)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "message")
     private List<Status> statuses = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "messageId", targetEntity = Reaction.class)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "message")
     private List<Reaction> reactions = new ArrayList<>();
 
     public static Message of(Chat chat, UUID userId, String text, Message forwardedMessage) {

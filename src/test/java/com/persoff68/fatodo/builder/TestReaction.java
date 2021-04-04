@@ -14,7 +14,7 @@ public class TestReaction extends Reaction {
     }
 
 
-    public static TestReaction.TestReactionBuilder defaultBuilder() {
+    public static TestReactionBuilder defaultBuilder() {
         return TestReaction.builder();
     }
 

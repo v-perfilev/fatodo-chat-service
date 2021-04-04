@@ -8,6 +8,7 @@ import com.persoff68.fatodo.builder.TestMemberEvent;
 import com.persoff68.fatodo.builder.TestMessage;
 import com.persoff68.fatodo.builder.TestStatus;
 import com.persoff68.fatodo.client.UserServiceClient;
+import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -67,6 +69,8 @@ public class StatusControllerIT {
 
     @MockBean
     UserServiceClient userServiceClient;
+    @MockBean
+    WsServiceClient wsServiceClient;
 
     MockMvc mvc;
 
@@ -91,6 +95,7 @@ public class StatusControllerIT {
         message4 = createMessage(chat2, USER_ID_2);
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        doNothing().when(wsServiceClient).sendStatusesEvent(any());
     }
 
     @Test

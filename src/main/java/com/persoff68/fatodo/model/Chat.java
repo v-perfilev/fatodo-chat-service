@@ -25,10 +25,10 @@ public class Chat extends AbstractAuditingModel {
 
     private boolean isDirect = false;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "chat")
+    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "chat")
     private List<MemberEvent> memberEvents = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "chat")
+    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "chat")
     private List<Message> messages = new ArrayList<>();
 
 

@@ -102,8 +102,9 @@ public class MessageService {
 
     public boolean isMessageLastInChat(Message message) {
         UUID messageId = message.getId();
-        UUID chatId = message.getChat() != null ? message.getChat().getId() : null;
-        return messageId != null && chatId != null && messageRepository.isMessageIdLastInChat(messageId, chatId);
+        UUID chatId = message.getChat().getId();
+        Message lastMessageInChat = messageRepository.findLastMessageInChat(chatId);
+        return lastMessageInChat != null && lastMessageInChat.getId() == messageId;
     }
 
     private Message getForwardedById(UUID userId, UUID messageId) {

@@ -2,10 +2,12 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
+import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
+import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.ChatUtils;
 import lombok.RequiredArgsConstructor;

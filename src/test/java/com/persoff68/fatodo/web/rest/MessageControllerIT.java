@@ -8,6 +8,7 @@ import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.builder.TestMessage;
 import com.persoff68.fatodo.builder.TestMessageVM;
 import com.persoff68.fatodo.client.UserServiceClient;
+import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.MessageDTO;
@@ -30,12 +31,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -74,6 +75,8 @@ public class MessageControllerIT {
 
     @MockBean
     UserServiceClient userServiceClient;
+    @MockBean
+    WsServiceClient wsServiceClient;
 
     MockMvc mvc;
 
@@ -82,6 +85,10 @@ public class MessageControllerIT {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        doNothing().when(wsServiceClient).sendChatLastMessageEvent(any());
+        doNothing().when(wsServiceClient).sendChatLastMessageUpdateEvent(any());
+        doNothing().when(wsServiceClient).sendMessageNewEvent(any());
+        doNothing().when(wsServiceClient).sendMessageUpdateEvent(any());
 
         chatRepository.deleteAll();
         messageRepository.deleteAll();
@@ -298,8 +305,6 @@ public class MessageControllerIT {
         String url = ENDPOINT + "/" + message1.getId().toString();
         mvc.perform(delete(url))
                 .andExpect(status().isOk());
-        Optional<Message> messageOptional = messageRepository.findById(message1.getId());
-        assertThat(messageOptional).isEmpty();
     }
 
     @Test

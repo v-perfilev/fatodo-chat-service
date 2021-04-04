@@ -6,6 +6,7 @@ import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.client.UserServiceClient;
+import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.repository.ChatRepository;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -60,6 +62,8 @@ public class ChatControllerIT {
 
     @MockBean
     UserServiceClient userServiceClient;
+    @MockBean
+    WsServiceClient wsServiceClient;
 
     MockMvc mvc;
 
@@ -68,6 +72,8 @@ public class ChatControllerIT {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        doNothing().when(wsServiceClient).sendChatNewEvent(any());
+        doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
 
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();

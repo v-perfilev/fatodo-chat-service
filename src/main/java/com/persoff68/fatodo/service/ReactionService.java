@@ -9,9 +9,9 @@ import com.persoff68.fatodo.repository.ReactionRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.UUID;
 
 @Service
@@ -40,6 +40,8 @@ public class ReactionService {
 
         ReactionId id = new ReactionId(messageId, userId);
         reactionRepository.deleteById(id);
+        reactionRepository.flush();
+
         entityManager.refresh(message);
 
         wsService.sendMessageReactionEvent(message);

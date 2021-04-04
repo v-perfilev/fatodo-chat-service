@@ -1,7 +1,6 @@
 package com.persoff68.fatodo.repository;
 
 import com.persoff68.fatodo.model.Message;
-import com.persoff68.fatodo.repository.projection.ChatMessagesStats;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -143,12 +142,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             """, nativeQuery = true)
     Page<Message> findAllByUserId(UUID userId, Pageable pageable);
 
-    @Query(value = """
-            select if(m.id = ?1, true, false) from ftd_chat_message as m 
-            where m.chat_id = ?2 and m.is_stub = false order by m.created_at desc limit 1
-            """, nativeQuery = true)
-    boolean isMessageIdLastInChat(UUID id, UUID chatId);
-
     @Query(value = "with "
             + UNIFIED_ALL_UNREAD_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + UNREAD_MESSAGE_IDS + """
                 select m.*
@@ -156,5 +149,11 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                 where id in (select id from message_id)
             """, nativeQuery = true)
     List<Message> findAllUnreadMessages(UUID userId);
+
+    @Query(value = """
+            select m.* from ftd_chat_message as m 
+            where m.chat_id = ?1 and m.is_stub = false order by m.created_at desc limit 1
+            """, nativeQuery = true)
+    Message findLastMessageInChat(UUID chatId);
 
 }

@@ -13,7 +13,7 @@ public class TestStatus extends Status {
         super(messageId, userId, type);
     }
 
-    public static TestStatus.TestStatusBuilder defaultBuilder() {
+    public static TestStatusBuilder defaultBuilder() {
         return TestStatus.builder()
                 .type(StatusType.READ);
     }

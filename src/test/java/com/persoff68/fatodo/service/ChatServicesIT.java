@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.client.UserServiceClient;
+import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.repository.ChatRepository;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
@@ -52,13 +54,17 @@ public class ChatServicesIT {
 
     @MockBean
     UserServiceClient userServiceClient;
+    @MockBean
+    WsServiceClient wsServiceClient;
 
     MockMvc mvc;
 
     @BeforeEach
     public void setup() {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        doNothing().when(wsServiceClient).sendChatNewEvent(any());
 
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
@@ -66,7 +72,6 @@ public class ChatServicesIT {
         // create chats
         chatService.createDirect(USER_1_ID, USER_2_ID);
         secondChat = chatService.createIndirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID));
-
     }
 
     @Test
