@@ -4,7 +4,6 @@ import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
@@ -36,8 +35,6 @@ public class MessageServicesIT {
     private static final UUID USER_1_ID = UUID.fromString("98a4f736-70c2-4c7d-b75b-f7a5ae7bbe8d");
     private static final UUID USER_2_ID = UUID.fromString("8d583dfd-acfb-4481-80e6-0b46170e2a18");
     private static final UUID USER_3_ID = UUID.fromString("5b8bfe7e-7651-4d39-a70c-22c997e376b1");
-
-    private static final int TIMEOUT = 30;
 
     private static final Pageable pageable = PageRequest.of(0, 100);
 
@@ -82,12 +79,10 @@ public class MessageServicesIT {
         // create chats
         firstChat = chatService.createDirect(USER_1_ID, USER_2_ID);
         secondChat = chatService.createIndirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID));
-        sleep(TIMEOUT);
 
         // init with messages
         messageService.send(USER_1_ID, firstChat.getId(), UUID.randomUUID().toString(), null);
         messageService.send(USER_1_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
-        sleep(TIMEOUT);
     }
 
     @Test
@@ -104,13 +99,10 @@ public class MessageServicesIT {
     private void beforeLeaveAndGetAllMessagesTest() {
         // leave second chat
         memberEventService.leaveChat(USER_1_ID, secondChat.getId());
-        sleep(TIMEOUT);
         // message to second chat
         messageService.send(USER_2_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
-        sleep(TIMEOUT);
         // enter second chat
         memberEventService.addUsers(USER_2_ID, secondChat.getId(), Collections.singletonList(USER_1_ID));
-        sleep(TIMEOUT);
         // message to second chat
         messageService.send(USER_1_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
     }
@@ -123,9 +115,6 @@ public class MessageServicesIT {
                 .getAllByUserIdAndChatId(USER_1_ID, secondChat.getId(), pageable);
         List<Message> secondUserSecondChatMessageList = messageService
                 .getAllByUserIdAndChatId(USER_2_ID, secondChat.getId(), pageable);
-
-        List<MemberEvent> memberEventList = memberEventRepository.findAll();
-        List<Message> messageList = messageRepository.findAll();
 
         assertThat(firstUserSecondChatMessageList.size()).isEqualTo(5);
         assertThat(secondUserSecondChatMessageList.size()).isEqualTo(6);
@@ -150,14 +139,6 @@ public class MessageServicesIT {
 
         assertThat(firstUserSecondChatMessageList.size()).isEqualTo(1);
         assertThat(secondUserSecondChatMessageList.size()).isEqualTo(3);
-    }
-
-    private void sleep(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            // skip
-        }
     }
 
 }
