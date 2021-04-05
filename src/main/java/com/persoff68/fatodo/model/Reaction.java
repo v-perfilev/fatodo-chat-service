@@ -1,7 +1,6 @@
 package com.persoff68.fatodo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.persoff68.fatodo.model.constant.ReactionType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
