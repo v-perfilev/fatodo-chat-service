@@ -5,7 +5,7 @@ import org.hibernate.id.UUIDGenerator;
 
 import java.io.Serializable;
 
-public class UpdatableUUIDGenerator extends UUIDGenerator {
+public class UpdatableUuidGenerator extends UUIDGenerator {
 
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object object) {

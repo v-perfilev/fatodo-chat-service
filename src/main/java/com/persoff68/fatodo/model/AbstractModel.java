@@ -14,7 +14,7 @@ public abstract class AbstractModel {
 
     @Id
     @GeneratedValue(generator = "custom-uuid")
-    @GenericGenerator(name = "custom-uuid", strategy = "com.persoff68.fatodo.model.generator.UpdatableUUIDGenerator")
+    @GenericGenerator(name = "custom-uuid", strategy = "com.persoff68.fatodo.model.generator.UpdatableUuidGenerator")
     protected UUID id;
 
 }
