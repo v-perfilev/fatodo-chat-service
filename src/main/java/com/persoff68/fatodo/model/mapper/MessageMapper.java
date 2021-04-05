@@ -47,7 +47,7 @@ public abstract class MessageMapper {
                 : Collections.emptyList();
 
         List<StatusDTO> statusDTOList = message.getStatuses() != null
-                ?message.getStatuses().stream()
+                ? message.getStatuses().stream()
                 .map(statusMapper::pojoToDTO)
                 .collect(Collectors.toList())
                 : Collections.emptyList();
@@ -65,7 +65,7 @@ public abstract class MessageMapper {
         UUID chatId = chat != null ? chat.getId() : null;
 
         List<StatusDTO> statusDTOList = message.getStatuses() != null
-                ?message.getStatuses().stream()
+                ? message.getStatuses().stream()
                 .map(statusMapper::pojoToDTO)
                 .collect(Collectors.toList())
                 : Collections.emptyList();
