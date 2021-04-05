@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureStubRunner(ids = {"com.persoff68.fatodo:wsservice:+:stubs"},
-        stubsMode = StubRunnerProperties.StubsMode.REMOTE)
+        stubsMode = StubRunnerProperties.StubsMode.LOCAL)
 public class WsServiceCT {
 
     @Autowired

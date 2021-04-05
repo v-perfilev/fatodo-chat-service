@@ -4,6 +4,7 @@ import com.persoff68.fatodo.model.dto.StatusDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
 import lombok.Builder;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +21,8 @@ public class TestStatusesDTO extends StatusesDTO {
     public static TestStatusesDTOBuilder defaultBuilder() {
         return TestStatusesDTO.builder()
                 .chatId(UUID.randomUUID())
-                .messageId(UUID.randomUUID());
+                .messageId(UUID.randomUUID())
+                .statuses(Collections.singletonList(TestStatusDTO.defaultBuilder().build().toParent()));
     }
 
     public StatusesDTO toParent() {

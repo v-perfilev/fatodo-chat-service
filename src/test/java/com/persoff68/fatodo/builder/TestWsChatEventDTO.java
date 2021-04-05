@@ -18,7 +18,7 @@ public class TestWsChatEventDTO extends WsChatEventDTO {
     public static TestWsChatEventDTOBuilder defaultBuilder() {
         return TestWsChatEventDTO.builder()
                 .userIds(Collections.singletonList(UUID.randomUUID()))
-                .chatDTO(new ChatDTO());
+                .chatDTO(TestChatDTO.defaultBuilder().build().toParent());
     }
 
     public WsChatEventDTO toParent() {

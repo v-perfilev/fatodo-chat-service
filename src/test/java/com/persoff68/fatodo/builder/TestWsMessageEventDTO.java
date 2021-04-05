@@ -18,7 +18,7 @@ public class TestWsMessageEventDTO extends WsMessageEventDTO {
     public static TestWsMessageEventDTOBuilder defaultBuilder() {
         return TestWsMessageEventDTO.builder()
                 .userIds(Collections.singletonList(UUID.randomUUID()))
-                .messageDTO(new MessageDTO());
+                .messageDTO(TestMessageDTO.defaultBuilder().build().toParent());
     }
 
     public WsMessageEventDTO toParent() {
