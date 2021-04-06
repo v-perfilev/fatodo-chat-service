@@ -45,7 +45,7 @@ public class Reaction {
     private Date timestamp = new Date();
 
     @ManyToOne(targetEntity = Message.class)
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "message_id", insertable = false, updatable = false)
     @JsonBackReference
     private Message message;
 
