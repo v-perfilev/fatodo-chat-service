@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class MessageController {
     static final String ENDPOINT = "/api/message";
 
-    private static final int DEFAULT_SIZE = 50;
+    private static final int DEFAULT_SIZE = 30;
 
     private final MessageService messageService;
     private final MessageMapper messageMapper;
