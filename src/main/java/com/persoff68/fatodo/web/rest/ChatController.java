@@ -40,7 +40,7 @@ public class ChatController {
     private final ChatService chatService;
     private final ChatMapper chatMapper;
 
-    @GetMapping
+    @GetMapping("/get-all")
     public ResponseEntity<List<ChatDTO>> getAllPageable(@RequestParam(required = false) Integer offset,
                                                         @RequestParam(required = false) Integer size) {
         offset = Optional.ofNullable(offset).orElse(0);
@@ -54,7 +54,7 @@ public class ChatController {
         return ResponseEntity.ok(chatDtoList);
     }
 
-    @GetMapping("/{chatId}")
+    @GetMapping("/get-by-id/{chatId}")
     public ResponseEntity<ChatDTO> getById(@PathVariable UUID chatId) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Chat chat = chatService.getByUserIdAndId(userId, chatId);

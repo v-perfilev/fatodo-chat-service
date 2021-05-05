@@ -90,7 +90,8 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetAllPageable_ok_withoutParams() throws Exception {
-        ResultActions resultActions = mvc.perform(get(ENDPOINT))
+        String url = ENDPOINT + "/get-all";
+        ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
@@ -101,7 +102,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetAllPageable_ok_withParams() throws Exception {
-        String url = ENDPOINT + "?offset=1&size=10";
+        String url = ENDPOINT + "/get-all?offset=1&size=10";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -113,7 +114,8 @@ public class ChatControllerIT {
     @Test
     @WithAnonymousUser
     void testGetAllPageable_unauthorized() throws Exception {
-        mvc.perform(get(ENDPOINT))
+        String url = ENDPOINT + "/get-all";
+        mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -121,7 +123,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetById_ok() throws Exception {
-        String url = ENDPOINT + "/" + chat1.getId().toString();
+        String url = ENDPOINT + "/get-by-id/" + chat1.getId().toString();
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -132,7 +134,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetById_badRequest_noPermissions() throws Exception {
-        String url = ENDPOINT + "/" + chat2.getId().toString();
+        String url = ENDPOINT + "/get-by-id/" + chat2.getId().toString();
         mvc.perform(get(url))
                 .andExpect(status().isBadRequest());
     }
@@ -140,7 +142,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetById_notFound() throws Exception {
-        String url = ENDPOINT + "/" + UUID.randomUUID().toString();
+        String url = ENDPOINT + "/get-by-id/" + UUID.randomUUID();
         mvc.perform(get(url))
                 .andExpect(status().isNotFound());
     }
@@ -148,7 +150,7 @@ public class ChatControllerIT {
     @Test
     @WithAnonymousUser
     void testGetById_unauthorized() throws Exception {
-        String url = ENDPOINT + "/" + UUID.randomUUID().toString();
+        String url = ENDPOINT + "/get-by-id/" + UUID.randomUUID();
         mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
@@ -268,7 +270,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRename_notFound() throws Exception {
-        String url = ENDPOINT + "/rename/" + UUID.randomUUID().toString();
+        String url = ENDPOINT + "/rename/" + UUID.randomUUID();
         String requestBody = "test_name";
         mvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON).content(requestBody))
