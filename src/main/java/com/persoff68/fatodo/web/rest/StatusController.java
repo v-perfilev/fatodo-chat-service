@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequestMapping(StatusController.ENDPOINT)
 @RequiredArgsConstructor
 public class StatusController {
-    static final String ENDPOINT = "/api/status";
+    static final String ENDPOINT = "/api/statuses";
 
     private final StatusService statusService;
 

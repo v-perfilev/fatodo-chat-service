@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequestMapping(MemberController.ENDPOINT)
 @RequiredArgsConstructor
 public class MemberController {
-    static final String ENDPOINT = "/api/member";
+    static final String ENDPOINT = "/api/members";
 
     private final MemberEventService memberEventService;
 

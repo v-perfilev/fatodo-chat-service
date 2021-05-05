@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequestMapping(ReactionController.ENDPOINT)
 @RequiredArgsConstructor
 public class ReactionController {
-    static final String ENDPOINT = "/api/reaction";
+    static final String ENDPOINT = "/api/reactions";
 
     private final ReactionService reactionService;
 

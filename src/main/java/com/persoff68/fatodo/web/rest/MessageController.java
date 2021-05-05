@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class MessageController {
-    static final String ENDPOINT = "/api/message";
+    static final String ENDPOINT = "/api/messages";
 
     private static final int DEFAULT_SIZE = 30;
 

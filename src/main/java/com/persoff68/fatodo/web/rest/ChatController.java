@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class ChatController {
-    static final String ENDPOINT = "/api/chat";
+    static final String ENDPOINT = "/api/chats";
 
     public static final int DEFAULT_SIZE = 20;
 
