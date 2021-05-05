@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,12 +19,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                     select id, chat_id, user_id, is_stub, is_event,
                            created_at as timestamp, null as type, null as is_read
                     from ftd_chat_message
-                    where chat_id = ?1
+                    where chat_id = :chatId
                     union
                     select id, chat_id, null as user_id, null as is_stub, null as is_event,
                            timestamp, type, null as is_read
                     from ftd_chat_member_event
-                    where chat_id = ?1 and user_id = ?2)
+                    where chat_id = :chatId and user_id = :userId)
             """;
 
     String UNIFIED_ALL_CHATS_MESSAGES_AND_EVENTS = """
@@ -32,12 +33,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                            m.created_at as timestamp, null as type, null as is_read
                     from ftd_chat_message as m
                              right join ftd_chat_member_event as e on m.chat_id = e.chat_id
-                    where e.user_id = ?1
+                    where e.user_id = :userId
                     union
                     select id, chat_id, null as user_id, null as is_stub, null as is_event,
                            timestamp, type, null as is_read
                     from ftd_chat_member_event
-                    where user_id = ?1)
+                    where user_id = :userId)
             """;
 
     String UNIFIED_ALL_UNREAD_MESSAGES_AND_EVENTS = """
@@ -46,15 +47,15 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                            m.created_at as timestamp, null as type, s.type as is_read
                     from ftd_chat_message as m
                              left join ftd_chat_status as s on m.id = s.message_id
-                                and s.user_id = ?1
+                                and s.user_id = :userId
                                 and s.type = 'READ'
                              right join ftd_chat_member_event as e on m.chat_id = e.chat_id
-                    where e.user_id = ?1 and m.user_id <> ?1
+                    where e.user_id = :userId and m.user_id <> :userId
                     union
                     select id, chat_id, null as user_id, null as is_stub, null as is_event,
                            timestamp, type, null as is_read
                     from ftd_chat_member_event
-                    where user_id = ?1)
+                    where user_id = :userId)
             """;
 
     String VALIDATED = """
@@ -102,7 +103,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                          from validated
                          where type is null
                            and valid = 1
-                           and (is_stub = false or (is_stub = true and user_id = ?1)))
+                           and (is_stub = false or (is_stub = true and user_id = :userId)))
             """;
 
     String UNREAD_MESSAGE_IDS = """
@@ -127,8 +128,11 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                 select count(*)
                 from message_id
             """, nativeQuery = true)
-    Page<Message> findAllByChatIdAndUserId(UUID chatId, UUID userId, Pageable pageable);
-
+    Page<Message> findAllByChatIdAndUserId(
+            @Param("chatId") UUID chatId,
+            @Param("userId") UUID userId,
+            Pageable pageable
+    );
 
     @Query(value = "with "
             + UNIFIED_ALL_CHATS_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + LAST_MESSAGE_IDS + """
@@ -141,7 +145,10 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                 select count(*)
                 from message_id
             """, nativeQuery = true)
-    Page<Message> findAllByUserId(UUID userId, Pageable pageable);
+    Page<Message> findAllByUserId(
+            @Param("userId") UUID userId,
+            Pageable pageable
+    );
 
     @Query(value = "with "
             + UNIFIED_ALL_UNREAD_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + UNREAD_MESSAGE_IDS + """
@@ -149,20 +156,24 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                 from ftd_chat_message as m
                 where id in (select id from message_id)
             """, nativeQuery = true)
-    List<Message> findAllUnreadMessagesByUserId(UUID userId);
-
-    @Query(value = "with "
-            + UNIFIED_ALL_UNREAD_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + UNREAD_MESSAGE_IDS + """
-                select m.*
-                from ftd_chat_message as m
-                where id in (select id from message_id)
-            """, nativeQuery = true)
-    List<Message> findFilteredByUserId(UUID userId, String filter);
+    List<Message> findAllUnreadMessagesByUserId(
+            @Param("userId") UUID userId
+    );
 
     @Query(value = """
             select m.* from ftd_chat_message as m
-            where m.chat_id = ?1 and m.is_stub = false order by m.created_at desc limit 1
             """, nativeQuery = true)
-    Message findLastMessageInChat(UUID chatId);
+    List<Message> findFilteredByUserId(
+            @Param("userId") UUID userId,
+            @Param("filter") String filter
+    );
+
+    @Query(value = """
+            select m.* from ftd_chat_message as m
+            where m.chat_id = :chatId and m.is_stub = false order by m.created_at desc limit 1
+            """, nativeQuery = true)
+    Message findLastMessageInChat(
+            @Param("chatId") UUID chatId
+    );
 
 }
