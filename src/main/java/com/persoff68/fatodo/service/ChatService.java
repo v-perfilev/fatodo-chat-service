@@ -43,6 +43,12 @@ public class ChatService {
                 .collect(ChatUtils.CHAT_MAP_COLLECTOR);
     }
 
+    public Map<Chat, Message> getFilteredByUserId(UUID userId, String filter) {
+        List<Message> chatList = messageRepository.findFilteredByUserId(userId, filter);
+        return chatList.stream()
+                .collect(ChatUtils.CHAT_MAP_COLLECTOR);
+    }
+
     public Chat getByUserIdAndId(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -130,7 +136,7 @@ public class ChatService {
     }
 
     public Multimap<UUID, UUID> getUnreadMessagesMap(UUID userId) {
-        List<Message> unreadMessageList = messageRepository.findAllUnreadMessages(userId);
+        List<Message> unreadMessageList = messageRepository.findAllUnreadMessagesByUserId(userId);
         Multimap<UUID, Message> unreadMessageMultimap = Multimaps.index(unreadMessageList, m -> m.getChat().getId());
         return Multimaps.transformValues(unreadMessageMultimap, AbstractModel::getId);
     }

@@ -54,6 +54,16 @@ public class ChatController {
         return ResponseEntity.ok(chatDtoList);
     }
 
+    @GetMapping("/get-filtered/{filter}")
+    public ResponseEntity<List<ChatDTO>> getFiltered(@PathVariable String filter) {
+        UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
+        Map<Chat, Message> chatMap = chatService.getFilteredByUserId(userId, filter);
+        List<ChatDTO> chatDtoList = chatMap.entrySet().stream()
+                .map(entry -> chatMapper.pojoToDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(chatDtoList);
+    }
+
     @GetMapping("/get-by-id/{chatId}")
     public ResponseEntity<ChatDTO> getById(@PathVariable UUID chatId) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
