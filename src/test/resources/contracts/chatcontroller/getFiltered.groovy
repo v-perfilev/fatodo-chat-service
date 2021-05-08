@@ -3,7 +3,7 @@ package contracts.chatcontroller
 import org.springframework.cloud.contract.spec.Contract
 
 Contract.make {
-    name 'get pageable chats for user'
+    name 'get filtered chats for user'
     description 'should return status 200 and list of ChatDTO'
     request {
         method GET()

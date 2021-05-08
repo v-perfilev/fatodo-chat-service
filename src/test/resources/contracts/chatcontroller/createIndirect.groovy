@@ -7,7 +7,7 @@ Contract.make {
     description 'should return status 201 and ChatDTO'
     request {
         method POST()
-        url("/api/chat/create-indirect")
+        url("/api/chats/create-indirect")
         headers {
             contentType applicationJson()
             header 'Authorization': $(
