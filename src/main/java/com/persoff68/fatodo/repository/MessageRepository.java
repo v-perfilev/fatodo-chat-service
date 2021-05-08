@@ -174,13 +174,15 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             @Param("userId") UUID userId
     );
 
-    @Query(value = "with " + UNIFIED_FILTERED_CHAT_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + LAST_MESSAGE_IDS + """
+    @Query(value = "with " + UNIFIED_FILTERED_CHAT_MESSAGES_AND_EVENTS
+            + ", " + VALIDATED + ", " + LAST_MESSAGE_IDS + """
                 select m.*
                 from ftd_chat_message as m
                 where id in (select id from message_id)
                 order by m.created_at desc
             """, countQuery = "with "
-            + UNIFIED_FILTERED_CHAT_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + LAST_MESSAGE_IDS + """
+            + UNIFIED_FILTERED_CHAT_MESSAGES_AND_EVENTS
+            + ", " + VALIDATED + ", " + LAST_MESSAGE_IDS + """
                 select count(*)
                 from message_id
             """, nativeQuery = true)
