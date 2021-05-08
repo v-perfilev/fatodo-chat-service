@@ -26,7 +26,7 @@ Contract.make {
         body([
                 [
                         "id"      : "b73e8418-ff4a-472b-893d-4e248ae93797",
-                        "title"   : null,
+                        "title"   : "title",
                         "isDirect": false
                 ]
         ])
