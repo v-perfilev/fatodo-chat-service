@@ -29,7 +29,7 @@ public class UserServiceCT {
     @Test
     void testGetAllIdsByUsernamePart() {
         List<UUID> idList = userServiceClient.getAllIdsByUsernamePart("test");
-        assertThat(idList).isEmpty();
+        assertThat(idList).isNotEmpty();
     }
 
 }
