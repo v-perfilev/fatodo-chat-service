@@ -8,8 +8,8 @@ Contract.make {
     request {
         method GET()
         url($(
-                consumer(regex("/api/member/delete/" + uuid().toString())),
-                producer("/api/member/delete/b73e8418-ff4a-472b-893d-4e248ae93797")
+                consumer(regex("/api/members/delete/" + uuid().toString())),
+                producer("/api/members/delete/b73e8418-ff4a-472b-893d-4e248ae93797")
         ))
         headers {
             contentType applicationJson()
