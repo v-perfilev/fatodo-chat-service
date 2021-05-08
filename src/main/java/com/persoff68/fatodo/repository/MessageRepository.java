@@ -58,6 +58,20 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                     where user_id = :userId)
             """;
 
+
+    String UNIFIED_FILTERED_CHAT_MESSAGES_AND_EVENTS = """
+            unified as (
+                    select id, chat_id, user_id, is_stub, is_event,
+                           created_at as timestamp, null as type, null as is_read
+                    from ftd_chat_message
+                    where chat_id in :chatIdList
+                    union
+                    select id, chat_id, null as user_id, null as is_stub, null as is_event,
+                           timestamp, type, null as is_read
+                    from ftd_chat_member_event
+                    where chat_id in :chatIdList and user_id = :userId)
+            """;
+
     String VALIDATED = """
             validated as (
                          select id,
@@ -160,12 +174,19 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             @Param("userId") UUID userId
     );
 
-    @Query(value = """
-            select m.* from ftd_chat_message as m
+    @Query(value = "with " + UNIFIED_FILTERED_CHAT_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + LAST_MESSAGE_IDS + """
+                select m.*
+                from ftd_chat_message as m
+                where id in (select id from message_id)
+                order by m.created_at desc
+            """, countQuery = "with "
+            + UNIFIED_FILTERED_CHAT_MESSAGES_AND_EVENTS + ", " + VALIDATED + ", " + LAST_MESSAGE_IDS + """
+                select count(*)
+                from message_id
             """, nativeQuery = true)
-    List<Message> findFilteredByUserId(
-            @Param("userId") UUID userId,
-            @Param("filter") String filter
+    List<Message> findAllByChatIdListAndUserId(
+            @Param("chatIdList") List<UUID> chatIdList,
+            @Param("userId") UUID userId
     );
 
     @Query(value = """

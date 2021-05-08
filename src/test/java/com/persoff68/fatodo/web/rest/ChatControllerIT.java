@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,6 +49,7 @@ public class ChatControllerIT {
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
     private static final String USER_ID_2 = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
     private static final String USER_ID_3 = "a762e074-0c26-4a3e-9495-44ccb2baf85c";
+    private static final String USER_ID_4 = "e3526697-ce05-4cad-b289-97b8755169c1";
 
     private Chat chat1;
     private Chat chat2;
@@ -75,23 +77,22 @@ public class ChatControllerIT {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        when(userServiceClient.getAllIdsByUsernamePart(any())).thenReturn(Collections.emptyList());
         doNothing().when(wsServiceClient).sendChatNewEvent(any());
         doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
 
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
 
-        chat1 = createChat(false, USER_ID_1, USER_ID_2);
-        chat2 = createChat(false, USER_ID_2, USER_ID_3);
-        createChat(true, USER_ID_1, USER_ID_2);
-
+        chat1 = createChat("test_chat", false, USER_ID_1, USER_ID_2);
+        chat2 = createChat(null, false, USER_ID_2, USER_ID_3);
+        createChat(null, true, USER_ID_1, USER_ID_4);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetAllPageable_ok_withoutParams() throws Exception {
-        String url = ENDPOINT + "/get-all";
-        ResultActions resultActions = mvc.perform(get(url))
+        ResultActions resultActions = mvc.perform(get(ENDPOINT))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
@@ -102,7 +103,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetAllPageable_ok_withParams() throws Exception {
-        String url = ENDPOINT + "/get-all?offset=1&size=10";
+        String url = ENDPOINT + "?offset=1&size=10";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -114,16 +115,60 @@ public class ChatControllerIT {
     @Test
     @WithAnonymousUser
     void testGetAllPageable_unauthorized() throws Exception {
-        String url = ENDPOINT + "/get-all";
+        mvc.perform(get(ENDPOINT))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testGetFiltered_ok_byTitle() throws Exception {
+        String url = ENDPOINT + "/filtered/test";
+        ResultActions resultActions = mvc.perform(get(url))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
+        List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
+        assertThat(resultDTOList).isNotEmpty();
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testGetFiltered_ok_byUsername() throws Exception {
+        when(userServiceClient.getAllIdsByUsernamePart("test_user"))
+                .thenReturn(Collections.singletonList(UUID.fromString(USER_ID_4)));
+        String url = ENDPOINT + "/filtered/test_user";
+        ResultActions resultActions = mvc.perform(get(url))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
+        List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
+        assertThat(resultDTOList).isNotEmpty();
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testGetFiltered_ok_empty() throws Exception {
+        String url = ENDPOINT + "/filtered/not_found";
+        ResultActions resultActions = mvc.perform(get(url))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
+        List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
+        assertThat(resultDTOList).isEmpty();
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testGetFiltered_unauthorized() throws Exception {
+        String url = ENDPOINT + "/filtered/test";
         mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
 
-
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetById_ok() throws Exception {
-        String url = ENDPOINT + "/get-by-id/" + chat1.getId().toString();
+        String url = ENDPOINT + "/id/" + chat1.getId().toString();
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -134,7 +179,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetById_badRequest_noPermissions() throws Exception {
-        String url = ENDPOINT + "/get-by-id/" + chat2.getId().toString();
+        String url = ENDPOINT + "/id/" + chat2.getId().toString();
         mvc.perform(get(url))
                 .andExpect(status().isBadRequest());
     }
@@ -142,7 +187,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetById_notFound() throws Exception {
-        String url = ENDPOINT + "/get-by-id/" + UUID.randomUUID();
+        String url = ENDPOINT + "/id/" + UUID.randomUUID();
         mvc.perform(get(url))
                 .andExpect(status().isNotFound());
     }
@@ -150,7 +195,7 @@ public class ChatControllerIT {
     @Test
     @WithAnonymousUser
     void testGetById_unauthorized() throws Exception {
-        String url = ENDPOINT + "/get-by-id/" + UUID.randomUUID();
+        String url = ENDPOINT + "/id/" + UUID.randomUUID();
         mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
@@ -172,7 +217,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateDirect_badRequest_alreadyExists() throws Exception {
-        UUID userId = UUID.fromString(USER_ID_2);
+        UUID userId = UUID.fromString(USER_ID_4);
         String url = ENDPOINT + "/create-direct/" + userId;
         mvc.perform(get(url))
                 .andExpect(status().isBadRequest());
@@ -197,7 +242,6 @@ public class ChatControllerIT {
                 .andExpect(status().isUnauthorized());
     }
 
-
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateIndirect_ok() throws Exception {
@@ -216,7 +260,6 @@ public class ChatControllerIT {
         assertThat(resultDTO.isDirect()).isFalse();
     }
 
-
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateIndirect_notFound() throws Exception {
@@ -229,7 +272,6 @@ public class ChatControllerIT {
                 .andExpect(status().isNotFound());
     }
 
-
     @Test
     @WithAnonymousUser
     void testCreateIndirect_unauthorized() throws Exception {
@@ -240,7 +282,6 @@ public class ChatControllerIT {
                 .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
-
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
@@ -255,7 +296,6 @@ public class ChatControllerIT {
         assertThat(resultDTO.getId()).isEqualTo(chat1.getId());
         assertThat(resultDTO.getTitle()).isEqualTo(requestBody);
     }
-
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
@@ -288,8 +328,8 @@ public class ChatControllerIT {
     }
 
 
-    private Chat createChat(boolean isDirect, String... userIds) {
-        Chat chat = TestChat.defaultBuilder().isDirect(isDirect).build().toParent();
+    private Chat createChat(String title, boolean isDirect, String... userIds) {
+        Chat chat = TestChat.defaultBuilder().title(title).isDirect(isDirect).build().toParent();
         Chat savedChat = chatRepository.saveAndFlush(chat);
         createAddMemberEvents(savedChat, userIds);
         createStubMessages(savedChat, userIds);

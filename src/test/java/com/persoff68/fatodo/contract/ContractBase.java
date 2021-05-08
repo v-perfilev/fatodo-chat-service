@@ -74,7 +74,7 @@ public abstract class ContractBase {
         reactionRepository.deleteAll();
         statusRepository.deleteAll();
 
-        Chat chat = createChat(CHAT_ID);
+        Chat chat = createChat("test", CHAT_ID);
         createAddMemberEvent(chat, USER_ID_1);
         createAddMemberEvent(chat, USER_ID_2);
         createMessage(chat, MESSAGE_ID_1, USER_ID_1);
@@ -93,8 +93,8 @@ public abstract class ContractBase {
         doNothing().when(wsServiceClient).sendReactionsEvent(any());
     }
 
-    private Chat createChat(UUID chatId) {
-        Chat chat = TestChat.defaultBuilder().id(chatId).build().toParent();
+    private Chat createChat(String title, UUID chatId) {
+        Chat chat = TestChat.defaultBuilder().id(chatId).title(title).build().toParent();
         return entityManager.merge(chat);
     }
 

@@ -29,4 +29,8 @@ public class UserService {
         });
     }
 
+    public List<UUID> getUserIdsByUsernamePart(String username) {
+        return userServiceClient.getAllIdsByUsernamePart(username);
+    }
+
 }

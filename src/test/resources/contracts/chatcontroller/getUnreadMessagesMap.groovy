@@ -7,7 +7,7 @@ Contract.make {
     description 'should return status 200 and map of uuid'
     request {
         method GET()
-        url("/api/chat/unread-messages-map")
+        url("/api/chats/unread-messages-map")
         headers {
             header 'Authorization': $(
                     consumer(containing("Bearer")),

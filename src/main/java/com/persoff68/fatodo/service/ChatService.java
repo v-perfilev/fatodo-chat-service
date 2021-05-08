@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +45,18 @@ public class ChatService {
     }
 
     public Map<Chat, Message> getFilteredByUserId(UUID userId, String filter) {
-        List<Message> chatList = messageRepository.findFilteredByUserId(userId, filter);
-        return chatList.stream()
+        List<UUID> userIdList = userService.getUserIdsByUsernamePart(filter);
+        List<Chat> chatList = chatRepository.findAllByUserId(userId);
+        List<UUID> chatIdList = chatList.stream()
+                .filter(chat -> {
+                    boolean filteredByTitle = chat.getTitle() != null && chat.getTitle().contains(filter);
+                    boolean filteredByUsers = ChatUtils.isAnyUserInChat(chat, userIdList);
+                    return filteredByTitle || filteredByUsers;
+                })
+                .map(Chat::getId)
+                .collect(Collectors.toList());
+        List<Message> messageList = messageRepository.findAllByChatIdListAndUserId(chatIdList, userId);
+        return messageList.stream()
                 .collect(ChatUtils.CHAT_MAP_COLLECTOR);
     }
 

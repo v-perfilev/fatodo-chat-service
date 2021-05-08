@@ -8,8 +8,8 @@ Contract.make {
     request {
         method GET()
         url($(
-                consumer(regex("/api/chat.*")),
-                producer("/api/chat")
+                consumer(regex("/api/chats.*")),
+                producer("/api/chats")
         ))
         headers {
             header 'Authorization': $(

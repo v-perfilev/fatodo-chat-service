@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +41,7 @@ public class ChatController {
     private final ChatService chatService;
     private final ChatMapper chatMapper;
 
-    @GetMapping("/get-all")
+    @GetMapping
     public ResponseEntity<List<ChatDTO>> getAllPageable(@RequestParam(required = false) Integer offset,
                                                         @RequestParam(required = false) Integer size) {
         offset = Optional.ofNullable(offset).orElse(0);
@@ -54,8 +55,8 @@ public class ChatController {
         return ResponseEntity.ok(chatDtoList);
     }
 
-    @GetMapping("/get-filtered/{filter}")
-    public ResponseEntity<List<ChatDTO>> getFiltered(@PathVariable String filter) {
+    @GetMapping("/filtered/{filter}")
+    public ResponseEntity<List<ChatDTO>> getFiltered(@PathVariable @NotBlank String filter) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Map<Chat, Message> chatMap = chatService.getFilteredByUserId(userId, filter);
         List<ChatDTO> chatDtoList = chatMap.entrySet().stream()
@@ -64,7 +65,7 @@ public class ChatController {
         return ResponseEntity.ok(chatDtoList);
     }
 
-    @GetMapping("/get-by-id/{chatId}")
+    @GetMapping("/id/{chatId}")
     public ResponseEntity<ChatDTO> getById(@PathVariable UUID chatId) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Chat chat = chatService.getByUserIdAndId(userId, chatId);

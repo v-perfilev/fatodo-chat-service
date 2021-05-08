@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,6 +24,12 @@ public class UserServiceCT {
     void testGetAllUsernamesByIds() {
         boolean doesIdExist = userServiceClient.doesIdExist(UUID.randomUUID());
         assertThat(doesIdExist).isFalse();
+    }
+
+    @Test
+    void testGetAllIdsByUsernamePart() {
+        List<UUID> idList = userServiceClient.getAllIdsByUsernamePart("test");
+        assertThat(idList).isEmpty();
     }
 
 }

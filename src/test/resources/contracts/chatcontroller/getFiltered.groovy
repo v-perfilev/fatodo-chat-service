@@ -3,13 +3,13 @@ package contracts.chatcontroller
 import org.springframework.cloud.contract.spec.Contract
 
 Contract.make {
-    name 'get chat by id'
-    description 'should return status 200 and ChatDTO'
+    name 'get pageable chats for user'
+    description 'should return status 200 and list of ChatDTO'
     request {
         method GET()
         url($(
-                consumer(regex("/api/chats/id/" + uuid().toString())),
-                producer("/api/chats/id/b73e8418-ff4a-472b-893d-4e248ae93797")
+                consumer(regex("/api/chats/filtered/.*")),
+                producer("/api/chats/filtered/test")
         ))
         headers {
             header 'Authorization': $(
@@ -24,9 +24,11 @@ Contract.make {
             contentType applicationJson()
         }
         body([
-                "id"      : "b73e8418-ff4a-472b-893d-4e248ae93797",
-                "title"   : null,
-                "isDirect": false
+                [
+                        "id"      : "b73e8418-ff4a-472b-893d-4e248ae93797",
+                        "title"   : "test",
+                        "isDirect": false
+                ]
         ])
     }
 }

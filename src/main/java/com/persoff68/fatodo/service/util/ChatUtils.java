@@ -8,6 +8,7 @@ import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,6 +33,11 @@ public class ChatUtils {
     public static boolean isUserInChat(Chat chat, UUID userId) {
         List<UUID> activeUserIdLIst = getActiveUserIdList(chat);
         return activeUserIdLIst.contains(userId);
+    }
+
+    public static boolean isAnyUserInChat(Chat chat, List<UUID> userIdList) {
+        List<UUID> activeUserIdList = getActiveUserIdList(chat);
+        return !Collections.disjoint(activeUserIdList, userIdList);
     }
 
     public static boolean wasUserInChat(Chat chat, UUID userId) {
