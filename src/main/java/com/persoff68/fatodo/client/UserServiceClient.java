@@ -13,7 +13,7 @@ public interface UserServiceClient {
     @GetMapping(value = "/api/check/id/{id}")
     boolean doesIdExist(@PathVariable UUID id);
 
-    @GetMapping(value = "/api/user-data/ids/{username}/username")
+    @GetMapping(value = "/api/user-data/ids/{username}/username-part")
     List<UUID> getAllIdsByUsernamePart(@PathVariable String username);
 
 }
