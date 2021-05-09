@@ -21,4 +21,4 @@ COPY ./etc/tools/wait wait
 RUN chmod +x /wait
 
 # final command
-CMD /wait && java -XX:+UseContainerSupport -XX:+TieredCompilation -jar /app/app.jar
+CMD /wait && java $JAVA_OPTS -XX:+UseContainerSupport -XX:+TieredCompilation -jar /app/app.jar
