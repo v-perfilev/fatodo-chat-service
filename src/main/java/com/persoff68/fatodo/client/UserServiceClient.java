@@ -10,10 +10,10 @@ import java.util.UUID;
 @FeignClient(name = "user-service", primary = false)
 public interface UserServiceClient {
 
-    @GetMapping(value = "/api/check/id-exists/{id}")
+    @GetMapping(value = "/api/check/id/{id}")
     boolean doesIdExist(@PathVariable UUID id);
 
-    @GetMapping(value = "/api/user/all-ids-by-username/{username}")
+    @GetMapping(value = "/api/user-data/ids/{username}/username")
     List<UUID> getAllIdsByUsernamePart(@PathVariable String username);
 
 }
