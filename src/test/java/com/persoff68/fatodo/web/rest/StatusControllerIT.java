@@ -21,12 +21,11 @@ import com.persoff68.fatodo.repository.StatusRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,11 +36,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
+@AutoConfigureMockMvc
 public class StatusControllerIT {
     private static final String ENDPOINT = "/api/statuses";
 
@@ -55,7 +54,7 @@ public class StatusControllerIT {
     private Message message4;
 
     @Autowired
-    WebApplicationContext context;
+    MockMvc mvc;
     @Autowired
     ChatRepository chatRepository;
     @Autowired
@@ -72,12 +71,8 @@ public class StatusControllerIT {
     @MockBean
     WsServiceClient wsServiceClient;
 
-    MockMvc mvc;
-
     @BeforeEach
     public void setup() {
-        mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
-
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
         messageRepository.deleteAll();

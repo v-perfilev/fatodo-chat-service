@@ -29,6 +29,8 @@ public abstract class MessageMapper {
     private StatusMapper statusMapper;
 
     @Mapping(target = "forwardedMessage", ignore = true)
+    @Mapping(target = "statuses", ignore = true)
+    @Mapping(target = "reactions", ignore = true)
     abstract MessageDTO defaultPojoToDTO(Message message);
 
     public MessageDTO pojoToDTO(Message message) {
