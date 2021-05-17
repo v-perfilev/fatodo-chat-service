@@ -1,10 +1,11 @@
 package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.exception.ClientException;
-import com.persoff68.fatodo.model.dto.WsChatEventDTO;
-import com.persoff68.fatodo.model.dto.WsMessageEventDTO;
-import com.persoff68.fatodo.model.dto.WsReactionsEventDTO;
-import com.persoff68.fatodo.model.dto.WsStatusesEventDTO;
+import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.MessageDTO;
+import com.persoff68.fatodo.model.dto.ReactionsDTO;
+import com.persoff68.fatodo.model.dto.StatusesDTO;
+import com.persoff68.fatodo.model.dto.WsEventDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
@@ -19,7 +20,7 @@ public class WsServiceClientWrapper implements WsServiceClient {
     private final WsServiceClient wsServiceClient;
 
     @Override
-    public void sendChatNewEvent(WsChatEventDTO event) {
+    public void sendChatNewEvent(WsEventDTO<ChatDTO> event) {
         try {
             wsServiceClient.sendChatNewEvent(event);
         } catch (Exception e) {
@@ -28,7 +29,7 @@ public class WsServiceClientWrapper implements WsServiceClient {
     }
 
     @Override
-    public void sendChatUpdateEvent(WsChatEventDTO event) {
+    public void sendChatUpdateEvent(WsEventDTO<ChatDTO> event) {
         try {
             wsServiceClient.sendChatUpdateEvent(event);
         } catch (Exception e) {
@@ -37,7 +38,7 @@ public class WsServiceClientWrapper implements WsServiceClient {
     }
 
     @Override
-    public void sendChatLastMessageEvent(WsChatEventDTO event) {
+    public void sendChatLastMessageEvent(WsEventDTO<ChatDTO> event) {
         try {
             wsServiceClient.sendChatLastMessageEvent(event);
         } catch (Exception e) {
@@ -46,7 +47,7 @@ public class WsServiceClientWrapper implements WsServiceClient {
     }
 
     @Override
-    public void sendChatLastMessageUpdateEvent(WsChatEventDTO event) {
+    public void sendChatLastMessageUpdateEvent(WsEventDTO<ChatDTO> event) {
         try {
             wsServiceClient.sendChatLastMessageUpdateEvent(event);
         } catch (Exception e) {
@@ -55,7 +56,7 @@ public class WsServiceClientWrapper implements WsServiceClient {
     }
 
     @Override
-    public void sendMessageNewEvent(WsMessageEventDTO event) {
+    public void sendMessageNewEvent(WsEventDTO<MessageDTO> event) {
         try {
             wsServiceClient.sendMessageNewEvent(event);
         } catch (Exception e) {
@@ -64,7 +65,7 @@ public class WsServiceClientWrapper implements WsServiceClient {
     }
 
     @Override
-    public void sendMessageUpdateEvent(WsMessageEventDTO event) {
+    public void sendMessageUpdateEvent(WsEventDTO<MessageDTO> event) {
         try {
             wsServiceClient.sendMessageUpdateEvent(event);
         } catch (Exception e) {
@@ -73,7 +74,7 @@ public class WsServiceClientWrapper implements WsServiceClient {
     }
 
     @Override
-    public void sendStatusesEvent(WsStatusesEventDTO event) {
+    public void sendStatusesEvent(WsEventDTO<StatusesDTO> event) {
         try {
             wsServiceClient.sendStatusesEvent(event);
         } catch (Exception e) {
@@ -82,7 +83,7 @@ public class WsServiceClientWrapper implements WsServiceClient {
     }
 
     @Override
-    public void sendReactionsEvent(WsReactionsEventDTO event) {
+    public void sendReactionsEvent(WsEventDTO<ReactionsDTO> event) {
         try {
             wsServiceClient.sendReactionsEvent(event);
         } catch (Exception e) {

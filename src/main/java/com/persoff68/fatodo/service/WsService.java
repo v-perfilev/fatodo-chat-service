@@ -7,10 +7,7 @@ import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
-import com.persoff68.fatodo.model.dto.WsChatEventDTO;
-import com.persoff68.fatodo.model.dto.WsMessageEventDTO;
-import com.persoff68.fatodo.model.dto.WsReactionsEventDTO;
-import com.persoff68.fatodo.model.dto.WsStatusesEventDTO;
+import com.persoff68.fatodo.model.dto.WsEventDTO;
 import com.persoff68.fatodo.model.mapper.ChatMapper;
 import com.persoff68.fatodo.model.mapper.MessageMapper;
 import com.persoff68.fatodo.service.util.ChatUtils;
@@ -31,56 +28,56 @@ public class WsService {
     public void sendChatNewEvent(Chat chat) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
-        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
+        WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
         wsServiceClient.sendChatNewEvent(eventDTO);
     }
 
     public void sendChatUpdateEvent(Chat chat) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
-        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
+        WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
         wsServiceClient.sendChatUpdateEvent(eventDTO);
     }
 
     public void sendChatLastMessageEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         ChatDTO chatDTO = chatMapper.pojoToDTO(message.getChat(), message);
-        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
+        WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
         wsServiceClient.sendChatLastMessageEvent(eventDTO);
     }
 
     public void sendChatLastMessageUpdateEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         ChatDTO chatDTO = chatMapper.pojoToDTO(message.getChat(), message);
-        WsChatEventDTO eventDTO = new WsChatEventDTO(userIdList, chatDTO);
+        WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
         wsServiceClient.sendChatLastMessageUpdateEvent(eventDTO);
     }
 
     public void sendMessageNewEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         MessageDTO messageDTO = messageMapper.pojoToDTO(message);
-        WsMessageEventDTO eventDTO = new WsMessageEventDTO(userIdList, messageDTO);
+        WsEventDTO<MessageDTO> eventDTO = new WsEventDTO<>(userIdList, messageDTO);
         wsServiceClient.sendMessageNewEvent(eventDTO);
     }
 
     public void sendMessageUpdateEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         MessageDTO messageDTO = messageMapper.pojoToDTO(message);
-        WsMessageEventDTO eventDTO = new WsMessageEventDTO(userIdList, messageDTO);
+        WsEventDTO<MessageDTO> eventDTO = new WsEventDTO<>(userIdList, messageDTO);
         wsServiceClient.sendMessageUpdateEvent(eventDTO);
     }
 
     public void sendMessageStatusEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         StatusesDTO statusesDTO = messageMapper.pojoToStatusesDTO(message);
-        WsStatusesEventDTO eventDTO = new WsStatusesEventDTO(userIdList, statusesDTO);
+        WsEventDTO<StatusesDTO> eventDTO = new WsEventDTO<>(userIdList, statusesDTO);
         wsServiceClient.sendStatusesEvent(eventDTO);
     }
 
     public void sendMessageReactionEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         ReactionsDTO reactionsDTO = messageMapper.pojoToReactionsDTO(message);
-        WsReactionsEventDTO eventDTO = new WsReactionsEventDTO(userIdList, reactionsDTO);
+        WsEventDTO<ReactionsDTO> eventDTO = new WsEventDTO<>(userIdList, reactionsDTO);
         wsServiceClient.sendReactionsEvent(eventDTO);
     }
 

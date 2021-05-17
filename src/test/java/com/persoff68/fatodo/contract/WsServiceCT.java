@@ -1,14 +1,16 @@
 package com.persoff68.fatodo.contract;
 
-import com.persoff68.fatodo.builder.TestWsChatEventDTO;
-import com.persoff68.fatodo.builder.TestWsMessageEventDTO;
-import com.persoff68.fatodo.builder.TestWsReactionsEventDTO;
-import com.persoff68.fatodo.builder.TestWsStatusesEventDTO;
+import com.persoff68.fatodo.builder.TestChatDTO;
+import com.persoff68.fatodo.builder.TestMessageDTO;
+import com.persoff68.fatodo.builder.TestReactionsDTO;
+import com.persoff68.fatodo.builder.TestStatusesDTO;
+import com.persoff68.fatodo.builder.TestWsEventDTO;
 import com.persoff68.fatodo.client.WsServiceClient;
-import com.persoff68.fatodo.model.dto.WsChatEventDTO;
-import com.persoff68.fatodo.model.dto.WsMessageEventDTO;
-import com.persoff68.fatodo.model.dto.WsReactionsEventDTO;
-import com.persoff68.fatodo.model.dto.WsStatusesEventDTO;
+import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.MessageDTO;
+import com.persoff68.fatodo.model.dto.ReactionsDTO;
+import com.persoff68.fatodo.model.dto.StatusesDTO;
+import com.persoff68.fatodo.model.dto.WsEventDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,56 +29,66 @@ public class WsServiceCT {
 
     @Test
     void testSendChatNewEvent() {
-        WsChatEventDTO dto = TestWsChatEventDTO.defaultBuilder().build().toParent();
+        ChatDTO chatDTO = TestChatDTO.defaultBuilder().build().toParent();
+        WsEventDTO<ChatDTO> dto = TestWsEventDTO.<ChatDTO>defaultBuilder().content(chatDTO).build().toParent();
         wsServiceClient.sendChatNewEvent(dto);
         assertThat(true).isTrue();
     }
 
     @Test
     void testSendChatUpdateEvent() {
-        WsChatEventDTO dto = TestWsChatEventDTO.defaultBuilder().build().toParent();
+        ChatDTO chatDTO = TestChatDTO.defaultBuilder().build().toParent();
+        WsEventDTO<ChatDTO> dto = TestWsEventDTO.<ChatDTO>defaultBuilder().content(chatDTO).build().toParent();
         wsServiceClient.sendChatUpdateEvent(dto);
         assertThat(true).isTrue();
     }
 
     @Test
     void testSendChatLastMessageEvent() {
-        WsChatEventDTO dto = TestWsChatEventDTO.defaultBuilder().build().toParent();
+        ChatDTO chatDTO = TestChatDTO.defaultBuilder().build().toParent();
+        WsEventDTO<ChatDTO> dto = TestWsEventDTO.<ChatDTO>defaultBuilder().content(chatDTO).build().toParent();
         wsServiceClient.sendChatLastMessageEvent(dto);
         assertThat(true).isTrue();
     }
 
     @Test
     void testSendChatLastMessageUpdateEvent() {
-        WsChatEventDTO dto = TestWsChatEventDTO.defaultBuilder().build().toParent();
+        ChatDTO chatDTO = TestChatDTO.defaultBuilder().build().toParent();
+        WsEventDTO<ChatDTO> dto = TestWsEventDTO.<ChatDTO>defaultBuilder().content(chatDTO).build().toParent();
         wsServiceClient.sendChatLastMessageUpdateEvent(dto);
         assertThat(true).isTrue();
     }
 
     @Test
     void testSendMessageNewEvent() {
-        WsMessageEventDTO dto = TestWsMessageEventDTO.defaultBuilder().build().toParent();
+        MessageDTO messageDTO = TestMessageDTO.defaultBuilder().build().toParent();
+        WsEventDTO<MessageDTO> dto = TestWsEventDTO.<MessageDTO>defaultBuilder().content(messageDTO).build().toParent();
         wsServiceClient.sendMessageNewEvent(dto);
         assertThat(true).isTrue();
     }
 
     @Test
     void testSendMessageUpdateEvent() {
-        WsMessageEventDTO dto = TestWsMessageEventDTO.defaultBuilder().build().toParent();
+        MessageDTO messageDTO = TestMessageDTO.defaultBuilder().build().toParent();
+        WsEventDTO<MessageDTO> dto = TestWsEventDTO.<MessageDTO>defaultBuilder().content(messageDTO).build().toParent();
         wsServiceClient.sendMessageUpdateEvent(dto);
         assertThat(true).isTrue();
     }
 
     @Test
     void testSendStatusesEvent() {
-        WsStatusesEventDTO dto = TestWsStatusesEventDTO.defaultBuilder().build().toParent();
+        StatusesDTO statusesDTO = TestStatusesDTO.defaultBuilder().build().toParent();
+        WsEventDTO<StatusesDTO> dto = TestWsEventDTO.<StatusesDTO>defaultBuilder()
+                .content(statusesDTO).build().toParent();
         wsServiceClient.sendStatusesEvent(dto);
         assertThat(true).isTrue();
     }
 
     @Test
     void testSendReactionsEvent() {
-        WsReactionsEventDTO dto = TestWsReactionsEventDTO.defaultBuilder().build().toParent();
+        ReactionsDTO reactionsDTO = TestReactionsDTO.defaultBuilder().build().toParent();
+        WsEventDTO<ReactionsDTO> dto = TestWsEventDTO.<ReactionsDTO>defaultBuilder()
+                .content(reactionsDTO).build().toParent();
         wsServiceClient.sendReactionsEvent(dto);
         assertThat(true).isTrue();
     }
