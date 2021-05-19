@@ -17,7 +17,7 @@ import java.io.IOException;
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 @RequiredArgsConstructor
-public class ServiceExceptionHandling {
+public class ServiceExceptionHandlerSet {
 
     private final ObjectMapper objectMapper;
 

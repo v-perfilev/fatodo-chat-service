@@ -18,7 +18,7 @@ import java.io.IOException;
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 @RequiredArgsConstructor
-public class RestExceptionHandling {
+public class RestExceptionHandlerSet {
 
     private final ObjectMapper objectMapper;
 
