@@ -7,6 +7,7 @@ import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
+import com.persoff68.fatodo.service.ws.WsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

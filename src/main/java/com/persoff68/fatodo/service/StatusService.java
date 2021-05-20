@@ -7,6 +7,7 @@ import com.persoff68.fatodo.model.constant.StatusType;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.repository.StatusRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
+import com.persoff68.fatodo.service.ws.WsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

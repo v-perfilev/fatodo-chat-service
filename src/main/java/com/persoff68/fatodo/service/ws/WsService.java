@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.service;
+package com.persoff68.fatodo.service.ws;
 
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
@@ -12,6 +12,7 @@ import com.persoff68.fatodo.model.mapper.ChatMapper;
 import com.persoff68.fatodo.model.mapper.MessageMapper;
 import com.persoff68.fatodo.service.util.ChatUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Async
 public class WsService {
 
     private final WsServiceClient wsServiceClient;
