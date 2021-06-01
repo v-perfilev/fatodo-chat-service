@@ -60,8 +60,8 @@
         <skipITs>${skipTests}</skipITs>
         <!-- Profiles -->
         <dev.spring-profile>dev</dev.spring-profile>
-        <dev-docker.spring-profile>devDocker</dev-docker.spring-profile>
         <docker.spring-profile>docker</docker.spring-profile>
+        <stage.spring-profile>stage</stage.spring-profile>
         <prod.spring-profile>prod</prod.spring-profile>
     </properties>
 
@@ -626,18 +626,18 @@
                 <spring.profiles.active>${dev.spring-profile}</spring.profiles.active>
             </properties>
         </profile>
-        <!-- development docker profile -->
-        <profile>
-            <id>devDocker</id>
-            <properties>
-                <spring.profiles.active>${dev-docker.spring-profile}</spring.profiles.active>
-            </properties>
-        </profile>
         <!-- docker profile -->
         <profile>
             <id>docker</id>
             <properties>
                 <spring.profiles.active>${docker.spring-profile}</spring.profiles.active>
+            </properties>
+        </profile>
+        <!-- stage profile -->
+        <profile>
+            <id>stage</id>
+            <properties>
+                <spring.profiles.active>${stage.spring-profile}</spring.profiles.active>
             </properties>
         </profile>
         <!-- prod profile -->

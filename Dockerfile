@@ -6,7 +6,7 @@ WORKDIR /build
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
 COPY etc etc
-RUN ./mvnw verify clean --fail-never
+RUN ./mvnw dependency:resolve
 
 # app build layer
 COPY src src
