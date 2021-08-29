@@ -42,7 +42,7 @@ public class MessageService {
         userService.checkUserExists(recipientId);
         Chat chat = chatService.getOrCreateDirectByUserIds(userId, recipientId);
 
-        Message message = Message.of(chat, userId, text, getForwardedById(userId, forwardedMessageId));
+        Message message = Message.of(chat, userId, text, getReferenceById(userId, forwardedMessageId));
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 
@@ -53,11 +53,11 @@ public class MessageService {
         return message;
     }
 
-    public Message send(UUID userId, UUID chatId, String text, UUID forwardedMessageId) {
+    public Message send(UUID userId, UUID chatId, String text, UUID referenceId) {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
         permissionService.hasSendMessagePermission(chat, userId);
 
-        Message message = Message.of(chat, userId, text, getForwardedById(userId, forwardedMessageId));
+        Message message = Message.of(chat, userId, text, getReferenceById(userId, referenceId));
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 
@@ -68,13 +68,12 @@ public class MessageService {
         return message;
     }
 
-    public Message edit(UUID userId, UUID messageId, String text, UUID forwardedMessageId) {
+    public Message edit(UUID userId, UUID messageId, String text) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         permissionService.hasEditMessagePermission(message, userId);
 
         message.setText(text);
-        message.setForwardedMessage(getForwardedById(userId, forwardedMessageId));
         message = messageRepository.save(message);
         Chat chat = message.getChat();
         entityManager.refresh(chat);
@@ -94,7 +93,7 @@ public class MessageService {
         permissionService.hasEditMessagePermission(message, userId);
 
         message.setText(null);
-        message.setForwardedMessage(null);
+        message.setReference(null);
         message.setDeleted(true);
         message = messageRepository.save(message);
         Chat chat = message.getChat();
@@ -114,7 +113,7 @@ public class MessageService {
         return lastMessageInChat != null && lastMessageInChat.getId() == messageId;
     }
 
-    private Message getForwardedById(UUID userId, UUID messageId) {
+    private Message getReferenceById(UUID userId, UUID messageId) {
         if (messageId == null) {
             return null;
         }

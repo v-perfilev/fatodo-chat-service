@@ -28,7 +28,7 @@ public abstract class MessageMapper {
     @Autowired
     private StatusMapper statusMapper;
 
-    @Mapping(target = "forwardedMessage", ignore = true)
+    @Mapping(target = "reference", ignore = true)
     @Mapping(target = "statuses", ignore = true)
     @Mapping(target = "reactions", ignore = true)
     abstract MessageDTO defaultPojoToDTO(Message message);
@@ -40,7 +40,7 @@ public abstract class MessageMapper {
         Chat chat = message.getChat();
         UUID chatId = chat != null ? chat.getId() : null;
 
-        MessageDTO forwardedMessageDTO = pojoToDTO(message.getForwardedMessage());
+        MessageDTO referenceDTO = pojoToDTO(message.getReference());
 
         List<ReactionDTO> reactionDTOList = message.getReactions() != null
                 ? message.getReactions().stream()
@@ -56,7 +56,7 @@ public abstract class MessageMapper {
 
         MessageDTO dto = defaultPojoToDTO(message);
         dto.setChatId(chatId);
-        dto.setForwardedMessage(forwardedMessageDTO);
+        dto.setReference(referenceDTO);
         dto.setReactions(reactionDTOList);
         dto.setStatuses(statusDTOList);
         return dto;

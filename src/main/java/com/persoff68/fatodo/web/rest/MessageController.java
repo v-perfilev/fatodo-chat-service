@@ -61,7 +61,7 @@ public class MessageController {
                                                  @Valid @RequestBody MessageVM messageVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Message message = messageService
-                .sendDirect(userId, recipientId, messageVM.getText(), messageVM.getForwardedMessageId());
+                .sendDirect(userId, recipientId, messageVM.getText(), messageVM.getReferenceId());
         MessageDTO messageDTO = messageMapper.pojoToDTO(message);
         return ResponseEntity.status(HttpStatus.CREATED).body(messageDTO);
     }
@@ -71,7 +71,7 @@ public class MessageController {
                                            @Valid @RequestBody MessageVM messageVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Message message = messageService
-                .send(userId, chatId, messageVM.getText(), messageVM.getForwardedMessageId());
+                .send(userId, chatId, messageVM.getText(), messageVM.getReferenceId());
         MessageDTO messageDTO = messageMapper.pojoToDTO(message);
         return ResponseEntity.status(HttpStatus.CREATED).body(messageDTO);
     }
@@ -81,7 +81,7 @@ public class MessageController {
                                            @Valid @RequestBody MessageVM messageVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Message message = messageService
-                .edit(userId, messageId, messageVM.getText(), messageVM.getForwardedMessageId());
+                .edit(userId, messageId, messageVM.getText());
         MessageDTO messageDTO = messageMapper.pojoToDTO(message);
         return ResponseEntity.ok(messageDTO);
     }

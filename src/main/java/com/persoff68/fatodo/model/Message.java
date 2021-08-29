@@ -35,7 +35,7 @@ public class Message extends AbstractAuditingModel {
     private String text;
 
     @OneToOne
-    private Message forwardedMessage;
+    private Message reference;
 
     private boolean isEvent = false;
     private boolean isStub = false;
@@ -47,12 +47,12 @@ public class Message extends AbstractAuditingModel {
     @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true)
     private List<Reaction> reactions = new ArrayList<>();
 
-    public static Message of(Chat chat, UUID userId, String text, Message forwardedMessage) {
+    public static Message of(Chat chat, UUID userId, String text, Message reference) {
         Message message = new Message();
         message.chat = chat;
         message.userId = userId;
         message.text = text;
-        message.forwardedMessage = forwardedMessage;
+        message.reference = reference;
         return message;
     }
 

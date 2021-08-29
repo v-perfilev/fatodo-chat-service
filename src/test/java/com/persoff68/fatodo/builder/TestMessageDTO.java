@@ -17,7 +17,7 @@ public class TestMessageDTO extends MessageDTO {
                           @NotNull UUID chatId,
                           @NotNull UUID userId,
                           @NotNull String text,
-                          MessageDTO forwardedMessage,
+                          MessageDTO reference,
                           boolean isEvent,
                           List<StatusDTO> statuses,
                           List<ReactionDTO> reactions) {
@@ -26,7 +26,7 @@ public class TestMessageDTO extends MessageDTO {
         super.setChatId(chatId);
         super.setUserId(userId);
         super.setText(text);
-        super.setForwardedMessage(forwardedMessage);
+        super.setReference(reference);
         super.setEvent(isEvent);
         super.setStatuses(statuses);
         super.setReactions(reactions);
@@ -46,7 +46,7 @@ public class TestMessageDTO extends MessageDTO {
         dto.setChatId(getChatId());
         dto.setUserId(getUserId());
         dto.setText(getText());
-        dto.setForwardedMessage(getForwardedMessage());
+        dto.setReference(getReference());
         dto.setEvent(isEvent());
         dto.setStatuses(getStatuses());
         dto.setReactions(getReactions());

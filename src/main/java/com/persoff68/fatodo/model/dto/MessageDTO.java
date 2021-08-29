@@ -14,7 +14,7 @@ public class MessageDTO extends AbstractAuditingDTO {
     private UUID chatId;
     private UUID userId;
     private String text;
-    private MessageDTO forwardedMessage;
+    private MessageDTO reference;
 
     @JsonProperty("isDeleted")
     private boolean isDeleted;

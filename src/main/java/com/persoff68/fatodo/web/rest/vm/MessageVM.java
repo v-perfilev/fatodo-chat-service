@@ -9,5 +9,5 @@ import java.util.UUID;
 public class MessageVM {
     @NotEmpty
     private String text;
-    private UUID forwardedMessageId;
+    private UUID referenceId;
 }
