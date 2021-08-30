@@ -77,7 +77,7 @@ public class MessageControllerIT {
     WsServiceClient wsServiceClient;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws InterruptedException {
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatLastMessageEvent(any());
         doNothing().when(wsServiceClient).sendChatLastMessageUpdateEvent(any());
@@ -149,7 +149,7 @@ public class MessageControllerIT {
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         ResultActions resultActions = mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         MessageDTO resultDTO = objectMapper.readValue(resultString, MessageDTO.class);
@@ -161,11 +161,11 @@ public class MessageControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSendDirect_notFound() throws Exception {
         when(userServiceClient.doesIdExist(any())).thenReturn(false);
-        String url = ENDPOINT + "/direct/" + UUID.randomUUID().toString();
+        String url = ENDPOINT + "/direct/" + UUID.randomUUID();
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -173,11 +173,11 @@ public class MessageControllerIT {
     @WithAnonymousUser
     void testSendDirect_unauthorized() throws Exception {
         when(userServiceClient.doesIdExist(any())).thenReturn(false);
-        String url = ENDPOINT + "/direct/" + UUID.randomUUID().toString();
+        String url = ENDPOINT + "/direct/" + UUID.randomUUID();
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -189,7 +189,7 @@ public class MessageControllerIT {
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         ResultActions resultActions = mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         MessageDTO resultDTO = objectMapper.readValue(resultString, MessageDTO.class);
@@ -204,18 +204,18 @@ public class MessageControllerIT {
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSend_notFound() throws Exception {
-        String url = ENDPOINT + "/" + UUID.randomUUID().toString();
+        String url = ENDPOINT + "/" + UUID.randomUUID();
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -226,7 +226,7 @@ public class MessageControllerIT {
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -238,7 +238,7 @@ public class MessageControllerIT {
         MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         ResultActions resultActions = mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         MessageDTO resultDTO = objectMapper.readValue(resultString, MessageDTO.class);
@@ -253,7 +253,7 @@ public class MessageControllerIT {
         MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -264,18 +264,18 @@ public class MessageControllerIT {
         MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testEdit_notFound() throws Exception {
-        String url = ENDPOINT + "/" + UUID.randomUUID().toString();
+        String url = ENDPOINT + "/" + UUID.randomUUID();
         MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -286,7 +286,7 @@ public class MessageControllerIT {
         MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -318,7 +318,7 @@ public class MessageControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testDelete_notFound() throws Exception {
-        String url = ENDPOINT + "/" + UUID.randomUUID().toString();
+        String url = ENDPOINT + "/" + UUID.randomUUID();
         mvc.perform(delete(url))
                 .andExpect(status().isNotFound());
     }
