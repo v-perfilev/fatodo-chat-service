@@ -11,7 +11,7 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <springProfile name="docker,prod">
+    <springProfile name="stage,prod">
         <!-- Kafka Appender -->
         <appender name="kafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">
             <encoder>
