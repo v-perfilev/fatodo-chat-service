@@ -6,7 +6,7 @@ import com.persoff68.fatodo.model.dto.StatusDTO;
 import lombok.Builder;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class TestMessageDTO extends MessageDTO {
@@ -19,8 +19,8 @@ public class TestMessageDTO extends MessageDTO {
                           @NotNull String text,
                           MessageDTO reference,
                           boolean isEvent,
-                          List<StatusDTO> statuses,
-                          List<ReactionDTO> reactions) {
+                          Set<StatusDTO> statuses,
+                          Set<ReactionDTO> reactions) {
         super();
         super.setId(id);
         super.setChatId(chatId);

@@ -7,7 +7,7 @@ import com.persoff68.fatodo.model.Status;
 import lombok.Builder;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class TestMessage extends Message {
@@ -20,8 +20,8 @@ public class TestMessage extends Message {
                        @NotNull String text,
                        Message reference,
                        boolean isEvent,
-                       List<Status> statuses,
-                       List<Reaction> reactions) {
+                       Set<Status> statuses,
+                       Set<Reaction> reactions) {
         super();
         super.setChat(chat);
         super.setUserId(userId);

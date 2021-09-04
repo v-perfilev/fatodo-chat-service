@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -21,7 +21,7 @@ public class MessageDTO extends AbstractAuditingDTO {
     @JsonProperty("isEvent")
     private boolean isEvent;
 
-    private List<StatusDTO> statuses;
-    private List<ReactionDTO> reactions;
+    private Set<StatusDTO> statuses;
+    private Set<ReactionDTO> reactions;
 
 }

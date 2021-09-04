@@ -8,13 +8,14 @@ import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -22,8 +23,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@ToString(exclude = {"chat"})
+@EqualsAndHashCode(callSuper = true, exclude = {"chat", "reference", "statuses", "reactions"})
+@ToString(exclude = {"chat", "reference", "statuses", "reactions"})
 public class Message extends AbstractAuditingModel {
 
     @ManyToOne
@@ -41,11 +42,11 @@ public class Message extends AbstractAuditingModel {
     private boolean isStub = false;
     private boolean isDeleted = false;
 
-    @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true)
-    private List<Status> statuses = new ArrayList<>();
+    @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<Status> statuses = new HashSet<>();
 
-    @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true)
-    private List<Reaction> reactions = new ArrayList<>();
+    @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<Reaction> reactions = new HashSet<>();
 
     public static Message of(Chat chat, UUID userId, String text, Message reference) {
         Message message = new Message();

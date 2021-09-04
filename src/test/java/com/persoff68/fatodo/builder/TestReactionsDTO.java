@@ -5,13 +5,13 @@ import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import lombok.Builder;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class TestReactionsDTO extends ReactionsDTO {
 
     @Builder
-    TestReactionsDTO(UUID chatId, UUID messageId, List<ReactionDTO> reactions) {
+    TestReactionsDTO(UUID chatId, UUID messageId, Set<ReactionDTO> reactions) {
         super();
         super.setChatId(chatId);
         super.setMessageId(messageId);
@@ -22,7 +22,7 @@ public class TestReactionsDTO extends ReactionsDTO {
         return TestReactionsDTO.builder()
                 .chatId(UUID.randomUUID())
                 .messageId(UUID.randomUUID())
-                .reactions(Collections.singletonList(TestReactionDTO.defaultBuilder().build().toParent()));
+                .reactions(Collections.singleton(TestReactionDTO.defaultBuilder().build().toParent()));
     }
 
     public ReactionsDTO toParent() {

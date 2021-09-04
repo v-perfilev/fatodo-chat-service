@@ -76,10 +76,10 @@ public class ChatService {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         Chat chat = create(userIdList, true);
 
-        // STUB MESSAGE
-        systemMessageService.createStubMessages(chat.getId(), userIdList);
         // WS
         wsService.sendChatNewEvent(chat);
+        // STUB MESSAGE
+        systemMessageService.createStubMessages(chat.getId(), userIdList);
         // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 firstUserId,
@@ -96,10 +96,10 @@ public class ChatService {
         allUserIdList.add(userId);
         Chat chat = create(allUserIdList, false);
 
-        // STUB MESSAGES
-        systemMessageService.createStubMessages(chat.getId(), allUserIdList);
         // WS
         wsService.sendChatNewEvent(chat);
+        // STUB MESSAGES
+        systemMessageService.createStubMessages(chat.getId(), allUserIdList);
         // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 userId,

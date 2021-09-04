@@ -38,11 +38,12 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
-    public Message sendDirect(UUID userId, UUID recipientId, String text, UUID forwardedMessageId) {
+    public Message sendDirect(UUID userId, UUID recipientId, String text, UUID referenceId) {
         userService.checkUserExists(recipientId);
         Chat chat = chatService.getOrCreateDirectByUserIds(userId, recipientId);
 
-        Message message = Message.of(chat, userId, text, getReferenceById(userId, forwardedMessageId));
+        Message reference = getReferenceById(userId, referenceId);
+        Message message = Message.of(chat, userId, text, reference);
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 
@@ -57,7 +58,8 @@ public class MessageService {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
         permissionService.hasSendMessagePermission(chat, userId);
 
-        Message message = Message.of(chat, userId, text, getReferenceById(userId, referenceId));
+        Message reference = getReferenceById(userId, referenceId);
+        Message message = Message.of(chat, userId, text, reference);
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 

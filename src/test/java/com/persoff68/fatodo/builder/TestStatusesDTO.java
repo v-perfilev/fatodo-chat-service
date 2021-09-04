@@ -5,13 +5,13 @@ import com.persoff68.fatodo.model.dto.StatusesDTO;
 import lombok.Builder;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class TestStatusesDTO extends StatusesDTO {
 
     @Builder
-    TestStatusesDTO(UUID chatId, UUID messageId, List<StatusDTO> statuses) {
+    TestStatusesDTO(UUID chatId, UUID messageId, Set<StatusDTO> statuses) {
         super();
         super.setChatId(chatId);
         super.setMessageId(messageId);
@@ -22,7 +22,7 @@ public class TestStatusesDTO extends StatusesDTO {
         return TestStatusesDTO.builder()
                 .chatId(UUID.randomUUID())
                 .messageId(UUID.randomUUID())
-                .statuses(Collections.singletonList(TestStatusDTO.defaultBuilder().build().toParent()));
+                .statuses(Collections.singleton(TestStatusDTO.defaultBuilder().build().toParent()));
     }
 
     public StatusesDTO toParent() {
