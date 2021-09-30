@@ -72,7 +72,7 @@ public class ChatControllerIT {
 
     @BeforeEach
     public void setup() {
-        when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        when(userServiceClient.doIdsExist(any())).thenReturn(true);
         when(userServiceClient.getAllIdsByUsernamePart(any())).thenReturn(Collections.emptyList());
         doNothing().when(wsServiceClient).sendChatNewEvent(any());
         doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
@@ -222,7 +222,7 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateDirect_notFound() throws Exception {
-        when(userServiceClient.doesIdExist(any())).thenReturn(false);
+        when(userServiceClient.doIdsExist(any())).thenReturn(false);
         UUID userId = UUID.randomUUID();
         String url = ENDPOINT + "/create-direct/" + userId;
         mvc.perform(get(url))
@@ -245,7 +245,7 @@ public class ChatControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_2), UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         ResultActions resultActions = mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
@@ -259,12 +259,12 @@ public class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateIndirect_notFound() throws Exception {
-        when(userServiceClient.doesIdExist(any())).thenReturn(false);
+        when(userServiceClient.doIdsExist(any())).thenReturn(false);
         String url = ENDPOINT + "/create-indirect";
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_2), UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -275,7 +275,7 @@ public class ChatControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_2), UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -285,7 +285,7 @@ public class ChatControllerIT {
         String url = ENDPOINT + "/rename/" + chat1.getId().toString();
         String requestBody = "test_name";
         ResultActions resultActions = mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
@@ -299,7 +299,7 @@ public class ChatControllerIT {
         String url = ENDPOINT + "/rename/" + chat2.getId().toString();
         String requestBody = "test_name";
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -309,7 +309,7 @@ public class ChatControllerIT {
         String url = ENDPOINT + "/rename/" + UUID.randomUUID();
         String requestBody = "test_name";
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -319,7 +319,7 @@ public class ChatControllerIT {
         String url = ENDPOINT + "/rename/" + chat1.getId().toString();
         String requestBody = "test_name";
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 

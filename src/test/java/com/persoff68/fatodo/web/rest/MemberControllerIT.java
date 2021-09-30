@@ -73,7 +73,7 @@ public class MemberControllerIT {
         chat1 = createIndirectChat(USER_ID_1, USER_ID_2);
         chat2 = createIndirectChat(USER_ID_2, USER_ID_3);
 
-        when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        when(userServiceClient.doIdsExist(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
     }
 
@@ -85,7 +85,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isOk());
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
@@ -103,7 +103,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3), UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isOk());
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
@@ -118,12 +118,12 @@ public class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     public void testAddUsers_notFound_user() throws Exception {
-        when(userServiceClient.doesIdExist(any())).thenReturn(false);
+        when(userServiceClient.doIdsExist(any())).thenReturn(false);
         String url = ENDPOINT + "/add/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.randomUUID());
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -134,7 +134,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -145,7 +145,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -156,7 +156,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -169,7 +169,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isOk());
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
@@ -189,7 +189,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3), UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isOk());
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
@@ -209,7 +209,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -220,7 +220,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -231,7 +231,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -242,7 +242,7 @@ public class MemberControllerIT {
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 

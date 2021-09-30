@@ -69,7 +69,7 @@ public class MessageServicesIT {
     public void setup() {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
-        when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        when(userServiceClient.doIdsExist(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatNewEvent(any());
 
         chatRepository.deleteAll();

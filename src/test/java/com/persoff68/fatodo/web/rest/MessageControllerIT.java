@@ -79,6 +79,7 @@ public class MessageControllerIT {
     @BeforeEach
     public void setup() throws InterruptedException {
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        when(userServiceClient.doIdsExist(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatLastMessageEvent(any());
         doNothing().when(wsServiceClient).sendChatLastMessageUpdateEvent(any());
         doNothing().when(wsServiceClient).sendMessageNewEvent(any());
