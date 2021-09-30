@@ -27,6 +27,15 @@ public class UserServiceClientWrapper implements UserServiceClient {
     }
 
     @Override
+    public boolean doIdsExist(List<UUID> idList) {
+        try {
+            return userServiceClient.doIdsExist(idList);
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
+
+    @Override
     public List<UUID> getAllIdsByUsernamePart(String username) {
         try {
             return userServiceClient.getAllIdsByUsernamePart(username);

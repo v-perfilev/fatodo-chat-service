@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,9 +22,15 @@ public class UserServiceCT {
     UserServiceClient userServiceClient;
 
     @Test
-    void testGetAllUsernamesByIds() {
+    void testCheckUserExists() {
         boolean doesIdExist = userServiceClient.doesIdExist(UUID.randomUUID());
         assertThat(doesIdExist).isFalse();
+    }
+
+    @Test
+    void testCheckUsersExist() {
+        boolean doIdsExist = userServiceClient.doIdsExist(Collections.singletonList(UUID.randomUUID()));
+        assertThat(doIdsExist).isFalse();
     }
 
     @Test
