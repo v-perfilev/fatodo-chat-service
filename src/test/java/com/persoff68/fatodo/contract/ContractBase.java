@@ -82,6 +82,7 @@ public abstract class ContractBase {
         createReaction(MESSAGE_ID_1, USER_ID_1);
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        when(userServiceClient.doIdsExist(any())).thenReturn(true);
 
         doNothing().when(wsServiceClient).sendChatNewEvent(any());
         doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
