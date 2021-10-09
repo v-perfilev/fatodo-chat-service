@@ -12,7 +12,8 @@
             </column>
 
             <column name="chat_id" type="binary(16)">
-                <constraints foreignKeyName="fk_message_chat" references="ftd_chat(id)" nullable="false"/>
+                <constraints foreignKeyName="fk_message_chat" references="ftd_chat(id)" deleteCascade="true"
+                             nullable="false"/>
             </column>
 
             <column name="user_id" type="binary(16)">

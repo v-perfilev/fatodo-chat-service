@@ -10,7 +10,7 @@
 
             <column name="message_id" type="binary(16)">
                 <constraints primaryKey="true" foreignKeyName="fk_status_message" references="ftd_chat_message(id)"
-                             nullable="false"/>
+                             deleteCascade="true" nullable="false"/>
             </column>
 
             <column name="user_id" type="binary(16)">
