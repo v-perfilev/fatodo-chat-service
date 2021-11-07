@@ -89,7 +89,7 @@ public class ServiceExceptionTest {
         Object exception = new PermissionException();
         assertThat(exception).isInstanceOf(AbstractException.class);
         AbstractException abstractException = (AbstractException) exception;
-        assertThat(abstractException.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(abstractException.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(abstractException.getFeedBackCode()).isEqualTo("permission.restricted");
     }
 
@@ -98,7 +98,7 @@ public class ServiceExceptionTest {
         Object exception = new PermissionException("test_message");
         assertThat(exception).isInstanceOf(AbstractException.class);
         AbstractException abstractException = (AbstractException) exception;
-        assertThat(abstractException.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(abstractException.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(abstractException.getFeedBackCode()).isEqualTo("permission.restricted");
     }
 

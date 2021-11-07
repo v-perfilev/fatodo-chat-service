@@ -8,11 +8,11 @@ public class PermissionException extends AbstractException {
     private static final String FEEDBACK_CODE = "permission.restricted";
 
     public PermissionException() {
-        super(HttpStatus.BAD_REQUEST, MESSAGE, FEEDBACK_CODE);
+        super(HttpStatus.FORBIDDEN, MESSAGE, FEEDBACK_CODE);
     }
 
     public PermissionException(String message) {
-        super(HttpStatus.BAD_REQUEST, message, FEEDBACK_CODE);
+        super(HttpStatus.FORBIDDEN, message, FEEDBACK_CODE);
     }
 
 }
