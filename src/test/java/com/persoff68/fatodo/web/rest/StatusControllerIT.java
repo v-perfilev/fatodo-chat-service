@@ -119,25 +119,25 @@ public class StatusControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetRead_badRequest_ownMessage() throws Exception {
+    void testSetRead_forbidden_ownMessage() throws Exception {
         String messageId = message2.getId().toString();
         String url = ENDPOINT + "/read/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetRead_badRequest_noPermissions() throws Exception {
+    void testSetRead_forbidden_noPermissions() throws Exception {
         String messageId = message4.getId().toString();
         String url = ENDPOINT + "/read/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetRead_badRequest_notFound() throws Exception {
+    void testSetRead_notFound() throws Exception {
         String messageId = UUID.randomUUID().toString();
         String url = ENDPOINT + "/read/" + messageId;
         mvc.perform(get(url))

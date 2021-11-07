@@ -174,10 +174,10 @@ public class ChatControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testGetById_badRequest_noPermissions() throws Exception {
+    void testGetById_forbidden() throws Exception {
         String url = ENDPOINT + "/id/" + chat2.getId().toString();
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -295,12 +295,12 @@ public class ChatControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testRename_badRequest_noPermissions() throws Exception {
+    void testRename_forbidden() throws Exception {
         String url = ENDPOINT + "/rename/" + chat2.getId().toString();
         String requestBody = "test_name";
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test

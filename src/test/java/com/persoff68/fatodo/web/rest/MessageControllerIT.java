@@ -128,10 +128,10 @@ public class MessageControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testGetAllByUserIdPageable_badRequest_noPermissions() throws Exception {
+    void testGetAllByUserIdPageable_forbidden() throws Exception {
         String url = ENDPOINT + "/" + chat2.getId().toString();
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -200,13 +200,13 @@ public class MessageControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSend_badRequest_noPermissions() throws Exception {
+    void testSend_forbidden() throws Exception {
         String url = ENDPOINT + "/" + chat2.getId().toString();
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -249,24 +249,24 @@ public class MessageControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testEdit_badRequest_notOwner() throws Exception {
+    void testEdit_forbidden_notOwner() throws Exception {
         String url = ENDPOINT + "/" + message2.getId().toString();
         MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testEdit_badRequest_wrongChat() throws Exception {
+    void testEdit_forbidden_wrongChat() throws Exception {
         String url = ENDPOINT + "/" + message3.getId().toString();
         MessageVM vm = TestMessageVM.defaultBuilder().text("new_text").build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -302,18 +302,18 @@ public class MessageControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testDelete_badRequest_notOwner() throws Exception {
+    void testDelete_forbidden_notOwner() throws Exception {
         String url = ENDPOINT + "/" + message2.getId().toString();
         mvc.perform(delete(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testDelete_badRequest_wrongChat() throws Exception {
+    void testDelete_forbidden_wrongChat() throws Exception {
         String url = ENDPOINT + "/" + message3.getId().toString();
         mvc.perform(delete(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test

@@ -140,13 +140,13 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUsers_badRequest_noPermissions() throws Exception {
+    public void testAddUsers_forbidden() throws Exception {
         String url = ENDPOINT + "/add/" + chat2.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -226,13 +226,13 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testRemoveUsers_badRequest_noPermissions() throws Exception {
+    public void testRemoveUsers_forbidden() throws Exception {
         String url = ENDPOINT + "/remove/" + chat2.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -264,10 +264,10 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testLeave_badRequest_noPermissions() throws Exception {
+    void testLeave_forbidden() throws Exception {
         String url = ENDPOINT + "/leave/" + chat2.getId().toString();
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -304,10 +304,10 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testClear_badRequest_noPermissions() throws Exception {
+    void testClear_forbidden() throws Exception {
         String url = ENDPOINT + "/clear/" + chat2.getId().toString();
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -344,10 +344,10 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testDelete_badRequest_noPermissions() throws Exception {
+    void testDelete_forbidden() throws Exception {
         String url = ENDPOINT + "/delete/" + chat2.getId().toString();
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test

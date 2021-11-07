@@ -125,20 +125,20 @@ public class ReactionControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetLike_badRequest_ownMessage() throws Exception {
+    void testSetLike_forbidden_ownMessage() throws Exception {
         String messageId = message2.getId().toString();
         String url = ENDPOINT + "/like/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetLike_badRequest_noPermissions() throws Exception {
+    void testSetLike_forbidden_noPermissions() throws Exception {
         String messageId = message4.getId().toString();
         String url = ENDPOINT + "/like/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -178,20 +178,20 @@ public class ReactionControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetDislike_badRequest_ownMessage() throws Exception {
+    void testSetDislike_forbidden_ownMessage() throws Exception {
         String messageId = message2.getId().toString();
         String url = ENDPOINT + "/dislike/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetDislike_badRequest_noPermissions() throws Exception {
+    void testSetDislike_forbidden_noPermissions() throws Exception {
         String messageId = message4.getId().toString();
         String url = ENDPOINT + "/dislike/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -230,25 +230,25 @@ public class ReactionControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetNone_badRequest_ownMessage() throws Exception {
+    void testSetNone_forbidden_ownMessage() throws Exception {
         String messageId = message2.getId().toString();
         String url = ENDPOINT + "/none/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetNone_badRequest_noPermissions() throws Exception {
+    void testSetNone_forbidden_noPermissions() throws Exception {
         String messageId = message4.getId().toString();
         String url = ENDPOINT + "/none/" + messageId;
         mvc.perform(get(url))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetNone_badRequest_notFound() throws Exception {
+    void testSetNone_notFound() throws Exception {
         String messageId = UUID.randomUUID().toString();
         String url = ENDPOINT + "/none/" + messageId;
         mvc.perform(get(url))
