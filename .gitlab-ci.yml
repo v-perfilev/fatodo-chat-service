@@ -38,6 +38,9 @@ unit-tests:
     paths:
       - target/
     expire_in: 1 day
+  except:
+    variables:
+      - $DEPLOY_ONLY
 
 integration-tests:
   stage: IT
@@ -50,6 +53,9 @@ integration-tests:
     paths:
       - target/
     expire_in: 1 day
+  except:
+    variables:
+      - $DEPLOY_ONLY
 
 contract-tests:
   stage: IT
@@ -65,6 +71,9 @@ contract-tests:
     paths:
       - target/
     expire_in: 1 day
+  except:
+    variables:
+      - $DEPLOY_ONLY
 
 sonar:
   stage: analyze
@@ -79,11 +88,17 @@ sonar:
     paths:
       - target/
     expire_in: 1 day
+  except:
+    variables:
+      - $DEPLOY_ONLY
 
 checkstyle:
   stage: analyze
   script:
     - ./mvnw $MAVEN_CLI_OPTS checkstyle:check $MAVEN_OPTS
+  except:
+    variables:
+      - $DEPLOY_ONLY
 
 publish-to-docker:
   image: docker:20
@@ -117,6 +132,9 @@ publish-to-nexus:
     paths:
       - target/
     expire_in: 1 day
+  except:
+    variables:
+      - $DEPLOY_ONLY
 
 deploy-to-stage:
   stage: deploy
