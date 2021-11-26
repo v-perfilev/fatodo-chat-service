@@ -4,6 +4,7 @@ import com.persoff68.fatodo.service.exception.ModelAlreadyExistsException;
 import com.persoff68.fatodo.service.exception.ModelDuplicatedException;
 import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
+import com.persoff68.fatodo.service.exception.NotAllowedUsersException;
 import com.persoff68.fatodo.service.exception.PermissionException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -82,6 +83,15 @@ public class ServiceExceptionTest {
         AbstractException abstractException = (AbstractException) exception;
         assertThat(abstractException.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(abstractException.getFeedBackCode()).isEqualTo("model.invalid");
+    }
+
+    @Test
+    void testNotAllowedUsersException_firstConstructor() {
+        Object exception = new NotAllowedUsersException();
+        assertThat(exception).isInstanceOf(AbstractException.class);
+        AbstractException abstractException = (AbstractException) exception;
+        assertThat(abstractException.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(abstractException.getFeedBackCode()).isEqualTo("permission.notAllowedUsers");
     }
 
     @Test

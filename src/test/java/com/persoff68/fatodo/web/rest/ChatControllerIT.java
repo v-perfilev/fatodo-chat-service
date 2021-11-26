@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestChat;
+import com.persoff68.fatodo.client.ContactServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
@@ -65,6 +66,8 @@ public class ChatControllerIT {
     @MockBean
     UserServiceClient userServiceClient;
     @MockBean
+    ContactServiceClient contactServiceClient;
+    @MockBean
     WsServiceClient wsServiceClient;
 
     private Chat chat1;
@@ -73,6 +76,7 @@ public class ChatControllerIT {
     @BeforeEach
     public void setup() {
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
+        when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
         when(userServiceClient.getAllIdsByUsernamePart(any())).thenReturn(Collections.emptyList());
         doNothing().when(wsServiceClient).sendChatNewEvent(any());
         doNothing().when(wsServiceClient).sendChatUpdateEvent(any());

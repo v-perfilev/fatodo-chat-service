@@ -34,6 +34,7 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
     private final UserService userService;
+    private final ContactService contactService;
     private final MemberEventService memberEventService;
     private final PermissionService permissionService;
     private final SystemMessageService systemMessageService;
@@ -135,7 +136,11 @@ public class ChatService {
     }
 
     protected Chat create(List<UUID> userIdList, boolean isDirect) {
-        userService.checkUsersExist(userIdList);
+        if (isDirect) {
+            userService.checkUsersExist(userIdList);
+        } else {
+            contactService.checkIfUsersInContactList(userIdList);
+        }
         Chat chat = chatRepository.saveAndFlush(new Chat(isDirect));
         memberEventService.addUsersUnsafe(chat.getId(), userIdList);
         return chat;

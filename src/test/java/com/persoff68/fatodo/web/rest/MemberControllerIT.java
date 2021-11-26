@@ -5,6 +5,7 @@ import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.builder.TestMemberEvent;
+import com.persoff68.fatodo.client.ContactServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
@@ -63,6 +64,8 @@ public class MemberControllerIT {
     @MockBean
     UserServiceClient userServiceClient;
     @MockBean
+    ContactServiceClient contactServiceClient;
+    @MockBean
     WsServiceClient wsServiceClient;
 
     @BeforeEach
@@ -74,6 +77,7 @@ public class MemberControllerIT {
         chat2 = createIndirectChat(USER_ID_2, USER_ID_3);
 
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
+        when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
     }
 
@@ -117,14 +121,14 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUsers_notFound_user() throws Exception {
-        when(userServiceClient.doIdsExist(any())).thenReturn(false);
+    public void testAddUsers_notAllowedUsers() throws Exception {
+        when(contactServiceClient.areUsersInContactList(any())).thenReturn(false);
         String url = ENDPOINT + "/add/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.randomUUID());
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
     }
 
     @Test

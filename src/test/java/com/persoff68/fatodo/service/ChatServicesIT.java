@@ -1,6 +1,7 @@
 package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.FatodoChatServiceApplication;
+import com.persoff68.fatodo.client.ContactServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
@@ -56,6 +57,8 @@ public class ChatServicesIT {
     @MockBean
     UserServiceClient userServiceClient;
     @MockBean
+    ContactServiceClient contactServiceClient;
+    @MockBean
     WsServiceClient wsServiceClient;
 
     MockMvc mvc;
@@ -66,6 +69,7 @@ public class ChatServicesIT {
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
+        when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatNewEvent(any());
 
         chatRepository.deleteAll();

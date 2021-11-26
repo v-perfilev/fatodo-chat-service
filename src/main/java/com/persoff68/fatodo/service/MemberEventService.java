@@ -28,6 +28,7 @@ public class MemberEventService {
     private final MemberEventRepository memberEventRepository;
     private final SystemMessageService systemMessageService;
     private final UserService userService;
+    private final ContactService contactService;
     private final PermissionService permissionService;
     private final EntityManager entityManager;
     private final WsService wsService;
@@ -49,7 +50,7 @@ public class MemberEventService {
     }
 
     public void addUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
-        userService.checkUsersExist(userIdList);
+        contactService.checkIfUsersInContactList(userIdList);
 
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
