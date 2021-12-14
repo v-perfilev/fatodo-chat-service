@@ -26,6 +26,7 @@
         <contract.package>com.persoff68.fatodo.contract</contract.package>
         <!-- Dependency versions -->
         <java.version>15</java.version>
+        <log4j2.version>2.15.0</log4j2.version>
         <spring-cloud.version>Hoxton.SR5</spring-cloud.version>
         <hikari.version>3.4.5</hikari.version>
         <h2.version>1.4.200</h2.version>
