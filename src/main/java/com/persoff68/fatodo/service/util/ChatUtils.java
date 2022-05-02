@@ -76,7 +76,7 @@ public class ChatUtils {
                     return addEventCount > deleteEventCount + leaveEventCount;
                 })
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static Table<UUID, MemberEventType, Integer> getMemberEventCountTable(List<MemberEvent> memberEventList) {

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Aspect
 @Component
@@ -87,7 +86,7 @@ public class CacheAspect {
         Cache cache = cacheManager.getCache(cacheableMethod.cacheName());
 
         List<?> sortedList = getKeyCollection(pjp, cacheableMethod.key())
-                .stream().sorted().collect(Collectors.toList());
+                .stream().sorted().toList();
         int hash = sortedList.hashCode();
 
         if (cache != null) {

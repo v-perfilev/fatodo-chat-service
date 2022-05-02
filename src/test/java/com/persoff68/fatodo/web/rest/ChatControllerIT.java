@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
 @AutoConfigureMockMvc
-public class ChatControllerIT {
+class ChatControllerIT {
     private static final String ENDPOINT = "/api/chats";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
@@ -74,7 +73,7 @@ public class ChatControllerIT {
     private Chat chat2;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
         when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
         when(userServiceClient.getAllIdsByUsernamePart(any())).thenReturn(Collections.emptyList());
@@ -97,7 +96,7 @@ public class ChatControllerIT {
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
         List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(2);
+        assertThat(resultDTOList).hasSize(2);
     }
 
     @Test
@@ -109,7 +108,7 @@ public class ChatControllerIT {
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
         List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(1);
+        assertThat(resultDTOList).hasSize(1);
     }
 
     @Test
@@ -340,7 +339,7 @@ public class ChatControllerIT {
         List<MemberEvent> messageList = Arrays.stream(userIds)
                 .map(UUID::fromString)
                 .map(userId -> new MemberEvent(chat, userId, MemberEventType.ADD_MEMBER))
-                .collect(Collectors.toList());
+                .toList();
         memberEventRepository.saveAll(messageList);
         memberEventRepository.flush();
     }
@@ -348,7 +347,7 @@ public class ChatControllerIT {
     private void createStubMessages(Chat chat, String... userIds) {
         List<Message> messageList = Arrays.stream(userIds)
                 .map(userId -> Message.stub(chat, UUID.fromString(userId)))
-                .collect(Collectors.toList());
+                .toList();
         messageRepository.saveAll(messageList);
         messageRepository.flush();
     }

@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +44,7 @@ public class SystemMessageService {
                 ? userIdList.stream()
                 .distinct()
                 .map(id -> Message.stub(chat, id))
-                .collect(Collectors.toList())
+                .toList()
                 : Collections.emptyList();
 
 

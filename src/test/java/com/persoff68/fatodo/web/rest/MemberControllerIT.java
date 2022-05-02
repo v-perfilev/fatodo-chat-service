@@ -27,7 +27,6 @@ import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
 @AutoConfigureMockMvc
-public class MemberControllerIT {
+class MemberControllerIT {
     private static final String ENDPOINT = "/api/members";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
@@ -69,7 +68,7 @@ public class MemberControllerIT {
     WsServiceClient wsServiceClient;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
 
@@ -84,7 +83,7 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUsers_ok_one() throws Exception {
+    void testAddUsers_ok_one() throws Exception {
         String url = ENDPOINT + "/add/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -96,13 +95,13 @@ public class MemberControllerIT {
                 .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
                         && memberEvent.getType().equals(MemberEventType.ADD_MEMBER)
                         && memberEvent.getUserId().equals(UUID.fromString(USER_ID_3)))
-                .collect(Collectors.toList());
-        assertThat(filteredMemberEventList.size()).isEqualTo(1);
+                .toList();
+        assertThat(filteredMemberEventList).hasSize(1);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUsers_ok_many() throws Exception {
+    void testAddUsers_ok_many() throws Exception {
         String url = ENDPOINT + "/add/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3), UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -115,13 +114,13 @@ public class MemberControllerIT {
                         && memberEvent.getType().equals(MemberEventType.ADD_MEMBER)
                         && (memberEvent.getUserId().equals(UUID.fromString(USER_ID_3))
                         || memberEvent.getUserId().equals(UUID.fromString(USER_ID_4))))
-                .collect(Collectors.toList());
-        assertThat(filteredMemberEventList.size()).isEqualTo(2);
+                .toList();
+        assertThat(filteredMemberEventList).hasSize(2);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUsers_notAllowedUsers() throws Exception {
+    void testAddUsers_notAllowedUsers() throws Exception {
         when(contactServiceClient.areUsersInContactList(any())).thenReturn(false);
         String url = ENDPOINT + "/add/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.randomUUID());
@@ -133,8 +132,8 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUsers_notFound_chat() throws Exception {
-        String url = ENDPOINT + "/add/" + UUID.randomUUID().toString();
+    void testAddUsers_notFound_chat() throws Exception {
+        String url = ENDPOINT + "/add/" + UUID.randomUUID();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -144,7 +143,7 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testAddUsers_forbidden() throws Exception {
+    void testAddUsers_forbidden() throws Exception {
         String url = ENDPOINT + "/add/" + chat2.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -167,7 +166,7 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testRemoveUsers_ok_one() throws Exception {
+    void testRemoveUsers_ok_one() throws Exception {
         createMemberEvents(chat1, USER_ID_3, USER_ID_4);
         String url = ENDPOINT + "/remove/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
@@ -181,13 +180,13 @@ public class MemberControllerIT {
                         && (memberEvent.getType().equals(MemberEventType.ADD_MEMBER)
                         || memberEvent.getType().equals(MemberEventType.DELETE_MEMBER))
                         && memberEvent.getUserId().equals(UUID.fromString(USER_ID_3)))
-                .collect(Collectors.toList());
-        assertThat(filteredMemberEventList.size()).isEqualTo(2);
+                .toList();
+        assertThat(filteredMemberEventList).hasSize(2);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testRemoveUsers_ok_many() throws Exception {
+    void testRemoveUsers_ok_many() throws Exception {
         createMemberEvents(chat1, USER_ID_3, USER_ID_4);
         String url = ENDPOINT + "/remove/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3), UUID.fromString(USER_ID_4));
@@ -202,13 +201,13 @@ public class MemberControllerIT {
                         || memberEvent.getType().equals(MemberEventType.DELETE_MEMBER))
                         && (memberEvent.getUserId().equals(UUID.fromString(USER_ID_3))
                         || memberEvent.getUserId().equals(UUID.fromString(USER_ID_4))))
-                .collect(Collectors.toList());
-        assertThat(filteredMemberEventList.size()).isEqualTo(4);
+                .toList();
+        assertThat(filteredMemberEventList).hasSize(4);
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testRemoveUsers_notFound_user() throws Exception {
+    void testRemoveUsers_notFound_user() throws Exception {
         String url = ENDPOINT + "/remove/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -219,8 +218,8 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testRemoveUsers_notFound_chat() throws Exception {
-        String url = ENDPOINT + "/remove/" + UUID.randomUUID().toString();
+    void testRemoveUsers_notFound_chat() throws Exception {
+        String url = ENDPOINT + "/remove/" + UUID.randomUUID();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -230,7 +229,7 @@ public class MemberControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    public void testRemoveUsers_forbidden() throws Exception {
+    void testRemoveUsers_forbidden() throws Exception {
         String url = ENDPOINT + "/remove/" + chat2.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
@@ -262,8 +261,8 @@ public class MemberControllerIT {
                 .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
                         && memberEvent.getType().equals(MemberEventType.LEAVE_CHAT)
                         && memberEvent.getUserId().equals(UUID.fromString(USER_ID_1)))
-                .collect(Collectors.toList());
-        assertThat(filteredMemberEventList.size()).isEqualTo(1);
+                .toList();
+        assertThat(filteredMemberEventList).hasSize(1);
     }
 
     @Test
@@ -302,8 +301,8 @@ public class MemberControllerIT {
                 .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
                         && memberEvent.getType().equals(MemberEventType.CLEAR_CHAT)
                         && memberEvent.getUserId().equals(UUID.fromString(USER_ID_1)))
-                .collect(Collectors.toList());
-        assertThat(filteredMemberEventList.size()).isEqualTo(1);
+                .toList();
+        assertThat(filteredMemberEventList).hasSize(1);
     }
 
     @Test
@@ -342,8 +341,8 @@ public class MemberControllerIT {
                 .filter(memberEvent -> memberEvent.getChat().getId().equals(chat1.getId())
                         && memberEvent.getType().equals(MemberEventType.DELETE_MEMBER)
                         && memberEvent.getUserId().equals(UUID.fromString(USER_ID_1)))
-                .collect(Collectors.toList());
-        assertThat(filteredMemberEventList.size()).isEqualTo(1);
+                .toList();
+        assertThat(filteredMemberEventList).hasSize(1);
     }
 
     @Test
@@ -382,7 +381,7 @@ public class MemberControllerIT {
         List<MemberEvent> memberEventList = Arrays.stream(userIds)
                 .map(id -> TestMemberEvent.defaultBuilder()
                         .chat(chat).userId(UUID.fromString(id)).build().toParent())
-                .collect(Collectors.toList());
+                .toList();
         memberEventRepository.saveAll(memberEventList);
         memberEventRepository.flush();
     }

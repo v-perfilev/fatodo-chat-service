@@ -29,8 +29,8 @@ public class ExceptionHandlerSet {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(HttpServletRequest request, RuntimeException e)
             throws IOException {
-        return e.getCause() instanceof Exception
-                ? AttributeHandler.from(request, (Exception) e.getCause()).getResponseEntity(objectMapper)
+        return e.getCause() instanceof Exception cause
+                ? AttributeHandler.from(request, cause).getResponseEntity(objectMapper)
                 : AttributeHandler.from(request, e).getResponseEntity(objectMapper);
     }
 

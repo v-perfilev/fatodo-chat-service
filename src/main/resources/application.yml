@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: chat-service
+
+  config:
+    import: optional:configserver:http://config-user:${CONFIG_SERVER_PASSWORD:dev}@${CONFIG_SERVER_HOST:localhost}:8888
+
+  cloud:
+    config:
+      failFast: true

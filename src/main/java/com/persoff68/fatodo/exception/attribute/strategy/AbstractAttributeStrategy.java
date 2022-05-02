@@ -19,16 +19,13 @@ public abstract class AbstractAttributeStrategy implements AttributeStrategy {
 
     @Override
     public HttpStatus getStatus() {
-        return exception instanceof AbstractException && ((AbstractException) exception).getStatus() != null
-                ? ((AbstractException) exception).getStatus()
-                : HttpStatus.INTERNAL_SERVER_ERROR;
+        return exception instanceof AbstractException e && e.getStatus() != null ? e.getStatus() :
+                HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
     @Override
     public String getFeedbackCode() {
-        return exception instanceof AbstractException && ((AbstractException) exception).getFeedBackCode() != null
-                ? ((AbstractException) exception).getFeedBackCode()
-                : null;
+        return exception instanceof AbstractException e && e.getFeedBackCode() != null ? e.getFeedBackCode() : null;
     }
 
     @Override

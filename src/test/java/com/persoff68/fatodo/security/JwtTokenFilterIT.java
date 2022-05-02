@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class JwtTokenFilterIT {
+class JwtTokenFilterIT {
 
     @Value("${test.jwt.user}")
     String userJwt;

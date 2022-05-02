@@ -77,6 +77,11 @@ public class OffsetPageRequest implements Pageable, Serializable {
         return of(offset, 0, size);
     }
 
+    @Override
+    public Pageable withPage(int pageNumber) {
+        return of(offset, pageNumber, size);
+    }
+
     public boolean hasPrevious() {
         return page > 0;
     }

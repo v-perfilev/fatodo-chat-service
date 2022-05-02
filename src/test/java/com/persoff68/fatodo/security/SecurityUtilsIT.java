@@ -15,65 +15,68 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = SecurityUtils.class)
-public class SecurityUtilsIT {
+class SecurityUtilsIT {
 
     @Test
     @WithAnonymousUser
     void testGetCurrentId_ifAnonymous() {
         Optional<UUID> idOptional = SecurityUtils.getCurrentId();
-        assertThat(idOptional.isPresent()).isFalse();
+        assertThat(idOptional).isNotPresent();
     }
 
     @Test
     @WithCustomSecurityContext
     void testGetCurrentId_ifAuthorized() {
         Optional<UUID> idOptional = SecurityUtils.getCurrentId();
-        assertThat(idOptional.isPresent()).isTrue();
-        assertThat(idOptional.get()).isEqualTo(UUID.fromString("41789d72-3fa5-4019-8205-ccf44213b322"));
+        assertThat(idOptional)
+                .isPresent()
+                .contains(UUID.fromString("41789d72-3fa5-4019-8205-ccf44213b322"));
     }
 
     @Test
     @WithAnonymousUser
     void testGetCurrentUsername_ifAnonymous() {
         Optional<String> usernameOptional = SecurityUtils.getCurrentUsername();
-        assertThat(usernameOptional.isPresent()).isFalse();
+        assertThat(usernameOptional).isNotPresent();
     }
 
     @Test
     @WithCustomSecurityContext
     void testGetCurrentUsername_ifAuthorized() {
         Optional<String> usernameOptional = SecurityUtils.getCurrentUsername();
-        assertThat(usernameOptional.isPresent()).isTrue();
-        assertThat(usernameOptional.get()).isEqualTo("test_username");
+        assertThat(usernameOptional)
+                .isPresent()
+                .contains("test_username");
     }
 
     @Test
     @WithAnonymousUser
     void testGetCurrentJwt_ifAnonymous() {
         Optional<String> jwtOptional = SecurityUtils.getCurrentJwt();
-        assertThat(jwtOptional.isPresent()).isFalse();
+        assertThat(jwtOptional).isNotPresent();
     }
 
     @Test
     @WithCustomSecurityContext
     void testGetCurrentJwt_ifAuthorized() {
         Optional<String> jwtOptional = SecurityUtils.getCurrentJwt();
-        assertThat(jwtOptional.isPresent()).isTrue();
-        assertThat(jwtOptional.get()).isEqualTo("test_jwt");
+        assertThat(jwtOptional)
+                .isPresent()
+                .contains("test_jwt");
     }
 
     @Test
     @WithAnonymousUser
     void testGetCurrentAuthoritySet_ifAnonymous() {
         Optional<Set<GrantedAuthority>> authoritySetOptional = SecurityUtils.getCurrentAuthoritySet();
-        assertThat(authoritySetOptional.isPresent()).isFalse();
+        assertThat(authoritySetOptional).isNotPresent();
     }
 
     @Test
     @WithCustomSecurityContext
     void testGetCurrentAuthoritySet_ifAuthorized() {
         Optional<Set<GrantedAuthority>> authoritySetOptional = SecurityUtils.getCurrentAuthoritySet();
-        assertThat(authoritySetOptional.isPresent()).isTrue();
+        assertThat(authoritySetOptional).isPresent();
         assertThat(authoritySetOptional.get()).contains(new SimpleGrantedAuthority("ROLE_TEST"));
         assertThat(authoritySetOptional.get()).hasSize(1);
     }

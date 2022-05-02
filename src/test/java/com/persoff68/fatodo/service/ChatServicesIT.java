@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
-public class ChatServicesIT {
+class ChatServicesIT {
 
     private static final UUID USER_1_ID = UUID.fromString("98a4f736-70c2-4c7d-b75b-f7a5ae7bbe8d");
     private static final UUID USER_2_ID = UUID.fromString("8d583dfd-acfb-4481-80e6-0b46170e2a18");
@@ -64,7 +64,7 @@ public class ChatServicesIT {
     MockMvc mvc;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
@@ -81,12 +81,12 @@ public class ChatServicesIT {
     }
 
     @Test
-    public void getAllChatsByUserIdTest() {
+    void getAllChatsByUserIdTest() {
         Map<Chat, Message> firstUserChatMap = chatService.getAllByUserId(USER_1_ID, pageable);
         Map<Chat, Message> secondUserChatMap = chatService.getAllByUserId(USER_2_ID, pageable);
 
-        assertThat(firstUserChatMap.size()).isEqualTo(2);
-        assertThat(secondUserChatMap.size()).isEqualTo(2);
+        assertThat(firstUserChatMap).hasSize(2);
+        assertThat(secondUserChatMap).hasSize(2);
     }
 
     private void beforeLeaveAndGetAllChatsByUserIdTest() {
@@ -94,14 +94,14 @@ public class ChatServicesIT {
     }
 
     @Test
-    public void leaveAndGetAllChatsByUserIdTest() {
+    void leaveAndGetAllChatsByUserIdTest() {
         beforeLeaveAndGetAllChatsByUserIdTest();
 
         Map<Chat, Message> firstUserChatMap = chatService.getAllByUserId(USER_1_ID, pageable);
         Map<Chat, Message> secondUserChatMap = chatService.getAllByUserId(USER_2_ID, pageable);
 
-        assertThat(firstUserChatMap.size()).isEqualTo(2);
-        assertThat(secondUserChatMap.size()).isEqualTo(2);
+        assertThat(firstUserChatMap).hasSize(2);
+        assertThat(secondUserChatMap).hasSize(2);
     }
 
     private void beforeClearAndGetAllChatsByUserIdTest() {
@@ -109,14 +109,14 @@ public class ChatServicesIT {
     }
 
     @Test
-    public void clearAndGetAllChatsByUserIdTest() {
+    void clearAndGetAllChatsByUserIdTest() {
         beforeClearAndGetAllChatsByUserIdTest();
 
         Map<Chat, Message> firstUserChatMap = chatService.getAllByUserId(USER_1_ID, pageable);
         Map<Chat, Message> secondUserChatMap = chatService.getAllByUserId(USER_2_ID, pageable);
 
-        assertThat(firstUserChatMap.size()).isEqualTo(2);
-        assertThat(secondUserChatMap.size()).isEqualTo(2);
+        assertThat(firstUserChatMap).hasSize(2);
+        assertThat(secondUserChatMap).hasSize(2);
     }
 
     private void beforeDeleteAndGetAllChatsByUserIdTest() {
@@ -125,14 +125,14 @@ public class ChatServicesIT {
 
     @Test
     @Transactional
-    public void deleteAndGetAllChatsByUserIdTest() {
+    void deleteAndGetAllChatsByUserIdTest() {
         beforeDeleteAndGetAllChatsByUserIdTest();
 
         Map<Chat, Message> firstUserChatMap = chatService.getAllByUserId(USER_1_ID, pageable);
         Map<Chat, Message> secondUserChatMap = chatService.getAllByUserId(USER_2_ID, pageable);
 
-        assertThat(firstUserChatMap.size()).isEqualTo(1);
-        assertThat(secondUserChatMap.size()).isEqualTo(2);
+        assertThat(firstUserChatMap).hasSize(1);
+        assertThat(secondUserChatMap).hasSize(2);
     }
 
 }

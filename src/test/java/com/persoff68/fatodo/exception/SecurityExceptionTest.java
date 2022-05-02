@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SecurityExceptionTest {
+class SecurityExceptionTest {
 
     @Test
     void testForbiddenException() {

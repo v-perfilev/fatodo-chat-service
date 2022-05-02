@@ -30,8 +30,8 @@ public class AttributeUtils {
         Throwable error = getError(new ServletWebRequest(request));
         Integer statusCode = (Integer) request.getAttribute(STATUS_CODE_PATH);
 
-        if (error instanceof AbstractException) {
-            status = ((AbstractException) error).getStatus();
+        if (error instanceof AbstractException e) {
+            status = e.getStatus();
         } else if (statusCode != null) {
             try {
                 status = HttpStatus.valueOf(statusCode);

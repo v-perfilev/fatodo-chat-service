@@ -7,13 +7,14 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AppProfileUtilsTest {
+class AppProfileUtilsTest {
 
     @Test
     void testGetDefaultProfile() {
         Properties properties = AppProfileUtils.getDefaultProfile();
         String[] defaultProfiles = (String[]) properties.get("spring.profiles.default");
-        assertThat(defaultProfiles).hasSize(1);
-        assertThat(defaultProfiles).contains(Profile.DEVELOPMENT.getValue());
+        assertThat(defaultProfiles)
+                .hasSize(1)
+                .contains(Profile.Constants.DEVELOPMENT_VALUE);
     }
 }

@@ -1,5 +1,5 @@
 # BUILD
-FROM openjdk:15 as build
+FROM azul/zulu-openjdk:17 as build
 WORKDIR /build
 
 # maven dependencies layer
@@ -13,7 +13,7 @@ COPY src src
 RUN ./mvnw install -Dmaven.test.skip=true
 
 # DEPLOY
-FROM openjdk:15-alpine
+FROM azul/zulu-openjdk-alpine:17-jre
 COPY --from=build /build/target/fatodo.jar /app/app.jar
 
 # wait tool layer

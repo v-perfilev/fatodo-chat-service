@@ -16,7 +16,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.InetAddress;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -40,8 +39,8 @@ public class OnStartRunner implements ApplicationRunner, ApplicationListener<Web
     public void onApplicationEvent(WebServerInitializedEvent event) {
         try {
             this.appName = env.getProperty("spring.application.name");
-            this.protocol = env.getProperty("server.ssl.key-store") != null ? "https" : "http";
-            this.host = InetAddress.getLocalHost().getHostAddress();
+            this.protocol = "http";
+            this.host = "localhost";
             this.port = env.getProperty("server.port");
             this.profiles = env.getActiveProfiles().length > 0 ? env.getActiveProfiles() : env.getDefaultProfiles();
         } catch (Exception e) {
@@ -60,9 +59,11 @@ public class OnStartRunner implements ApplicationRunner, ApplicationListener<Web
 
     private void logCommonInfo() {
         log.info(
-                "Application '{}' is running!\n\t"
-                        + "Access URL: \t{}://{}:{}\n\t"
-                        + "Profile(s): \t{}\n",
+                """
+                            Application '{}' is running!
+                            \tAccess URL: \t{}://{}:{}
+                            \tProfile(s): \t{}
+                        """,
                 appName,
                 protocol,
                 host,

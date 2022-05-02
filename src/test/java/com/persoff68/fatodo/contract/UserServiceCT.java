@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureStubRunner(ids = {"com.persoff68.fatodo:userservice:+:stubs"},
         stubsMode = StubRunnerProperties.StubsMode.REMOTE)
-public class UserServiceCT {
+class UserServiceCT {
 
     @Autowired
     UserServiceClient userServiceClient;

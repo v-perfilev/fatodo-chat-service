@@ -27,7 +27,6 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(MessageController.ENDPOINT)
@@ -52,7 +51,7 @@ public class MessageController {
         List<Message> messageList = messageService.getAllByUserIdAndChatId(userId, chatId, pageRequest);
         List<MessageDTO> chatDtoList = messageList.stream()
                 .map(messageMapper::pojoToDTO)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(chatDtoList);
     }
 

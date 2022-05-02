@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class MessageService {
         Page<Message> messagePage = messageRepository.findAllByChatIdAndUserId(chatId, userId, pageable);
         return messagePage.toList().stream()
                 .filter(m -> !m.isStub())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Message sendDirect(UUID userId, UUID recipientId, String text, UUID referenceId) {

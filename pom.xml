@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.0.RELEASE</version>
+        <version>2.6.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.persoff68.fatodo</groupId>
@@ -25,29 +25,31 @@
         <root.package>com.persoff68.fatodo</root.package>
         <contract.package>com.persoff68.fatodo.contract</contract.package>
         <!-- Dependency versions -->
-        <java.version>15</java.version>
-        <log4j2.version>2.15.0</log4j2.version>
-        <spring-cloud.version>Hoxton.SR5</spring-cloud.version>
-        <hikari.version>3.4.5</hikari.version>
-        <h2.version>1.4.200</h2.version>
-        <liquibase.version>4.1.1</liquibase.version>
-        <liquibase-hibernate5.version>4.1.1</liquibase-hibernate5.version>
-        <jackson.version>2.10.2</jackson.version>
+        <java.version>17</java.version>
+        <spring-boot.version>2.6.7</spring-boot.version>
+        <spring-cloud.version>2021.0.2</spring-cloud.version>
+        <caffeine.version>3.1.0</caffeine.version>
+        <jackson.version>2.13.2.2</jackson.version>
+        <jackson-guava.version>2.13.2</jackson-guava.version>
+        <hikari.version>5.0.1</hikari.version>
+        <h2.version>2.1.212</h2.version>
+        <liquibase.version>4.9.1</liquibase.version>
+        <liquibase-hibernate5.version>4.9.1</liquibase-hibernate5.version>
         <jaxb.version>2.3.1</jaxb.version>
         <jwt.version>0.9.1</jwt.version>
-        <guava.version>30.1-jre</guava.version>
-        <lombok.version>1.18.16</lombok.version>
-        <mapstruct.version>1.4.1.Final</mapstruct.version>
+        <guava.version>31.1-jre</guava.version>
+        <lombok.version>1.18.24</lombok.version>
+        <mapstruct.version>1.4.2.Final</mapstruct.version>
         <logback-kafka-appender.version>0.2.0-RC2</logback-kafka-appender.version>
-        <micrometer-registry-influx.version>1.4.0</micrometer-registry-influx.version>
-        <swagger.version>3.0.0</swagger.version>
+        <micrometer-registry-influx.version>1.8.5</micrometer-registry-influx.version>
+        <swagger.version>1.6.8</swagger.version>
         <!-- Plugin versions -->
         <liquibase-maven-plugin.version>4.1.1</liquibase-maven-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
-        <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
-        <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M6</maven-failsafe-plugin.version>
+        <properties-maven-plugin.version>1.1.0</properties-maven-plugin.version>
+        <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <maven-checkstyle-toolkit.version>8.40</maven-checkstyle-toolkit.version>
         <spring-cloud-contract-maven-plugin.version>3.0.0</spring-cloud-contract-maven-plugin.version>
@@ -94,6 +96,12 @@
                 <artifactId>liquibase-core</artifactId>
                 <version>${liquibase.version}</version>
             </dependency>
+            <!-- Caffeine management -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
             <!-- Jackson management -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -103,7 +111,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-guava</artifactId>
-                <version>${jackson.version}</version>
+                <version>${jackson-guava.version}</version>
             </dependency>
             <!-- JAXB management -->
             <dependency>
@@ -158,13 +166,8 @@
 
             <!-- Swagger management -->
             <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
         </dependencies>
@@ -182,11 +185,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+            <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -194,13 +197,18 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-zipkin</artifactId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
         </dependency>
 
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- Spring Boot Validation -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <!-- Spring Boot Security -->
         <dependency>
@@ -246,6 +254,12 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
+        </dependency>
+
+        <!-- Caffeine management -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
         </dependency>
 
         <!-- Jackson -->
@@ -314,12 +328,8 @@
 
         <!-- Swagger -->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
         </dependency>
 
         <!-- Test -->

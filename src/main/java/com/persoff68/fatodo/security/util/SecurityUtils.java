@@ -70,20 +70,16 @@ public class SecurityUtils {
 
     private static Set<GrantedAuthority> fetchAuthoritiesFromAuthentication(Authentication authentication) {
         Set<GrantedAuthority> authoritySet = null;
-        if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    (UsernamePasswordAuthenticationToken) authentication;
-            authoritySet = new HashSet<>(authenticationToken.getAuthorities());
+        if (authentication instanceof UsernamePasswordAuthenticationToken a) {
+            authoritySet = new HashSet<>(a.getAuthorities());
         }
         return authoritySet;
     }
 
     private static String fetchJwtFromAuthentication(Authentication authentication) {
         String jwt = null;
-        if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    (UsernamePasswordAuthenticationToken) authentication;
-            jwt = (String) authenticationToken.getCredentials();
+        if (authentication instanceof UsernamePasswordAuthenticationToken a) {
+            jwt = (String) a.getCredentials();
         }
         return jwt;
     }

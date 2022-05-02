@@ -44,7 +44,7 @@ public class JwtTokenProvider {
         List<? extends GrantedAuthority> authorityList =
                 Arrays.stream(claims.get(AUTHORITY_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+                        .toList();
         CustomUserDetails userDetails = new CustomUserDetails(id, username, "", authorityList);
         return new UsernamePasswordAuthenticationToken(userDetails, jwt, authorityList);
     }

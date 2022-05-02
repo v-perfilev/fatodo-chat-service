@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(ChatController.ENDPOINT)
@@ -51,7 +50,7 @@ public class ChatController {
         Map<Chat, Message> chatMap = chatService.getAllByUserId(userId, pageRequest);
         List<ChatDTO> chatDtoList = chatMap.entrySet().stream()
                 .map(entry -> chatMapper.pojoToDTO(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(chatDtoList);
     }
 
@@ -61,7 +60,7 @@ public class ChatController {
         Map<Chat, Message> chatMap = chatService.getFilteredByUserId(userId, filter);
         List<ChatDTO> chatDtoList = chatMap.entrySet().stream()
                 .map(entry -> chatMapper.pojoToDTO(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(chatDtoList);
     }
 

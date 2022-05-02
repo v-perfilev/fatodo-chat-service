@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public abstract class AbstractDatabaseException extends AbstractException {
 
-    public AbstractDatabaseException(HttpStatus status, String message, String feedback) {
+    protected AbstractDatabaseException(HttpStatus status, String message, String feedback) {
         super(status, message, feedback);
     }
 

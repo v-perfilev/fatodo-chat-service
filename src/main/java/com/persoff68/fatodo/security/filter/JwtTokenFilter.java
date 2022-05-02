@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -49,7 +48,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         String jwt = null;
         List<String> headerList = Collections.list(request.getHeaderNames()).stream()
-                .map(String::toLowerCase).collect(Collectors.toList());
+                .map(String::toLowerCase).toList();
         boolean hasHeader = headerList.contains(authHeader.toLowerCase());
         if (hasHeader) {
             String bearerToken = request.getHeader(authHeader);

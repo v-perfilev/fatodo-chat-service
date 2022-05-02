@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ServiceExceptionTest {
+class ServiceExceptionTest {
 
     @Test
     void testModelAlreadyExistsException_firstConstructor() {

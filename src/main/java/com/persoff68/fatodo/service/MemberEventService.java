@@ -17,7 +17,6 @@ import javax.persistence.EntityManager;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +41,7 @@ public class MemberEventService {
         List<MemberEvent> newMemberList = userIdList.stream()
                 .distinct()
                 .map(id -> new MemberEvent(chat, id, MemberEventType.ADD_MEMBER))
-                .collect(Collectors.toList());
+                .toList();
 
         memberEventRepository.saveAll(newMemberList);
         memberEventRepository.flush();
@@ -62,7 +61,7 @@ public class MemberEventService {
                 .filter(id -> !activeUserIdList.contains(id))
                 .distinct()
                 .map(id -> new MemberEvent(chat, id, MemberEventType.ADD_MEMBER))
-                .collect(Collectors.toList());
+                .toList();
 
         memberEventRepository.saveAll(memberEventList);
         memberEventRepository.flush();
@@ -92,7 +91,7 @@ public class MemberEventService {
                 .filter(activeUserIdList::contains)
                 .distinct()
                 .map(id -> new MemberEvent(chat, id, MemberEventType.DELETE_MEMBER))
-                .collect(Collectors.toList());
+                .toList();
 
         if (memberEventList.isEmpty()) {
             throw new ModelNotFoundException();

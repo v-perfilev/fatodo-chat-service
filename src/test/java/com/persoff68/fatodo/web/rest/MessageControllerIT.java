@@ -32,7 +32,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
 @AutoConfigureMockMvc
-public class MessageControllerIT {
+class MessageControllerIT {
     private static final String ENDPOINT = "/api/messages";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
@@ -77,7 +76,7 @@ public class MessageControllerIT {
     WsServiceClient wsServiceClient;
 
     @BeforeEach
-    public void setup() throws InterruptedException {
+    void setup() {
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatLastMessageEvent(any());
@@ -111,7 +110,7 @@ public class MessageControllerIT {
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, MessageDTO.class);
         List<MessageDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(20);
+        assertThat(resultDTOList).hasSize(20);
     }
 
     @Test
@@ -123,7 +122,7 @@ public class MessageControllerIT {
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, MessageDTO.class);
         List<MessageDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList.size()).isEqualTo(10);
+        assertThat(resultDTOList).hasSize(10);
     }
 
     @Test
@@ -344,7 +343,7 @@ public class MessageControllerIT {
         List<MemberEvent> messageList = Arrays.stream(userIds)
                 .map(UUID::fromString)
                 .map(userId -> new MemberEvent(chat, userId, MemberEventType.ADD_MEMBER))
-                .collect(Collectors.toList());
+                .toList();
         memberEventRepository.saveAll(messageList);
         memberEventRepository.flush();
     }

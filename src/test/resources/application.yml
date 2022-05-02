@@ -30,3 +30,44 @@ test:
     invalid-format: eyJhbGciOiJIUzUxMiJ9..Z9W6euZQEMSqVomaAEvUttG5jDwigScyhIYz_e8bHhYqSyirlP_vbU3xTb3iNMtVTU-rSADh5P-zZzic_aiO3g
     invalid-wrong-token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1MTk4ZjAxNC00YTFlLTQ3NDgtOGM5Yy1iOTQ3Y2EyZGNlMzgiLCJ1c2VybmFtZSI6InRlc3RfdXNlciIsImF1dGhvcml0aWVzIjoiUk9MRV9VU0VSIiwiaWF0IjowLCJleHAiOjMyNTAzNjc2NDAwfQ.RCunC96AOl9NA4jeFZX5NYuX_OUBQemYduOhRNymALqvh0JGQQ87RJeNrdgCbsVnOUNmcJKTp6FRAPjTA7dHHw
     invalid-wrong-uuid: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnZhbGlkIiwidXNlcm5hbWUiOiJ0ZXN0X3VzZXIiLCJhdXRob3JpdGllcyI6IlJPTEVfVVNFUiIsImlhdCI6MCwiZXhwIjozMjUwMzY3NjQwMH0.xcg-BTmu5JcgDnLGDJfA0ssf85q_BRaX2W3XNb3Ff2Po5lxTqWNArqpx2DPrbzk8z_IWx8VDVxkmNaLnBlwQ9w
+
+server:
+  address: localhost
+  port: 10344
+
+spring:
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+  zipkin:
+    enabled: false
+  cache:
+    type: none
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:file:./target/h2db/db/fatodo;DB_CLOSE_DELAY=-1
+    username: test
+    password:
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+  h2:
+    console:
+      enabled: false
+  jpa:
+    open-in-view: false
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 20000
+        readTimeout: 20000
+
+management:
+  metrics:
+    export:
+      influx:
+        enabled: false

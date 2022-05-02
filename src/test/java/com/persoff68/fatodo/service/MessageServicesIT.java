@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
-public class MessageServicesIT {
+class MessageServicesIT {
 
     private static final UUID USER_1_ID = UUID.fromString("98a4f736-70c2-4c7d-b75b-f7a5ae7bbe8d");
     private static final UUID USER_2_ID = UUID.fromString("8d583dfd-acfb-4481-80e6-0b46170e2a18");
@@ -69,7 +69,7 @@ public class MessageServicesIT {
     MockMvc mvc;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
@@ -90,14 +90,14 @@ public class MessageServicesIT {
     }
 
     @Test
-    public void getAllMessagesTest() {
+    void getAllMessagesTest() {
         List<Message> firstUserFirstChatMessageList = messageService
                 .getAllByUserIdAndChatId(USER_1_ID, firstChat.getId(), pageable);
         List<Message> firstUserSecondChatMessageList = messageService
                 .getAllByUserIdAndChatId(USER_1_ID, secondChat.getId(), pageable);
 
-        assertThat(firstUserFirstChatMessageList.size()).isEqualTo(2);
-        assertThat(firstUserSecondChatMessageList.size()).isEqualTo(2);
+        assertThat(firstUserFirstChatMessageList).hasSize(2);
+        assertThat(firstUserSecondChatMessageList).hasSize(2);
     }
 
     private void beforeLeaveAndGetAllMessagesTest() {
@@ -112,7 +112,7 @@ public class MessageServicesIT {
     }
 
     @Test
-    public void leaveAndGetAllMessagesTest() {
+    void leaveAndGetAllMessagesTest() {
         beforeLeaveAndGetAllMessagesTest();
 
         List<Message> firstUserSecondChatMessageList = messageService
@@ -120,8 +120,8 @@ public class MessageServicesIT {
         List<Message> secondUserSecondChatMessageList = messageService
                 .getAllByUserIdAndChatId(USER_2_ID, secondChat.getId(), pageable);
 
-        assertThat(firstUserSecondChatMessageList.size()).isEqualTo(5);
-        assertThat(secondUserSecondChatMessageList.size()).isEqualTo(6);
+        assertThat(firstUserSecondChatMessageList).hasSize(5);
+        assertThat(secondUserSecondChatMessageList).hasSize(6);
     }
 
     private void beforeClearAndGetAllMessagesTest() {
@@ -133,7 +133,7 @@ public class MessageServicesIT {
     }
 
     @Test
-    public void clearAndGetAllMessagesTest() {
+    void clearAndGetAllMessagesTest() {
         beforeClearAndGetAllMessagesTest();
 
         List<Message> firstUserSecondChatMessageList = messageService
@@ -141,8 +141,8 @@ public class MessageServicesIT {
         List<Message> secondUserSecondChatMessageList = messageService
                 .getAllByUserIdAndChatId(USER_2_ID, secondChat.getId(), pageable);
 
-        assertThat(firstUserSecondChatMessageList.size()).isEqualTo(1);
-        assertThat(secondUserSecondChatMessageList.size()).isEqualTo(3);
+        assertThat(firstUserSecondChatMessageList).hasSize(1);
+        assertThat(secondUserSecondChatMessageList).hasSize(3);
     }
 
 }

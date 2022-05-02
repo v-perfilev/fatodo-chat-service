@@ -30,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
 @AutoConfigureMockMvc
-public class ReactionControllerIT {
+class ReactionControllerIT {
     private static final String ENDPOINT = "/api/reactions";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
@@ -72,7 +71,7 @@ public class ReactionControllerIT {
     WsServiceClient wsServiceClient;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
         messageRepository.deleteAll();
@@ -274,7 +273,7 @@ public class ReactionControllerIT {
         List<MemberEvent> memberEventList = Arrays.stream(userIds)
                 .map(id -> TestMemberEvent.defaultBuilder()
                         .chat(chat).userId(UUID.fromString(id)).build().toParent())
-                .collect(Collectors.toList());
+                .toList();
         memberEventRepository.saveAll(memberEventList);
     }
 
