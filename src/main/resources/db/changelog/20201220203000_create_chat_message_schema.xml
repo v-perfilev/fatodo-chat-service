@@ -26,7 +26,7 @@
             <column name="is_event" type="boolean">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_stub" type="boolean">
+            <column name="is_private" type="boolean">
                 <constraints nullable="false"/>
             </column>
             <column name="is_deleted" type="boolean">

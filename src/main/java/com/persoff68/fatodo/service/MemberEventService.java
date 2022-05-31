@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,8 +66,6 @@ public class MemberEventService {
         memberEventRepository.flush();
         entityManager.refresh(chat);
 
-        // STUB MESSAGE
-        systemMessageService.createStubMessages(chatId, userIdList);
         // WS
         wsService.sendChatUpdateEvent(chat);
         // EVENT MESSAGE
@@ -138,8 +135,8 @@ public class MemberEventService {
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
 
-        // STUB MESSAGE
-        systemMessageService.createStubMessages(chatId, Collections.singletonList(userId));
+        // EVENT MESSAGE
+        systemMessageService.createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT);
     }
 
     public void deleteChat(UUID userId, UUID chatId) {

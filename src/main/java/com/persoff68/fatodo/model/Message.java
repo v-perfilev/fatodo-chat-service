@@ -39,7 +39,7 @@ public class Message extends AbstractAuditingModel {
     private Message reference;
 
     private boolean isEvent = false;
-    private boolean isStub = false;
+    private boolean isPrivate = false;
     private boolean isDeleted = false;
 
     @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true, fetch = FetchType.EAGER)
@@ -66,11 +66,13 @@ public class Message extends AbstractAuditingModel {
         return message;
     }
 
-    public static Message stub(Chat chat, UUID userId) {
+    public static Message privateEvent(Chat chat, UUID userId, String text) {
         Message message = new Message();
         message.chat = chat;
         message.userId = userId;
-        message.isStub = true;
+        message.text = text;
+        message.isEvent = true;
+        message.isPrivate = true;
         return message;
     }
 

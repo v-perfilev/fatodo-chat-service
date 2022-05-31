@@ -32,9 +32,7 @@ public class MessageService {
         permissionService.hasReadChatPermission(chat, userId);
 
         Page<Message> messagePage = messageRepository.findAllByChatIdAndUserId(chatId, userId, pageable);
-        return messagePage.toList().stream()
-                .filter(m -> !m.isStub())
-                .toList();
+        return messagePage.toList().stream().toList();
     }
 
     public Message sendDirect(UUID userId, UUID recipientId, String text, UUID referenceId) {

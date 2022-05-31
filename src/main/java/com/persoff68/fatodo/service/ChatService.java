@@ -78,8 +78,6 @@ public class ChatService {
 
         // WS
         wsService.sendChatNewEvent(chat);
-        // STUB MESSAGE
-        systemMessageService.createStubMessages(chat.getId(), userIdList);
         // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 firstUserId,
@@ -98,8 +96,6 @@ public class ChatService {
 
         // WS
         wsService.sendChatNewEvent(chat);
-        // STUB MESSAGES
-        systemMessageService.createStubMessages(chat.getId(), allUserIdList);
         // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 userId,

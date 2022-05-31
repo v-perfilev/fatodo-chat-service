@@ -141,7 +141,7 @@ class MessageServicesIT {
         List<Message> secondUserSecondChatMessageList = messageService
                 .getAllByUserIdAndChatId(USER_2_ID, secondChat.getId(), pageable);
 
-        assertThat(firstUserSecondChatMessageList).hasSize(1);
+        assertThat(firstUserSecondChatMessageList).hasSize(2);
         assertThat(secondUserSecondChatMessageList).hasSize(3);
     }
 

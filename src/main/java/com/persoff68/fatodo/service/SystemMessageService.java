@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,50 +35,41 @@ public class SystemMessageService {
     private final ObjectMapper objectMapper;
     private final WsService wsService;
 
-    public void createStubMessages(UUID chatId, List<UUID> userIdList) {
-        Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(ModelNotFoundException::new);
-
-        List<Message> messageList = userIdList != null && !userIdList.isEmpty()
-                ? userIdList.stream()
-                .distinct()
-                .map(id -> Message.stub(chat, id))
-                .toList()
-                : Collections.emptyList();
-
-
-        messageRepository.saveAll(messageList);
-        messageRepository.flush();
-        entityManager.refresh(chat);
-    }
-
     public void createSimpleEventMessage(UUID userId, UUID chatId, EventMessageType type) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put(TYPE_FIELD, type);
-        createEventMessage(userId, chatId, paramMap);
+        createEventMessage(userId, chatId, paramMap, false);
     }
 
     public void createTextEventMessage(UUID userId, UUID chatId, EventMessageType type, String text) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put(TYPE_FIELD, type);
         paramMap.put(TEXT_FIELD, text);
-        createEventMessage(userId, chatId, paramMap);
+        createEventMessage(userId, chatId, paramMap, false);
     }
 
     public void createIdsEventMessage(UUID userId, UUID chatId, EventMessageType type, List<UUID> idList) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put(TYPE_FIELD, type);
         paramMap.put(IDS_FIELD, idList);
-        createEventMessage(userId, chatId, paramMap);
+        createEventMessage(userId, chatId, paramMap, false);
     }
 
-    private void createEventMessage(UUID userId, UUID chatId, Map<String, Object> paramMap) {
+    public void createPrivateEventMessage(UUID userId, UUID chatId, EventMessageType type) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put(TYPE_FIELD, type);
+        createEventMessage(userId, chatId, paramMap, true);
+    }
+
+    private void createEventMessage(UUID userId, UUID chatId, Map<String, Object> paramMap, boolean isPrivate) {
         try {
             Chat chat = chatRepository.findById(chatId)
                     .orElseThrow(ModelNotFoundException::new);
 
             String params = objectMapper.writeValueAsString(paramMap);
-            Message message = Message.event(chat, userId, params);
+            Message message = isPrivate
+                    ? Message.privateEvent(chat, userId, params)
+                    : Message.event(chat, userId, params);
 
             messageRepository.saveAndFlush(message);
             entityManager.refresh(chat);

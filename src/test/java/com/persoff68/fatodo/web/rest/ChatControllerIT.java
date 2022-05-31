@@ -11,6 +11,7 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.repository.ChatRepository;
@@ -29,7 +30,9 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,7 +76,7 @@ class ChatControllerIT {
     private Chat chat2;
 
     @BeforeEach
-    void setup() {
+    void setup() throws Exception {
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
         when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
         when(userServiceClient.getAllIdsByUsernamePart(any())).thenReturn(Collections.emptyList());
@@ -327,11 +330,11 @@ class ChatControllerIT {
     }
 
 
-    private Chat createChat(String title, boolean isDirect, String... userIds) {
+    private Chat createChat(String title, boolean isDirect, String... userIds) throws Exception {
         Chat chat = TestChat.defaultBuilder().title(title).isDirect(isDirect).build().toParent();
         Chat savedChat = chatRepository.saveAndFlush(chat);
         createAddMemberEvents(savedChat, userIds);
-        createStubMessages(savedChat, userIds);
+        createEmptyMessage(savedChat, UUID.fromString(userIds[0]));
         return savedChat;
     }
 
@@ -344,11 +347,12 @@ class ChatControllerIT {
         memberEventRepository.flush();
     }
 
-    private void createStubMessages(Chat chat, String... userIds) {
-        List<Message> messageList = Arrays.stream(userIds)
-                .map(userId -> Message.stub(chat, UUID.fromString(userId)))
-                .toList();
-        messageRepository.saveAll(messageList);
+    private void createEmptyMessage(Chat chat, UUID userId) throws Exception {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("type", EventMessageType.EMPTY);
+        String params = objectMapper.writeValueAsString(paramMap);
+        Message message = Message.event(chat, userId, params);
+        messageRepository.save(message);
         messageRepository.flush();
     }
 
