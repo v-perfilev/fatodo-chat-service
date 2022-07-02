@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "contact-service", primary = false)
+@FeignClient(name = "contact-service", primary = false, qualifiers = {"feignContactServiceClient"})
 public interface ContactServiceClient {
 
     @PostMapping("/api/check/contacts")

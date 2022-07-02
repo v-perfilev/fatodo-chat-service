@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "ws-service", primary = false)
+@FeignClient(name = "ws-service", primary = false, qualifiers = {"feignWsServiceClient"})
 public interface WsServiceClient {
 
     @PostMapping(value = "/api/chat/new")

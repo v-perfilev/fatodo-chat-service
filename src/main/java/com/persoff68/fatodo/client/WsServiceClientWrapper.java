@@ -8,15 +8,13 @@ import com.persoff68.fatodo.model.dto.StatusesDTO;
 import com.persoff68.fatodo.model.dto.WsEventDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Component
-@Primary
 @RequiredArgsConstructor
 public class WsServiceClientWrapper implements WsServiceClient {
 
-    @Qualifier("wsServiceClient")
+    @Qualifier("feignWsServiceClient")
     private final WsServiceClient wsServiceClient;
 
     @Override

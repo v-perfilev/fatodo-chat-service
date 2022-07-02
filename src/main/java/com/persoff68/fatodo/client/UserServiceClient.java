@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "user-service", primary = false)
+@FeignClient(name = "user-service", primary = false, qualifiers = {"feignUserServiceClient"})
 public interface UserServiceClient {
 
     @GetMapping(value = "/api/check/id/{id}")
