@@ -30,7 +30,10 @@ public class ClientConfiguration {
     @Bean
     @Primary
     public WsServiceClient wsClient() {
-        return (WsServiceClient) beanFactory.getBean("wsServiceClientWrapper");
+        boolean kafkaProducerExists = beanFactory.containsBean("wsProducer");
+        return kafkaProducerExists
+                ? (WsServiceClient) beanFactory.getBean("wsProducer")
+                : (WsServiceClient) beanFactory.getBean("wsServiceClientWrapper");
     }
 
 }
