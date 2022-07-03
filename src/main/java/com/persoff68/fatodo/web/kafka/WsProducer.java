@@ -30,7 +30,7 @@ public class WsProducer implements WsServiceClient {
     }
 
     public void sendChatLastMessageEvent(WsEventDTO<ChatDTO> event) {
-        wsEventChatKafkaTemplate.send("ws_chat", "last-message-new", event);
+        wsEventChatKafkaTemplate.send("ws_chat", "last-message", event);
     }
 
     public void sendChatLastMessageUpdateEvent(WsEventDTO<ChatDTO> event) {

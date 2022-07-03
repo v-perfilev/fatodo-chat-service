@@ -158,7 +158,7 @@ public class WsProducerIT {
 
         assertThat(wsServiceClient instanceof WsProducer).isTrue();
         assertThat(recordList).isNotNull().hasSize(2);
-        assertThat(recordKeyList).contains("last-message-new");
+        assertThat(recordKeyList).contains("last-message");
         verify(wsServiceClient).sendChatLastMessageEvent(any());
     }
 
