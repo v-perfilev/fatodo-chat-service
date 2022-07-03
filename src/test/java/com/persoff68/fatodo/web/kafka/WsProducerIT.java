@@ -14,6 +14,8 @@ import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
+import com.persoff68.fatodo.repository.ReactionRepository;
+import com.persoff68.fatodo.repository.StatusRepository;
 import com.persoff68.fatodo.service.ChatService;
 import com.persoff68.fatodo.service.MessageService;
 import com.persoff68.fatodo.service.ReactionService;
@@ -83,6 +85,10 @@ public class WsProducerIT {
     MessageRepository messageRepository;
     @Autowired
     MemberEventRepository memberEventRepository;
+    @Autowired
+    StatusRepository statusRepository;
+    @Autowired
+    ReactionRepository reactionRepository;
 
     @MockBean
     UserServiceClient userServiceClient;
@@ -111,6 +117,8 @@ public class WsProducerIT {
         chatRepository.deleteAll();
         messageRepository.deleteAll();
         memberEventRepository.deleteAll();
+        statusRepository.deleteAll();
+        reactionRepository.deleteAll();
 
         stopWsConsumer();
     }
