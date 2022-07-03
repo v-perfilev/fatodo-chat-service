@@ -51,7 +51,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(properties = {
-        "kafka.bootstrapAddress=PLAINTEXT://localhost:9092",
+        "kafka.bootstrapAddress=localhost:9092",
         "kafka.groupId=test",
         "kafka.partitions=1",
         "kafka.autoOffsetResetConfig=earliest"
@@ -151,12 +151,14 @@ public class WsProducerIT {
     void testSendChatLastMessageEvent() throws Exception {
         messageService.send(UUID.fromString(USER_ID_1), chat.getId(), "message", null);
 
-        wsRecords.poll(10, TimeUnit.SECONDS);
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record1 = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record2 = wsRecords.poll(10, TimeUnit.SECONDS);
+        List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
+        List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
 
         assertThat(wsServiceClient instanceof WsProducer).isTrue();
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("last-message-new");
+        assertThat(recordList).isNotNull().hasSize(2);
+        assertThat(recordKeyList).contains("last-message-new");
         verify(wsServiceClient).sendChatLastMessageEvent(any());
     }
 
@@ -164,12 +166,14 @@ public class WsProducerIT {
     void testSendChatLastMessageUpdateEvent() throws Exception {
         messageService.edit(UUID.fromString(USER_ID_1), message.getId(), "updated-message");
 
-        wsRecords.poll(10, TimeUnit.SECONDS);
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record1 = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record2 = wsRecords.poll(10, TimeUnit.SECONDS);
+        List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
+        List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
 
         assertThat(wsServiceClient instanceof WsProducer).isTrue();
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("last-message-update");
+        assertThat(recordList).isNotNull().hasSize(2);
+        assertThat(recordKeyList).contains("last-message-update");
         verify(wsServiceClient).sendChatLastMessageUpdateEvent(any());
     }
 
@@ -177,11 +181,14 @@ public class WsProducerIT {
     void testSendMessageNewEvent() throws Exception {
         messageService.send(UUID.fromString(USER_ID_1), chat.getId(), "message", null);
 
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record1 = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record2 = wsRecords.poll(10, TimeUnit.SECONDS);
+        List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
+        List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
 
         assertThat(wsServiceClient instanceof WsProducer).isTrue();
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("message-new");
+        assertThat(recordList).isNotNull().hasSize(2);
+        assertThat(recordKeyList).contains("message-new");
         verify(wsServiceClient).sendMessageNewEvent(any());
     }
 
@@ -189,11 +196,14 @@ public class WsProducerIT {
     void testSendMessageUpdateEvent() throws Exception {
         messageService.edit(UUID.fromString(USER_ID_1), message.getId(), "updated-message");
 
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record1 = wsRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record2 = wsRecords.poll(10, TimeUnit.SECONDS);
+        List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
+        List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
 
         assertThat(wsServiceClient instanceof WsProducer).isTrue();
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("message-update");
+        assertThat(recordList).isNotNull().hasSize(2);
+        assertThat(recordKeyList).contains("message-update");
         verify(wsServiceClient).sendMessageUpdateEvent(any());
     }
 
