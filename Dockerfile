@@ -3,7 +3,7 @@ FROM azul/zulu-openjdk:17 as build
 WORKDIR /build
 
 # maven dependencies layer
-COPY mvnw pom.xml ./
+COPY mvnw pom.xml lombok.config ./
 COPY .mvn .mvn
 COPY etc etc
 RUN ./mvnw dependency:resolve
