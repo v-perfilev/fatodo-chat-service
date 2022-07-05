@@ -17,6 +17,7 @@ stubrunner:
     wsservice: ws-service
     commentservice: comment-service
     notificationservice: notification-service
+    eventservice: event-service
   repositoryRoot: '@maven.repo.url@'
   username: '@maven.repo.username@'
   password: '@maven.repo.password@'
