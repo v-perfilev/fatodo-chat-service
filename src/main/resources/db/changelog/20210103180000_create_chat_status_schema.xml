@@ -9,7 +9,7 @@
         <createTable tableName="ftd_chat_status">
 
             <column name="message_id" type="binary(16)">
-                <constraints primaryKey="true" foreignKeyName="fk_status_message" references="ftd_chat_message(id)"
+                <constraints primaryKey="true" foreignKeyName="fk_chat_status_message" references="ftd_chat_message(id)"
                              deleteCascade="true" nullable="false"/>
             </column>
 
@@ -23,6 +23,10 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <createIndex indexName="index_chat_status_message" tableName="ftd_chat_status">
+            <column name="message_id"/>
+        </createIndex>
 
     </changeSet>
 

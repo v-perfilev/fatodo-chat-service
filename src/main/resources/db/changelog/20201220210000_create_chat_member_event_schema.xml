@@ -12,7 +12,7 @@
             </column>
 
             <column name="chat_id" type="binary(16)">
-                <constraints foreignKeyName="fk_member_event_chat" references="ftd_chat(id)" deleteCascade="true"
+                <constraints foreignKeyName="fk_chat_member_event_chat" references="ftd_chat(id)" deleteCascade="true"
                              nullable="false"/>
             </column>
 
@@ -26,6 +26,10 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <createIndex indexName="index_chat_member_event_chat" tableName="ftd_chat_member_event">
+            <column name="chat_id"/>
+        </createIndex>
 
     </changeSet>
 

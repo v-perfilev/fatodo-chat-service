@@ -12,7 +12,7 @@
             </column>
 
             <column name="chat_id" type="binary(16)">
-                <constraints foreignKeyName="fk_message_chat" references="ftd_chat(id)" deleteCascade="true"
+                <constraints foreignKeyName="fk_chat_message_chat" references="ftd_chat(id)" deleteCascade="true"
                              nullable="false"/>
             </column>
 
@@ -38,6 +38,10 @@
             <column name="last_modified_by" type="binary(16)"/>
             <column name="last_modified_at" type="timestamp(6)"/>
         </createTable>
+
+        <createIndex indexName="index_chat_message_chat" tableName="ftd_chat_message">
+            <column name="chat_id"/>
+        </createIndex>
 
     </changeSet>
 
