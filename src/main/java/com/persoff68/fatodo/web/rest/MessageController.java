@@ -7,7 +7,7 @@ import com.persoff68.fatodo.repository.OffsetPageRequest;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
 import com.persoff68.fatodo.security.util.SecurityUtils;
 import com.persoff68.fatodo.service.MessageService;
-import com.persoff68.fatodo.web.rest.vm.MessageVM;
+import com.persoff68.fatodo.model.vm.MessageVM;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

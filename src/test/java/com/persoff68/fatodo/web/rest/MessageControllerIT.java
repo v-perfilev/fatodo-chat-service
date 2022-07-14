@@ -17,7 +17,7 @@ import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
-import com.persoff68.fatodo.web.rest.vm.MessageVM;
+import com.persoff68.fatodo.model.vm.MessageVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -8,7 +8,9 @@ import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.ChatUtils;
-import com.persoff68.fatodo.service.ws.WsService;
+import com.persoff68.fatodo.service.client.WsService;
+import com.persoff68.fatodo.service.util.ContactService;
+import com.persoff68.fatodo.service.util.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +29,7 @@ public class MemberEventService {
     private final SystemMessageService systemMessageService;
     private final UserService userService;
     private final ContactService contactService;
-    private final PermissionService permissionService;
+    private final ChatPermissionService chatPermissionService;
     private final EntityManager entityManager;
     private final WsService wsService;
 
@@ -53,7 +55,7 @@ public class MemberEventService {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
 
-        permissionService.hasEditMembersPermission(chat, userId);
+        chatPermissionService.hasEditMembersPermission(chat, userId);
 
         List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat);
         List<MemberEvent> memberEventList = userIdList.stream()
@@ -81,7 +83,7 @@ public class MemberEventService {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
 
-        permissionService.hasEditMembersPermission(chat, userId);
+        chatPermissionService.hasEditMembersPermission(chat, userId);
 
         List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat);
         List<MemberEvent> memberEventList = userIdList.stream()
@@ -113,7 +115,7 @@ public class MemberEventService {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
 
-        permissionService.hasLeaveChatPermission(chat, userId);
+        chatPermissionService.hasLeaveChatPermission(chat, userId);
 
         // WS
         wsService.sendChatUpdateEvent(chat);
@@ -129,7 +131,7 @@ public class MemberEventService {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
 
-        permissionService.hasClearChatPermission(chat, userId);
+        chatPermissionService.hasClearChatPermission(chat, userId);
 
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.CLEAR_CHAT);
         memberEventRepository.saveAndFlush(memberEvent);
@@ -143,7 +145,7 @@ public class MemberEventService {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
 
-        permissionService.hasDeleteChatPermission(chat, userId);
+        chatPermissionService.hasDeleteChatPermission(chat, userId);
 
         // WS
         wsService.sendChatUpdateEvent(chat);

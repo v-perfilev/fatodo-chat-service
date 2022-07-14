@@ -4,7 +4,8 @@ import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
-import com.persoff68.fatodo.service.ws.WsService;
+import com.persoff68.fatodo.service.client.WsService;
+import com.persoff68.fatodo.service.util.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,13 +24,13 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final ChatService chatService;
     private final UserService userService;
-    private final PermissionService permissionService;
+    private final ChatPermissionService chatPermissionService;
     private final EntityManager entityManager;
     private final WsService wsService;
 
     public List<Message> getAllByUserIdAndChatId(UUID userId, UUID chatId, Pageable pageable) {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
-        permissionService.hasReadChatPermission(chat, userId);
+        chatPermissionService.hasReadChatPermission(chat, userId);
 
         Page<Message> messagePage = messageRepository.findAllByChatIdAndUserId(chatId, userId, pageable);
         return messagePage.toList().stream().toList();
@@ -53,7 +54,7 @@ public class MessageService {
 
     public Message send(UUID userId, UUID chatId, String text, UUID referenceId) {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
-        permissionService.hasSendMessagePermission(chat, userId);
+        chatPermissionService.hasSendMessagePermission(chat, userId);
 
         Message reference = getReferenceById(userId, referenceId);
         Message message = Message.of(chat, userId, text, reference);
@@ -70,7 +71,7 @@ public class MessageService {
     public Message edit(UUID userId, UUID messageId, String text) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasEditMessagePermission(message, userId);
+        chatPermissionService.hasEditMessagePermission(message, userId);
 
         message.setText(text);
         message = messageRepository.save(message);
@@ -89,7 +90,7 @@ public class MessageService {
     public void delete(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasEditMessagePermission(message, userId);
+        chatPermissionService.hasEditMessagePermission(message, userId);
 
         message.setText(null);
         message.setReference(null);
@@ -118,7 +119,7 @@ public class MessageService {
         }
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReadChatPermission(message.getChat(), userId);
+        chatPermissionService.hasReadChatPermission(message.getChat(), userId);
         return message;
     }
 

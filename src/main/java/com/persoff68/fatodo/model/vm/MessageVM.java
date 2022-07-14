@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.web.rest.vm;
+package com.persoff68.fatodo.model.vm;
 
 import lombok.Data;
 

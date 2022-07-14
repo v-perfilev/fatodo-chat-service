@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.service;
+package com.persoff68.fatodo.service.util;
 
 import com.persoff68.fatodo.client.ContactServiceClient;
 import com.persoff68.fatodo.service.exception.NotAllowedUsersException;

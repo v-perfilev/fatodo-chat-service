@@ -7,7 +7,7 @@ import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
-import com.persoff68.fatodo.service.ws.WsService;
+import com.persoff68.fatodo.service.client.WsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class ReactionService {
 
     private final ReactionRepository reactionRepository;
     private final MessageRepository messageRepository;
-    private final PermissionService permissionService;
+    private final ChatPermissionService chatPermissionService;
     private final EntityManager entityManager;
     private final WsService wsService;
 
@@ -37,7 +37,7 @@ public class ReactionService {
     public void remove(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReactOnMessagePermission(message, userId);
+        chatPermissionService.hasReactOnMessagePermission(message, userId);
 
         ReactionId id = new ReactionId(messageId, userId);
         reactionRepository.findById(id).ifPresent(reactionRepository::delete);
@@ -52,7 +52,7 @@ public class ReactionService {
     protected void set(UUID userId, UUID messageId, ReactionType type) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReactOnMessagePermission(message, userId);
+        chatPermissionService.hasReactOnMessagePermission(message, userId);
 
         ReactionId id = new ReactionId(messageId, userId);
         Reaction reaction = reactionRepository.findById(id)

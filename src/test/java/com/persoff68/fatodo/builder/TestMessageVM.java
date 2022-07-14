@@ -1,6 +1,6 @@
 package com.persoff68.fatodo.builder;
 
-import com.persoff68.fatodo.web.rest.vm.MessageVM;
+import com.persoff68.fatodo.model.vm.MessageVM;
 import lombok.Builder;
 
 import java.util.UUID;

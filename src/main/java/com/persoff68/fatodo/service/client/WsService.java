@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.service.ws;
+package com.persoff68.fatodo.service.client;
 
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;

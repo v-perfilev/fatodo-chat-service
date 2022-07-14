@@ -11,7 +11,9 @@ import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.exception.ModelAlreadyExistsException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.ChatUtils;
-import com.persoff68.fatodo.service.ws.WsService;
+import com.persoff68.fatodo.service.client.WsService;
+import com.persoff68.fatodo.service.util.ContactService;
+import com.persoff68.fatodo.service.util.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,11 +34,11 @@ public class ChatService {
 
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
-    private final UserService userService;
     private final ContactService contactService;
     private final MemberEventService memberEventService;
-    private final PermissionService permissionService;
+    private final ChatPermissionService chatPermissionService;
     private final SystemMessageService systemMessageService;
+    private final UserService userService;
     private final WsService wsService;
 
     public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
@@ -64,7 +66,7 @@ public class ChatService {
     public Chat getByUserIdAndId(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasReadChatPermission(chat, userId);
+        chatPermissionService.hasReadChatPermission(chat, userId);
         return chat;
     }
 
@@ -110,7 +112,7 @@ public class ChatService {
     public Chat rename(UUID userId, UUID chatId, String title) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.hasRenameChatPermission(chat, userId);
+        chatPermissionService.hasRenameChatPermission(chat, userId);
 
         chat.setTitle(title);
         chat = chatRepository.save(chat);
