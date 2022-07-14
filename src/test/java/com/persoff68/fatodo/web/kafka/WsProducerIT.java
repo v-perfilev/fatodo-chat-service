@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
 })
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
-public class WsProducerIT {
+class WsProducerIT {
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
     private static final String USER_ID_2 = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
@@ -129,7 +129,7 @@ public class WsProducerIT {
 
         ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
         assertThat(record.key()).isEqualTo("new");
         verify(wsServiceClient).sendChatNewEvent(any());
@@ -141,7 +141,7 @@ public class WsProducerIT {
 
         ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
         assertThat(record.key()).isEqualTo("update");
         verify(wsServiceClient).sendChatUpdateEvent(any());
@@ -156,7 +156,7 @@ public class WsProducerIT {
         List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
         List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().hasSize(2);
         assertThat(recordKeyList).contains("last-message");
         verify(wsServiceClient).sendChatLastMessageEvent(any());
@@ -171,7 +171,7 @@ public class WsProducerIT {
         List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
         List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().hasSize(2);
         assertThat(recordKeyList).contains("last-message-update");
         verify(wsServiceClient).sendChatLastMessageUpdateEvent(any());
@@ -186,7 +186,7 @@ public class WsProducerIT {
         List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
         List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().hasSize(2);
         assertThat(recordKeyList).contains("message-new");
         verify(wsServiceClient).sendMessageNewEvent(any());
@@ -201,7 +201,7 @@ public class WsProducerIT {
         List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
         List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().hasSize(2);
         assertThat(recordKeyList).contains("message-update");
         verify(wsServiceClient).sendMessageUpdateEvent(any());
@@ -213,7 +213,7 @@ public class WsProducerIT {
 
         ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
         assertThat(record.key()).isEqualTo("statuses");
         verify(wsServiceClient).sendStatusesEvent(any());
@@ -225,7 +225,7 @@ public class WsProducerIT {
 
         ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
 
-        assertThat(wsServiceClient instanceof WsProducer).isTrue();
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
         assertThat(record.key()).isEqualTo("reactions");
         verify(wsServiceClient).sendReactionsEvent(any());
