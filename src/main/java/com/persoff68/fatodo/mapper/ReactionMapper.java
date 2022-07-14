@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.model.mapper;
+package com.persoff68.fatodo.mapper;
 
 import com.persoff68.fatodo.model.Reaction;
 import com.persoff68.fatodo.model.dto.ReactionDTO;

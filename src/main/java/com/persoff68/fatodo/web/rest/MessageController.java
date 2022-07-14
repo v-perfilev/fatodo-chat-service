@@ -2,7 +2,7 @@ package com.persoff68.fatodo.web.rest;
 
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.MessageDTO;
-import com.persoff68.fatodo.model.mapper.MessageMapper;
+import com.persoff68.fatodo.mapper.MessageMapper;
 import com.persoff68.fatodo.repository.OffsetPageRequest;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
 import com.persoff68.fatodo.security.util.SecurityUtils;

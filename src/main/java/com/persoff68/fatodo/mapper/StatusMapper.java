@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.model.mapper;
+package com.persoff68.fatodo.mapper;
 
 import com.persoff68.fatodo.model.Status;
 import com.persoff68.fatodo.model.dto.StatusDTO;
