@@ -10,8 +10,11 @@ import java.util.UUID;
 public class StatusDTO {
 
     private UUID messageId;
+
     private UUID userId;
+
     private StatusType type;
+
     private Date timestamp;
 
 }

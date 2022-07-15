@@ -40,6 +40,7 @@ public class Message extends AbstractAuditingModel {
 
     private boolean isEvent = false;
     private boolean isPrivate = false;
+
     private boolean isDeleted = false;
 
     @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true, fetch = FetchType.EAGER)

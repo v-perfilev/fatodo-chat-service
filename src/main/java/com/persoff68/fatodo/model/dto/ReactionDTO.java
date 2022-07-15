@@ -10,8 +10,11 @@ import java.util.UUID;
 public class ReactionDTO {
 
     private UUID messageId;
+
     private UUID userId;
+
     private ReactionType type;
+
     private Date timestamp;
 
 }

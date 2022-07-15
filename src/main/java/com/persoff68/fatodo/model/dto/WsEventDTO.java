@@ -9,7 +9,9 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 public class WsEventDTO<T> {
+
     private final List<UUID> userIds;
+
     private final T content;
 
 }

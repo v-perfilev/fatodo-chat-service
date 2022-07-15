@@ -12,16 +12,21 @@ import java.util.UUID;
 public class MessageDTO extends AbstractAuditingDTO {
 
     private UUID chatId;
+
     private UUID userId;
+
     private String text;
+
     private MessageDTO reference;
 
     @JsonProperty("isDeleted")
     private boolean isDeleted;
+
     @JsonProperty("isEvent")
     private boolean isEvent;
 
     private Set<StatusDTO> statuses;
+
     private Set<ReactionDTO> reactions;
 
 }

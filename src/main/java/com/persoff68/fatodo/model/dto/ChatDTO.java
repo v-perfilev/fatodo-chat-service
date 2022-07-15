@@ -12,10 +12,12 @@ import java.util.UUID;
 public class ChatDTO extends AbstractAuditingDTO {
 
     private String title;
+
     @JsonProperty("isDirect")
     private boolean isDirect;
 
     private List<UUID> members;
+
     MessageDTO lastMessage;
 
 }
