@@ -1,7 +1,9 @@
 package com.persoff68.fatodo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.persoff68.fatodo.config.constant.AppConstants;
 import com.persoff68.fatodo.model.constant.ReactionType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -18,6 +20,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -25,7 +29,7 @@ import java.util.UUID;
 @Table(name = "ftd_chat_reaction")
 @Data
 @NoArgsConstructor
-@IdClass(ReactionId.class)
+@IdClass(Reaction.ReactionId.class)
 @ToString(exclude = {"message"})
 public class Reaction {
 
@@ -53,6 +57,17 @@ public class Reaction {
         this.messageId = messageId;
         this.userId = userId;
         this.type = type;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReactionId implements Serializable {
+        @Serial
+        private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
+
+        private UUID messageId;
+        private UUID userId;
     }
 
 }
