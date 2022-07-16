@@ -13,7 +13,7 @@ public interface EventServiceClient {
     @PostMapping(value = "/api/events/chat", consumes = MediaType.APPLICATION_JSON_VALUE)
     void addChatEvent(@RequestBody CreateChatEventDTO createChatEventDTO);
 
-    @PostMapping("/chat/delete-users")
+    @PostMapping("/api/events/chat/delete-users")
     void deleteChatEventsForUser(@RequestBody DeleteUserEventsDTO deleteUserEventsDTO);
 
 }
