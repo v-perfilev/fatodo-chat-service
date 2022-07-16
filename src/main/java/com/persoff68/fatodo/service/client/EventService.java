@@ -51,7 +51,7 @@ public class EventService {
         eventServiceClient.addChatEvent(dto);
     }
 
-    public void deleteChatEventsForUserEvents(UUID chatId, List<UUID> userIdList) {
+    public void deleteChatEventsForUser(UUID chatId, List<UUID> userIdList) {
         DeleteUserEventsDTO dto = new DeleteUserEventsDTO(chatId, userIdList);
         eventServiceClient.deleteChatEventsForUser(dto);
     }

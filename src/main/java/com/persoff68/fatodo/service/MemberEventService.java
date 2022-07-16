@@ -118,7 +118,7 @@ public class MemberEventService {
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
         eventService.sendChatMemberDeleteEvent(recipientIdList, chatId, userId, userIdList);
-        eventService.deleteChatEventsForUserEvents(chatId, userIdList);
+        eventService.deleteChatEventsForUser(chatId, userIdList);
     }
 
     public void leaveChat(UUID userId, UUID chatId) {
@@ -172,7 +172,7 @@ public class MemberEventService {
         // EVENT MESSAGE
         systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
         // EVENT
-        eventService.deleteChatEventsForUserEvents(chatId, Collections.singletonList(userId));
+        eventService.deleteChatEventsForUser(chatId, Collections.singletonList(userId));
     }
 
 }
