@@ -1,8 +1,11 @@
 package com.persoff68.fatodo.config;
 
 import com.persoff68.fatodo.config.annotation.ConditionalOnPropertyNotNull;
+import com.persoff68.fatodo.config.constant.KafkaTopics;
 import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.CreateChatEventDTO;
+import com.persoff68.fatodo.model.dto.DeleteUserEventsDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
@@ -32,8 +35,18 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public NewTopic activationNewTopic() {
-        return KafkaUtils.buildTopic("ws_chat", partitions);
+    public NewTopic wsNewTopic() {
+        return KafkaUtils.buildTopic(KafkaTopics.WS_CHAT.getValue(), partitions);
+    }
+
+    @Bean
+    public NewTopic eventAddNewTopic() {
+        return KafkaUtils.buildTopic(KafkaTopics.EVENT_ADD.getValue(), partitions);
+    }
+
+    @Bean
+    public NewTopic eventDeleteNewTopic() {
+        return KafkaUtils.buildTopic(KafkaTopics.EVENT_DELETE.getValue(), partitions);
     }
 
     @Bean
@@ -53,6 +66,16 @@ public class KafkaConfiguration {
 
     @Bean
     public KafkaTemplate<String, WsEventDTO<ReactionsDTO>> wsEventReactionsKafkaTemplate() {
+        return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
+    }
+
+    @Bean
+    public KafkaTemplate<String, CreateChatEventDTO> eventChatKafkaTemplate() {
+        return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
+    }
+
+    @Bean
+    public KafkaTemplate<String, DeleteUserEventsDTO> eventDeleteUserKafkaTemplate() {
         return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
     }
 

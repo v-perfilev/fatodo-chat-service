@@ -6,6 +6,7 @@ import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.client.ContactServiceClient;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
@@ -71,6 +72,8 @@ class ChatControllerIT {
     ContactServiceClient contactServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     private Chat chat1;
     private Chat chat2;
@@ -82,6 +85,7 @@ class ChatControllerIT {
         when(userServiceClient.getAllIdsByUsernamePart(any())).thenReturn(Collections.emptyList());
         doNothing().when(wsServiceClient).sendChatNewEvent(any());
         doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
+        doNothing().when(eventServiceClient).addChatEvent(any());
 
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();

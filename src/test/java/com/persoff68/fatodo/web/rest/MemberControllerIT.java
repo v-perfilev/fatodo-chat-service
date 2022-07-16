@@ -6,6 +6,7 @@ import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.builder.TestMemberEvent;
 import com.persoff68.fatodo.client.ContactServiceClient;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
@@ -66,6 +67,8 @@ class MemberControllerIT {
     ContactServiceClient contactServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     @BeforeEach
     void setup() {
@@ -78,6 +81,8 @@ class MemberControllerIT {
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
         when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
+        doNothing().when(eventServiceClient).addChatEvent(any());
+        doNothing().when(eventServiceClient).deleteChatEventsForUser(any());
     }
 
 

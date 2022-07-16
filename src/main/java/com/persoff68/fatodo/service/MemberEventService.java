@@ -6,9 +6,10 @@ import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
+import com.persoff68.fatodo.service.client.EventService;
+import com.persoff68.fatodo.service.client.WsService;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.ChatUtils;
-import com.persoff68.fatodo.service.client.WsService;
 import com.persoff68.fatodo.service.util.ContactService;
 import com.persoff68.fatodo.service.util.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +34,7 @@ public class MemberEventService {
     private final ChatPermissionService chatPermissionService;
     private final EntityManager entityManager;
     private final WsService wsService;
+    private final EventService eventService;
 
     public void addUsersUnsafe(UUID chatId, List<UUID> userIdList) {
         userService.checkUsersExist(userIdList);
@@ -77,6 +80,9 @@ public class MemberEventService {
                 EventMessageType.ADD_MEMBERS,
                 userIdList
         );
+        // EVENT
+        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
+        eventService.sendChatMemberAddEvent(recipientIdList, chat.getId(), userId, userIdList);
     }
 
     public void removeUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
@@ -109,6 +115,10 @@ public class MemberEventService {
                 EventMessageType.DELETE_MEMBERS,
                 userIdList
         );
+        // EVENT
+        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
+        eventService.sendChatMemberDeleteEvent(recipientIdList, chatId, userId, userIdList);
+        eventService.deleteChatEventsForUserEvents(chatId, userIdList);
     }
 
     public void leaveChat(UUID userId, UUID chatId) {
@@ -125,6 +135,10 @@ public class MemberEventService {
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.LEAVE_CHAT);
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
+
+        // EVENT
+        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
+        eventService.sendChatMemberLeaveEvent(recipientIdList, chatId, userId);
     }
 
     public void clearChat(UUID userId, UUID chatId) {
@@ -141,20 +155,24 @@ public class MemberEventService {
         systemMessageService.createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT);
     }
 
+
+    // TODO check if it works correctly
     public void deleteChat(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
 
         chatPermissionService.hasDeleteChatPermission(chat, userId);
 
+        MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.DELETE_MEMBER);
+        memberEventRepository.saveAndFlush(memberEvent);
+        entityManager.refresh(chat);
+
         // WS
         wsService.sendChatUpdateEvent(chat);
         // EVENT MESSAGE
         systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
-
-        MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.DELETE_MEMBER);
-        memberEventRepository.saveAndFlush(memberEvent);
-        entityManager.refresh(chat);
+        // EVENT
+        eventService.deleteChatEventsForUserEvents(chatId, Collections.singletonList(userId));
     }
 
 }

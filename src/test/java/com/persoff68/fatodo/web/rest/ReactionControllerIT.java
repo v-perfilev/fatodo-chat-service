@@ -7,6 +7,7 @@ import com.persoff68.fatodo.builder.TestChat;
 import com.persoff68.fatodo.builder.TestMemberEvent;
 import com.persoff68.fatodo.builder.TestMessage;
 import com.persoff68.fatodo.builder.TestReaction;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
@@ -69,6 +70,8 @@ class ReactionControllerIT {
     UserServiceClient userServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     @BeforeEach
     void setup() {
@@ -90,6 +93,7 @@ class ReactionControllerIT {
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendReactionsEvent(any());
+        doNothing().when(eventServiceClient).addChatEvent(any());
     }
 
     @Test

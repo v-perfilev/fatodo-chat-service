@@ -5,6 +5,7 @@ import com.persoff68.fatodo.model.Reaction;
 import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
+import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.WsService;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class ReactionService {
     private final ChatPermissionService chatPermissionService;
     private final EntityManager entityManager;
     private final WsService wsService;
+    private final EventService eventService;
 
     public void setLike(UUID userId, UUID messageId) {
         set(userId, messageId, ReactionType.LIKE);
@@ -46,6 +48,8 @@ public class ReactionService {
 
         // WS
         wsService.sendMessageReactionEvent(message);
+        // EVENT
+        eventService.sendChatReactionEvent(message.getUserId(), message.getChat().getId(), userId, null);
     }
 
     protected void set(UUID userId, UUID messageId, ReactionType type) {
@@ -62,6 +66,8 @@ public class ReactionService {
 
         // WS
         wsService.sendMessageReactionEvent(message);
+        // EVENT
+        eventService.sendChatReactionEvent(message.getUserId(), message.getChat().getId(), userId, type);
     }
 
 }

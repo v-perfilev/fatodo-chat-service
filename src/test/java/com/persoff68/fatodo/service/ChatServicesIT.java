@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.client.ContactServiceClient;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
@@ -11,14 +12,13 @@ import com.persoff68.fatodo.repository.MemberEventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 import java.util.Map;
@@ -28,9 +28,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
+@AutoConfigureMockMvc
 class ChatServicesIT {
 
     private static final UUID USER_1_ID = UUID.fromString("98a4f736-70c2-4c7d-b75b-f7a5ae7bbe8d");
@@ -39,10 +39,9 @@ class ChatServicesIT {
 
     private static final Pageable pageable = PageRequest.of(0, 100);
 
-    private Chat secondChat;
 
     @Autowired
-    WebApplicationContext context;
+    MockMvc mvc;
 
     @Autowired
     ChatRepository chatRepository;
@@ -60,17 +59,20 @@ class ChatServicesIT {
     ContactServiceClient contactServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
-    MockMvc mvc;
+
+    private Chat secondChat;
 
     @BeforeEach
     void setup() {
-        mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
         when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
         doNothing().when(wsServiceClient).sendChatNewEvent(any());
+        doNothing().when(eventServiceClient).deleteChatEventsForUser(any());
 
         chatRepository.deleteAll();
         memberEventRepository.deleteAll();
@@ -81,6 +83,7 @@ class ChatServicesIT {
     }
 
     @Test
+    @Transactional
     void getAllChatsByUserIdTest() {
         Map<Chat, Message> firstUserChatMap = chatService.getAllByUserId(USER_1_ID, pageable);
         Map<Chat, Message> secondUserChatMap = chatService.getAllByUserId(USER_2_ID, pageable);
@@ -109,6 +112,7 @@ class ChatServicesIT {
     }
 
     @Test
+    @Transactional
     void clearAndGetAllChatsByUserIdTest() {
         beforeClearAndGetAllChatsByUserIdTest();
 

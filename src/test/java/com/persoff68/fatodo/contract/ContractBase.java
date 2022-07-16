@@ -5,6 +5,7 @@ import com.persoff68.fatodo.builder.TestMemberEvent;
 import com.persoff68.fatodo.builder.TestMessage;
 import com.persoff68.fatodo.builder.TestReaction;
 import com.persoff68.fatodo.client.ContactServiceClient;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
@@ -66,6 +67,8 @@ abstract class ContractBase {
     ContactServiceClient contactServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     @BeforeEach
     void setup() {
@@ -96,6 +99,8 @@ abstract class ContractBase {
         doNothing().when(wsServiceClient).sendMessageUpdateEvent(any());
         doNothing().when(wsServiceClient).sendStatusesEvent(any());
         doNothing().when(wsServiceClient).sendReactionsEvent(any());
+        doNothing().when(eventServiceClient).addChatEvent(any());
+        doNothing().when(eventServiceClient).deleteChatEventsForUser(any());
     }
 
     private Chat createChat(String title, UUID chatId) {

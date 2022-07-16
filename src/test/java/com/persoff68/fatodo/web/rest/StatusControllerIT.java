@@ -47,11 +47,6 @@ class StatusControllerIT {
     private static final String USER_ID_2 = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
     private static final String USER_ID_3 = "71bae736-415b-474c-9865-29043cbc8d0c";
 
-    private Message message1;
-    private Message message2;
-    private Message message3;
-    private Message message4;
-
     @Autowired
     MockMvc mvc;
     @Autowired
@@ -69,6 +64,12 @@ class StatusControllerIT {
     UserServiceClient userServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
+
+
+    private Message message1;
+    private Message message2;
+    private Message message3;
+    private Message message4;
 
     @BeforeEach
     void setup() {

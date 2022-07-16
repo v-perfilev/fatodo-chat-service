@@ -8,10 +8,11 @@ import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
+import com.persoff68.fatodo.service.client.EventService;
+import com.persoff68.fatodo.service.client.WsService;
 import com.persoff68.fatodo.service.exception.ModelAlreadyExistsException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.util.ChatUtils;
-import com.persoff68.fatodo.service.client.WsService;
 import com.persoff68.fatodo.service.util.ContactService;
 import com.persoff68.fatodo.service.util.UserService;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class ChatService {
     private final SystemMessageService systemMessageService;
     private final UserService userService;
     private final WsService wsService;
+    private final EventService eventService;
 
     public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findAllByUserId(userId, pageable);
@@ -87,6 +89,8 @@ public class ChatService {
                 EventMessageType.CREATE_DIRECT_CHAT,
                 Collections.singletonList(secondUserId)
         );
+        // EVENT
+        eventService.sendChatCreateEvent(chat.getId(), firstUserId, List.of(secondUserId));
 
         return chat;
     }
@@ -105,6 +109,8 @@ public class ChatService {
                 EventMessageType.CREATE_CHAT,
                 userIdList
         );
+        // EVENT
+        eventService.sendChatCreateEvent(chat.getId(), userId, userIdList);
 
         return chat;
     }
@@ -121,6 +127,9 @@ public class ChatService {
         wsService.sendChatUpdateEvent(chat);
         // EVENT MESSAGE
         systemMessageService.createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title);
+        // EVENT
+        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
+        eventService.sendChatUpdateEvent(recipientIdList, chat.getId(), userId);
 
         return chat;
     }
