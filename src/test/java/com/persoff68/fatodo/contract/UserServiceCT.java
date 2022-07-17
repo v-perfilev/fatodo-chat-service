@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.contract;
 
+import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.client.UserServiceClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,18 +23,21 @@ class UserServiceCT {
     UserServiceClient userServiceClient;
 
     @Test
+    @WithCustomSecurityContext
     void testCheckUserExists() {
         boolean doesIdExist = userServiceClient.doesIdExist(UUID.randomUUID());
         assertThat(doesIdExist).isFalse();
     }
 
     @Test
+    @WithCustomSecurityContext
     void testCheckUsersExist() {
         boolean doIdsExist = userServiceClient.doIdsExist(Collections.singletonList(UUID.randomUUID()));
         assertThat(doIdsExist).isFalse();
     }
 
     @Test
+    @WithCustomSecurityContext
     void testGetAllIdsByUsernamePart() {
         List<UUID> idList = userServiceClient.getAllIdsByUsernamePart("test");
         assertThat(idList).isNotEmpty();

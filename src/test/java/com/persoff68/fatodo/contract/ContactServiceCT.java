@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.contract;
 
+import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.client.ContactServiceClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ class ContactServiceCT {
     ContactServiceClient contactServiceClient;
 
     @Test
+    @WithCustomSecurityContext
     void testAreUsersInContactList() {
         List<UUID> userIdList = Collections.singletonList(UUID.randomUUID());
         boolean areUsersInContactList = contactServiceClient.areUsersInContactList(userIdList);
