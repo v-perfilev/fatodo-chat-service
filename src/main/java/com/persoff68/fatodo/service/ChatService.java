@@ -80,15 +80,15 @@ public class ChatService {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         Chat chat = create(userIdList, true);
 
-        // WS
-        wsService.sendChatNewEvent(chat);
-        // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 firstUserId,
                 chat.getId(),
                 EventMessageType.CREATE_DIRECT_CHAT,
                 Collections.singletonList(secondUserId)
         );
+
+        // WS
+        wsService.sendChatNewEvent(chat);
         // EVENT
         eventService.sendChatCreateEvent(chat.getId(), firstUserId, List.of(secondUserId));
 
@@ -100,15 +100,15 @@ public class ChatService {
         allUserIdList.add(userId);
         Chat chat = create(allUserIdList, false);
 
-        // WS
-        wsService.sendChatNewEvent(chat);
-        // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 userId,
                 chat.getId(),
                 EventMessageType.CREATE_CHAT,
                 userIdList
         );
+
+        // WS
+        wsService.sendChatNewEvent(chat);
         // EVENT
         eventService.sendChatCreateEvent(chat.getId(), userId, userIdList);
 
@@ -123,10 +123,10 @@ public class ChatService {
         chat.setTitle(title);
         chat = chatRepository.save(chat);
 
+        systemMessageService.createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title);
+
         // WS
         wsService.sendChatUpdateEvent(chat);
-        // EVENT MESSAGE
-        systemMessageService.createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title);
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
         eventService.sendChatUpdateEvent(recipientIdList, chat.getId(), userId);

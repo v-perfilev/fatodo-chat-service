@@ -5,6 +5,7 @@ import com.persoff68.fatodo.model.constant.ReactionType;
 import com.persoff68.fatodo.model.dto.CreateChatEventDTO;
 import com.persoff68.fatodo.model.dto.DeleteUserEventsDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Async
 public class EventService {
 
     private final EventServiceClient eventServiceClient;

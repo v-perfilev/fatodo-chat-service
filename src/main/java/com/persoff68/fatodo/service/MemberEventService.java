@@ -71,15 +71,15 @@ public class MemberEventService {
         memberEventRepository.flush();
         entityManager.refresh(chat);
 
-        // WS
-        wsService.sendChatUpdateEvent(chat);
-        // EVENT MESSAGE
         systemMessageService.createIdsEventMessage(
                 userId,
                 chatId,
                 EventMessageType.ADD_MEMBERS,
                 userIdList
         );
+
+        // WS
+        wsService.sendChatUpdateEvent(chat);
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
         eventService.sendChatMemberAddEvent(recipientIdList, chat.getId(), userId, userIdList);
@@ -106,15 +106,15 @@ public class MemberEventService {
         memberEventRepository.flush();
         entityManager.refresh(chat);
 
-        // WS
-        wsService.sendChatUpdateEvent(chat);
-        // SYSTEM MESSAGES
         systemMessageService.createIdsEventMessage(
                 userId,
                 chatId,
                 EventMessageType.DELETE_MEMBERS,
                 userIdList
         );
+
+        // WS
+        wsService.sendChatUpdateEvent(chat);
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
         eventService.sendChatMemberDeleteEvent(recipientIdList, chatId, userId, userIdList);
@@ -127,15 +127,14 @@ public class MemberEventService {
 
         chatPermissionService.hasLeaveChatPermission(chat, userId);
 
-        // WS
-        wsService.sendChatUpdateEvent(chat);
-        // EVENT MESSAGE
         systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
 
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.LEAVE_CHAT);
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
 
+        // WS
+        wsService.sendChatUpdateEvent(chat);
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
         eventService.sendChatMemberLeaveEvent(recipientIdList, chatId, userId);
@@ -151,12 +150,9 @@ public class MemberEventService {
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
 
-        // EVENT MESSAGE
         systemMessageService.createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT);
     }
 
-
-    // TODO check if it works correctly
     public void deleteChat(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -167,10 +163,10 @@ public class MemberEventService {
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
 
+        systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
+
         // WS
         wsService.sendChatUpdateEvent(chat);
-        // EVENT MESSAGE
-        systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
         // EVENT
         eventService.deleteChatEventsForUser(chatId, Collections.singletonList(userId));
     }
