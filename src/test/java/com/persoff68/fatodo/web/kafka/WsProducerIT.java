@@ -36,6 +36,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -127,11 +128,13 @@ class WsProducerIT {
     void testSendChatNewEvent() throws Exception {
         chatService.createDirect(UUID.fromString(USER_ID_1), UUID.fromString(USER_ID_3));
 
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("new");
+        assertThat(recordList).isNotNull().isNotEmpty();
+        assertThat(recordKeyList).contains("new");
         verify(wsServiceClient).sendChatNewEvent(any());
     }
 
@@ -139,11 +142,13 @@ class WsProducerIT {
     void testSendChatUpdateEvent() throws Exception {
         chatService.rename(UUID.fromString(USER_ID_1), chat.getId(), "new_test");
 
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("update");
+        assertThat(recordList).isNotNull().isNotEmpty();
+        assertThat(recordKeyList).contains("update");
         verify(wsServiceClient).sendChatUpdateEvent(any());
     }
 
@@ -151,13 +156,12 @@ class WsProducerIT {
     void testSendChatLastMessageEvent() throws Exception {
         messageService.send(UUID.fromString(USER_ID_1), chat.getId(), "message", null);
 
-        ConsumerRecord<String, String> record1 = wsRecords.poll(10, TimeUnit.SECONDS);
-        ConsumerRecord<String, String> record2 = wsRecords.poll(10, TimeUnit.SECONDS);
-        List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
-        List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(recordList).isNotNull().hasSize(2);
+        assertThat(recordList).isNotNull().isNotEmpty();
         assertThat(recordKeyList).contains("last-message");
         verify(wsServiceClient).sendChatLastMessageEvent(any());
     }
@@ -166,13 +170,12 @@ class WsProducerIT {
     void testSendChatLastMessageUpdateEvent() throws Exception {
         messageService.edit(UUID.fromString(USER_ID_1), message.getId(), "updated-message");
 
-        ConsumerRecord<String, String> record1 = wsRecords.poll(10, TimeUnit.SECONDS);
-        ConsumerRecord<String, String> record2 = wsRecords.poll(10, TimeUnit.SECONDS);
-        List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
-        List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(recordList).isNotNull().hasSize(2);
+        assertThat(recordList).isNotNull().isNotEmpty();
         assertThat(recordKeyList).contains("last-message-update");
         verify(wsServiceClient).sendChatLastMessageUpdateEvent(any());
     }
@@ -181,13 +184,12 @@ class WsProducerIT {
     void testSendMessageNewEvent() throws Exception {
         messageService.send(UUID.fromString(USER_ID_1), chat.getId(), "message", null);
 
-        ConsumerRecord<String, String> record1 = wsRecords.poll(10, TimeUnit.SECONDS);
-        ConsumerRecord<String, String> record2 = wsRecords.poll(10, TimeUnit.SECONDS);
-        List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
-        List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(recordList).isNotNull().hasSize(2);
+        assertThat(recordList).isNotNull().isNotEmpty();
         assertThat(recordKeyList).contains("message-new");
         verify(wsServiceClient).sendMessageNewEvent(any());
     }
@@ -196,13 +198,12 @@ class WsProducerIT {
     void testSendMessageUpdateEvent() throws Exception {
         messageService.edit(UUID.fromString(USER_ID_1), message.getId(), "updated-message");
 
-        ConsumerRecord<String, String> record1 = wsRecords.poll(10, TimeUnit.SECONDS);
-        ConsumerRecord<String, String> record2 = wsRecords.poll(10, TimeUnit.SECONDS);
-        List<ConsumerRecord<String, String>> recordList = List.of(record1, record2);
-        List<String> recordKeyList = recordList.stream().map(ConsumerRecord::key).toList();
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(recordList).isNotNull().hasSize(2);
+        assertThat(recordList).isNotNull().isNotEmpty();
         assertThat(recordKeyList).contains("message-update");
         verify(wsServiceClient).sendMessageUpdateEvent(any());
     }
@@ -211,11 +212,13 @@ class WsProducerIT {
     void testSendStatusesEvent() throws Exception {
         statusService.markAsRead(UUID.fromString(USER_ID_2), message.getId());
 
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("statuses");
+        assertThat(recordList).isNotNull().isNotEmpty();
+        assertThat(recordKeyList).contains("statuses");
         verify(wsServiceClient).sendStatusesEvent(any());
     }
 
@@ -223,11 +226,13 @@ class WsProducerIT {
     void testSendReactionsEvent() throws Exception {
         reactionService.setLike(UUID.fromString(USER_ID_2), message.getId());
 
-        ConsumerRecord<String, String> record = wsRecords.poll(10, TimeUnit.SECONDS);
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("reactions");
+        assertThat(recordList).isNotNull().isNotEmpty();
+        assertThat(recordKeyList).contains("reactions");
         verify(wsServiceClient).sendReactionsEvent(any());
     }
 
@@ -243,6 +248,19 @@ class WsProducerIT {
 
     private void stopWsConsumer() {
         wsContainer.stop();
+    }
+
+    private void waitForMultipleRecords(List<ConsumerRecord<String, String>> recordList,
+                                        List<String> recordKeyList) throws InterruptedException {
+        ConsumerRecord<String, String> record;
+        do {
+            record = wsRecords.poll(1, TimeUnit.SECONDS);
+            if (record != null) {
+                recordList.add(record);
+            }
+        } while (record != null);
+        List<String> keyList = recordList.stream().map(ConsumerRecord::key).toList();
+        recordKeyList.addAll(keyList);
     }
 
     private Chat createChat(String title, boolean isDirect, String... userIds) throws Exception {
