@@ -32,95 +32,95 @@ public class WsService {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
         WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
-        sendChatNewEvent(eventDTO);
+        sendChatNewEventAsync(eventDTO);
     }
 
     public void sendChatUpdateEvent(Chat chat) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
         WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
-        sendChatUpdateEvent(eventDTO);
+        sendChatUpdateEventAsync(eventDTO);
     }
 
     public void sendChatLastMessageEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         ChatDTO chatDTO = chatMapper.pojoToDTO(message.getChat(), message);
         WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
-        sendChatLastMessageEvent(eventDTO);
+        sendChatLastMessageEventAsync(eventDTO);
     }
 
     public void sendChatLastMessageUpdateEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         ChatDTO chatDTO = chatMapper.pojoToDTO(message.getChat(), message);
         WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
-        sendChatLastMessageUpdateEvent(eventDTO);
+        sendChatLastMessageUpdateEventAsync(eventDTO);
     }
 
     public void sendMessageNewEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         MessageDTO messageDTO = messageMapper.pojoToDTO(message);
         WsEventDTO<MessageDTO> eventDTO = new WsEventDTO<>(userIdList, messageDTO);
-        sendMessageNewEvent(eventDTO);
+        sendMessageNewEventAsync(eventDTO);
     }
 
     public void sendMessageUpdateEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         MessageDTO messageDTO = messageMapper.pojoToDTO(message);
         WsEventDTO<MessageDTO> eventDTO = new WsEventDTO<>(userIdList, messageDTO);
-        sendMessageUpdateEvent(eventDTO);
+        sendMessageUpdateEventAsync(eventDTO);
     }
 
     public void sendMessageStatusEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         StatusesDTO statusesDTO = messageMapper.pojoToStatusesDTO(message);
         WsEventDTO<StatusesDTO> eventDTO = new WsEventDTO<>(userIdList, statusesDTO);
-        sendStatusesEvent(eventDTO);
+        sendStatusesEventAsync(eventDTO);
     }
 
     public void sendMessageReactionEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         ReactionsDTO reactionsDTO = messageMapper.pojoToReactionsDTO(message);
         WsEventDTO<ReactionsDTO> eventDTO = new WsEventDTO<>(userIdList, reactionsDTO);
-        sendReactionsEvent(eventDTO);
+        sendReactionsEventAsync(eventDTO);
     }
 
     @Async
-    public void sendChatNewEvent(WsEventDTO<ChatDTO> event) {
+    public void sendChatNewEventAsync(WsEventDTO<ChatDTO> event) {
         wsServiceClient.sendChatNewEvent(event);
     }
 
     @Async
-    public void sendChatUpdateEvent(WsEventDTO<ChatDTO> event) {
+    public void sendChatUpdateEventAsync(WsEventDTO<ChatDTO> event) {
         wsServiceClient.sendChatUpdateEvent(event);
     }
 
     @Async
-    public void sendChatLastMessageEvent(WsEventDTO<ChatDTO> event) {
+    public void sendChatLastMessageEventAsync(WsEventDTO<ChatDTO> event) {
         wsServiceClient.sendChatLastMessageEvent(event);
     }
 
     @Async
-    public void sendChatLastMessageUpdateEvent(WsEventDTO<ChatDTO> event) {
+    public void sendChatLastMessageUpdateEventAsync(WsEventDTO<ChatDTO> event) {
         wsServiceClient.sendChatLastMessageUpdateEvent(event);
     }
 
     @Async
-    public void sendMessageNewEvent(WsEventDTO<MessageDTO> event) {
+    public void sendMessageNewEventAsync(WsEventDTO<MessageDTO> event) {
         wsServiceClient.sendMessageNewEvent(event);
     }
 
     @Async
-    public void sendMessageUpdateEvent(WsEventDTO<MessageDTO> event) {
+    public void sendMessageUpdateEventAsync(WsEventDTO<MessageDTO> event) {
         wsServiceClient.sendMessageUpdateEvent(event);
     }
 
     @Async
-    public void sendStatusesEvent(WsEventDTO<StatusesDTO> event) {
+    public void sendStatusesEventAsync(WsEventDTO<StatusesDTO> event) {
         wsServiceClient.sendStatusesEvent(event);
     }
 
     @Async
-    public void sendReactionsEvent(WsEventDTO<ReactionsDTO> event) {
+    public void sendReactionsEventAsync(WsEventDTO<ReactionsDTO> event) {
         wsServiceClient.sendReactionsEvent(event);
     }
 }
