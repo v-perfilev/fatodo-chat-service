@@ -5,7 +5,7 @@ import java.util.UUID;
 public class AppConstants {
     public static final String REPOSITORY_PATH = "com.persoff68.fatodo.repository";
     public static final String FEIGN_CLIENT_PATH = "com.persoff68.fatodo.client";
-    public static final String SERVICE_PATH = "com.persoff68.fatodo.service";
+    public static final String TASK_PATH = "com.persoff68.fatodo.task";
     public static final String CONTROLLER_PATH = "com.persoff68.fatodo.web.rest";
 
     public static final UUID SYSTEM_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
