@@ -65,6 +65,10 @@ public class ChatService {
                 .collect(ChatUtils.CHAT_MAP_COLLECTOR);
     }
 
+    public List<Chat> getAllAllowedByIds(UUID userId, List<UUID> chatIdList) {
+        return chatRepository.findAllByUserIdAndIds(userId, chatIdList);
+    }
+
     public Chat getByUserIdAndId(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -163,4 +167,5 @@ public class ChatService {
         Multimap<UUID, Message> unreadMessageMultimap = Multimaps.index(unreadMessageList, m -> m.getChat().getId());
         return Multimaps.transformValues(unreadMessageMultimap, AbstractModel::getId);
     }
+
 }

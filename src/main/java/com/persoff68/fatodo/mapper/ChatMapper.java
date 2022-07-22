@@ -3,6 +3,7 @@ package com.persoff68.fatodo.mapper;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.ChatInfoDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.service.util.ChatUtils;
 import org.mapstruct.InjectionStrategy;
@@ -23,12 +24,24 @@ public abstract class ChatMapper {
 
     abstract ChatDTO defaultPojoToDTO(Chat chat);
 
+    abstract ChatInfoDTO defaultPojoToInfoDTO(Chat chat);
+
     public ChatDTO pojoToDTO(Chat chat) {
         if (chat == null) {
             return null;
         }
         List<UUID> memberList = ChatUtils.getActiveUserIdList(chat);
         ChatDTO dto = defaultPojoToDTO(chat);
+        dto.setMembers(memberList);
+        return dto;
+    }
+
+    public ChatInfoDTO pojoToInfoDTO(Chat chat) {
+        if (chat == null) {
+            return null;
+        }
+        List<UUID> memberList = ChatUtils.getActiveUserIdList(chat);
+        ChatInfoDTO dto = defaultPojoToInfoDTO(chat);
         dto.setMembers(memberList);
         return dto;
     }

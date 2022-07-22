@@ -3,8 +3,9 @@ package com.persoff68.fatodo.service;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.repository.MessageRepository;
-import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.client.WsService;
+import com.persoff68.fatodo.service.exception.ModelNotFoundException;
+import com.persoff68.fatodo.service.util.ChatUtils;
 import com.persoff68.fatodo.service.util.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,13 @@ public class MessageService {
 
         Page<Message> messagePage = messageRepository.findAllByChatIdAndUserId(chatId, userId, pageable);
         return messagePage.toList().stream().toList();
+    }
+
+    public List<Message> getAllAllowedByIds(UUID userId, List<UUID> messageIdList) {
+        List<Message> messageList = messageRepository.findAllByIds(messageIdList);
+        return messageList.stream()
+                .filter(m -> ChatUtils.wasUserInChat(m.getChat(), userId))
+                .toList();
     }
 
     public Message sendDirect(UUID userId, UUID recipientId, String text, UUID referenceId) {

@@ -199,4 +199,9 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             @Param("chatId") UUID chatId
     );
 
+    @Query(value = """
+            select m from Message m
+            where m.id in :messageIds
+            """)
+    List<Message> findAllByIds(@Param("messageIds") List<UUID> messageIds);
 }

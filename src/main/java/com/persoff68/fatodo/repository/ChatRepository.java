@@ -39,6 +39,14 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
             """, nativeQuery = true)
     List<Chat> findAllByUserId(@Param("userId") UUID userId);
 
+    @Query(value = "with "
+            + USER_CHAT_IDS + """
+                select c.*
+                from ftd_chat as c
+                where c.id in (select id from chat_id) and c.id in :chatIds
+            """, nativeQuery = true)
+    List<Chat> findAllByUserIdAndIds(@Param("userId") UUID userId,@Param("chatIds") List<UUID> chatIds);
+
     @Query(value = """
             select c from Chat c where c.isDirect = true and c.id in
             (select e.chat.id from MemberEvent e where e.userId in ?1

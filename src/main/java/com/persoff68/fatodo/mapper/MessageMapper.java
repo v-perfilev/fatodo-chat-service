@@ -3,6 +3,7 @@ package com.persoff68.fatodo.mapper;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.MessageDTO;
+import com.persoff68.fatodo.model.dto.MessageInfoDTO;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusDTO;
@@ -32,6 +33,8 @@ public abstract class MessageMapper {
     @Mapping(target = "statuses", ignore = true)
     @Mapping(target = "reactions", ignore = true)
     abstract MessageDTO defaultPojoToDTO(Message message);
+
+    public abstract MessageInfoDTO pojoToInfoDTO(Message message);
 
     public MessageDTO pojoToDTO(Message message) {
         if (message == null) {
