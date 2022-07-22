@@ -36,16 +36,6 @@ public abstract class ChatMapper {
         return dto;
     }
 
-    public ChatInfoDTO pojoToInfoDTO(Chat chat) {
-        if (chat == null) {
-            return null;
-        }
-        List<UUID> memberList = ChatUtils.getActiveUserIdList(chat);
-        ChatInfoDTO dto = defaultPojoToInfoDTO(chat);
-        dto.setMembers(memberList);
-        return dto;
-    }
-
     public ChatDTO pojoToDTO(Chat chat, Message lastMessage) {
         if (chat == null) {
             return null;
@@ -53,6 +43,16 @@ public abstract class ChatMapper {
         ChatDTO dto = pojoToDTO(chat);
         MessageDTO messageDTO = messageMapper.defaultPojoToDTO(lastMessage);
         dto.setLastMessage(messageDTO);
+        return dto;
+    }
+
+    public ChatInfoDTO pojoToInfoDTO(Chat chat) {
+        if (chat == null) {
+            return null;
+        }
+        List<UUID> memberList = ChatUtils.getActiveUserIdList(chat);
+        ChatInfoDTO dto = defaultPojoToInfoDTO(chat);
+        dto.setMembers(memberList);
         return dto;
     }
 
