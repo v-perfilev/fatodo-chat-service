@@ -6,10 +6,10 @@ Contract.make {
     name 'dislike reaction'
     description 'should return status 201'
     request {
-        method GET()
+        method POST()
         url($(
-                consumer(regex("/api/reactions/dislike/" + uuid().toString())),
-                producer("/api/reactions/dislike/6520f3e6-0a7f-4c32-b6f8-ba5ae3ed0bd1")
+                consumer(regex("/api/reaction/" + uuid().toString() + "/dislike")),
+                producer("/api/reaction/6520f3e6-0a7f-4c32-b6f8-ba5ae3ed0bd1/dislike")
         ))
         headers {
             header 'Authorization': $(

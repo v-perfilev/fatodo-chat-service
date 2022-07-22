@@ -6,8 +6,8 @@ import com.persoff68.fatodo.service.StatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,11 +17,11 @@ import java.util.UUID;
 @RequestMapping(StatusController.ENDPOINT)
 @RequiredArgsConstructor
 public class StatusController {
-    static final String ENDPOINT = "/api/statuses";
+    static final String ENDPOINT = "/api/status";
 
     private final StatusService statusService;
 
-    @GetMapping("/read/{messageId}")
+    @PostMapping("/{messageId}/read")
     public ResponseEntity<Void> setRead(@PathVariable UUID messageId) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         statusService.markAsRead(userId, messageId);

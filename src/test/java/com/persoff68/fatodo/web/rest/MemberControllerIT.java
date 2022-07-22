@@ -14,6 +14,7 @@ import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,16 +32,15 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
 @AutoConfigureMockMvc
 class MemberControllerIT {
-    private static final String ENDPOINT = "/api/members";
+    private static final String ENDPOINT = "/api/member";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
     private static final String USER_ID_2 = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
@@ -72,24 +72,24 @@ class MemberControllerIT {
 
     @BeforeEach
     void setup() {
-        chatRepository.deleteAll();
-        memberEventRepository.deleteAll();
-
         chat1 = createIndirectChat(USER_ID_1, USER_ID_2);
         chat2 = createIndirectChat(USER_ID_2, USER_ID_3);
 
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
         when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
-        doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
-        doNothing().when(eventServiceClient).addChatEvent(any());
-        doNothing().when(eventServiceClient).deleteChatEventsForUser(any());
+    }
+
+    @AfterEach
+    void cleanup() {
+        chatRepository.deleteAll();
+        memberEventRepository.deleteAll();
     }
 
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAddUsers_ok_one() throws Exception {
-        String url = ENDPOINT + "/add/" + chat1.getId().toString();
+        String url = ENDPOINT + "/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -107,7 +107,7 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAddUsers_ok_many() throws Exception {
-        String url = ENDPOINT + "/add/" + chat1.getId().toString();
+        String url = ENDPOINT + "/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3), UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -127,7 +127,7 @@ class MemberControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAddUsers_notAllowedUsers() throws Exception {
         when(contactServiceClient.areUsersInContactList(any())).thenReturn(false);
-        String url = ENDPOINT + "/add/" + chat1.getId().toString();
+        String url = ENDPOINT + "/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.randomUUID());
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -138,7 +138,7 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAddUsers_notFound_chat() throws Exception {
-        String url = ENDPOINT + "/add/" + UUID.randomUUID();
+        String url = ENDPOINT + "/" + UUID.randomUUID();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -149,7 +149,7 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testAddUsers_forbidden() throws Exception {
-        String url = ENDPOINT + "/add/" + chat2.getId().toString();
+        String url = ENDPOINT + "/" + chat2.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_4));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -160,7 +160,7 @@ class MemberControllerIT {
     @Test
     @WithAnonymousUser
     void testAddUsers_unauthorized() throws Exception {
-        String url = ENDPOINT + "/add/" + chat1.getId().toString();
+        String url = ENDPOINT + "/" + chat1.getId().toString();
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -173,11 +173,8 @@ class MemberControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRemoveUsers_ok_one() throws Exception {
         createMemberEvents(chat1, USER_ID_3, USER_ID_4);
-        String url = ENDPOINT + "/remove/" + chat1.getId().toString();
-        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
-        String requestBody = objectMapper.writeValueAsString(userIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "?ids=" + USER_ID_3;
+        mvc.perform(delete(url))
                 .andExpect(status().isOk());
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
@@ -193,11 +190,8 @@ class MemberControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRemoveUsers_ok_many() throws Exception {
         createMemberEvents(chat1, USER_ID_3, USER_ID_4);
-        String url = ENDPOINT + "/remove/" + chat1.getId().toString();
-        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3), UUID.fromString(USER_ID_4));
-        String requestBody = objectMapper.writeValueAsString(userIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "?ids=" + USER_ID_3 + "," + USER_ID_4;
+        mvc.perform(delete(url))
                 .andExpect(status().isOk());
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
@@ -213,44 +207,32 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRemoveUsers_notFound_user() throws Exception {
-        String url = ENDPOINT + "/remove/" + chat1.getId().toString();
-        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
-        String requestBody = objectMapper.writeValueAsString(userIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "?ids=" + USER_ID_3;
+        mvc.perform(delete(url))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRemoveUsers_notFound_chat() throws Exception {
-        String url = ENDPOINT + "/remove/" + UUID.randomUUID();
-        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
-        String requestBody = objectMapper.writeValueAsString(userIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "?ids=" + USER_ID_3;
+        mvc.perform(delete(url))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRemoveUsers_forbidden() throws Exception {
-        String url = ENDPOINT + "/remove/" + chat2.getId().toString();
-        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
-        String requestBody = objectMapper.writeValueAsString(userIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/" + chat2.getId().toString() + "?ids=" + USER_ID_3;
+        mvc.perform(delete(url))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithAnonymousUser
     void testRemoveUsers_unauthorized() throws Exception {
-        String url = ENDPOINT + "/remove/" + chat1.getId().toString();
-        List<UUID> userIdList = List.of(UUID.fromString(USER_ID_3));
-        String requestBody = objectMapper.writeValueAsString(userIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "?ids=" + USER_ID_3;
+        mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -258,8 +240,8 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testLeave_ok() throws Exception {
-        String url = ENDPOINT + "/leave/" + chat1.getId().toString();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "/leave";
+        mvc.perform(delete(url))
                 .andExpect(status().isOk());
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
@@ -273,24 +255,24 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testLeave_forbidden() throws Exception {
-        String url = ENDPOINT + "/leave/" + chat2.getId().toString();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + chat2.getId().toString() + "/leave";
+        mvc.perform(delete(url))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testLeave_notFound() throws Exception {
-        String url = ENDPOINT + "/leave/" + UUID.randomUUID();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + UUID.randomUUID() + "/leave";
+        mvc.perform(delete(url))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithAnonymousUser
     void testLeave_unauthorized() throws Exception {
-        String url = ENDPOINT + "/leave/" + chat1.getId().toString();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "/leave";
+        mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -298,8 +280,8 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testClear_ok() throws Exception {
-        String url = ENDPOINT + "/clear/" + chat1.getId().toString();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "/clear";
+        mvc.perform(delete(url))
                 .andExpect(status().isOk());
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
@@ -313,24 +295,24 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testClear_forbidden() throws Exception {
-        String url = ENDPOINT + "/clear/" + chat2.getId().toString();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + chat2.getId().toString() + "/clear";
+        mvc.perform(delete(url))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testClear_notFound() throws Exception {
-        String url = ENDPOINT + "/clear/" + UUID.randomUUID();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + UUID.randomUUID() + "/clear";
+        mvc.perform(delete(url))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithAnonymousUser
     void testClear_unauthorized() throws Exception {
-        String url = ENDPOINT + "/clear/" + chat1.getId().toString();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "/clear";
+        mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -338,8 +320,8 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testDelete_ok() throws Exception {
-        String url = ENDPOINT + "/delete/" + chat1.getId().toString();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "/delete";
+        mvc.perform(delete(url))
                 .andExpect(status().isOk());
         List<MemberEvent> memberEventList = memberEventRepository.findAll();
         List<MemberEvent> filteredMemberEventList = memberEventList.stream()
@@ -353,24 +335,24 @@ class MemberControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testDelete_forbidden() throws Exception {
-        String url = ENDPOINT + "/delete/" + chat2.getId().toString();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + chat2.getId().toString() + "/delete";
+        mvc.perform(delete(url))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testDelete_notFound() throws Exception {
-        String url = ENDPOINT + "/delete/" + UUID.randomUUID();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + UUID.randomUUID() + "/delete";
+        mvc.perform(delete(url))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithAnonymousUser
     void testDelete_unauthorized() throws Exception {
-        String url = ENDPOINT + "/delete/" + chat1.getId().toString();
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + chat1.getId().toString() + "/delete";
+        mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());
     }
 

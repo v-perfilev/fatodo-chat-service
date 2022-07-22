@@ -6,10 +6,10 @@ Contract.make {
     name 'remove reaction'
     description 'should return status 201'
     request {
-        method GET()
+        method DELETE()
         url($(
-                consumer(regex("/api/reactions/none/" + uuid().toString())),
-                producer("/api/reactions/none/6520f3e6-0a7f-4c32-b6f8-ba5ae3ed0bd1")
+                consumer(regex("/api/reaction/" + uuid().toString())),
+                producer("/api/reaction/6520f3e6-0a7f-4c32-b6f8-ba5ae3ed0bd1")
         ))
         headers {
             header 'Authorization': $(

@@ -19,6 +19,7 @@ import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +35,15 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
 @AutoConfigureMockMvc
 class ReactionControllerIT {
-    private static final String ENDPOINT = "/api/reactions";
+    private static final String ENDPOINT = "/api/reaction";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
     private static final String USER_ID_2 = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
@@ -75,11 +76,6 @@ class ReactionControllerIT {
 
     @BeforeEach
     void setup() {
-        chatRepository.deleteAll();
-        memberEventRepository.deleteAll();
-        messageRepository.deleteAll();
-        reactionRepository.deleteAll();
-
         Chat chat1 = createDirectChat();
         createMemberEvents(chat1, USER_ID_1, USER_ID_2);
         message1 = createMessage(chat1, USER_ID_2);
@@ -92,16 +88,22 @@ class ReactionControllerIT {
         message4 = createMessage(chat2, USER_ID_2);
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
-        doNothing().when(wsServiceClient).sendReactionsEvent(any());
-        doNothing().when(eventServiceClient).addChatEvent(any());
+    }
+
+    @AfterEach
+    void cleanup() {
+        chatRepository.deleteAll();
+        memberEventRepository.deleteAll();
+        messageRepository.deleteAll();
+        reactionRepository.deleteAll();
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetLike_ok() throws Exception {
         String messageId = message1.getId().toString();
-        String url = ENDPOINT + "/like/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/like";
+        mvc.perform(post(url))
                 .andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
         boolean reactionExists = reactionList.stream()
@@ -115,8 +117,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetLike_ok_wasDislike() throws Exception {
         String messageId = message3.getId().toString();
-        String url = ENDPOINT + "/like/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/like";
+        mvc.perform(post(url))
                 .andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
         boolean reactionExists = reactionList.stream()
@@ -130,8 +132,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetLike_forbidden_ownMessage() throws Exception {
         String messageId = message2.getId().toString();
-        String url = ENDPOINT + "/like/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/like";
+        mvc.perform(post(url))
                 .andExpect(status().isForbidden());
     }
 
@@ -139,8 +141,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetLike_forbidden_noPermissions() throws Exception {
         String messageId = message4.getId().toString();
-        String url = ENDPOINT + "/like/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/like";
+        mvc.perform(post(url))
                 .andExpect(status().isForbidden());
     }
 
@@ -148,8 +150,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetLike_notFound() throws Exception {
         String messageId = UUID.randomUUID().toString();
-        String url = ENDPOINT + "/like/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/like";
+        mvc.perform(post(url))
                 .andExpect(status().isNotFound());
     }
 
@@ -157,8 +159,8 @@ class ReactionControllerIT {
     @WithAnonymousUser
     void testSetLike_unauthorized() throws Exception {
         String messageId = message1.getId().toString();
-        String url = ENDPOINT + "/like/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/like";
+        mvc.perform(post(url))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -167,8 +169,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetDislike_ok() throws Exception {
         String messageId = message1.getId().toString();
-        String url = ENDPOINT + "/dislike/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/dislike";
+        mvc.perform(post(url))
                 .andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
         boolean reactionExists = reactionList.stream()
@@ -183,8 +185,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetDislike_forbidden_ownMessage() throws Exception {
         String messageId = message2.getId().toString();
-        String url = ENDPOINT + "/dislike/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/dislike";
+        mvc.perform(post(url))
                 .andExpect(status().isForbidden());
     }
 
@@ -192,8 +194,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetDislike_forbidden_noPermissions() throws Exception {
         String messageId = message4.getId().toString();
-        String url = ENDPOINT + "/dislike/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/dislike";
+        mvc.perform(post(url))
                 .andExpect(status().isForbidden());
     }
 
@@ -201,8 +203,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetDislike_notFound() throws Exception {
         String messageId = UUID.randomUUID().toString();
-        String url = ENDPOINT + "/dislike/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/dislike";
+        mvc.perform(post(url))
                 .andExpect(status().isNotFound());
     }
 
@@ -210,8 +212,8 @@ class ReactionControllerIT {
     @WithAnonymousUser
     void testSetDislike_unauthorized() throws Exception {
         String messageId = message1.getId().toString();
-        String url = ENDPOINT + "/dislike/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId + "/dislike";
+        mvc.perform(post(url))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -220,8 +222,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetNone_ok() throws Exception {
         String messageId = message3.getId().toString();
-        String url = ENDPOINT + "/none/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId;
+        mvc.perform(delete(url))
                 .andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
         boolean reactionExists = reactionList.stream()
@@ -235,8 +237,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetNone_forbidden_ownMessage() throws Exception {
         String messageId = message2.getId().toString();
-        String url = ENDPOINT + "/none/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId;
+        mvc.perform(delete(url))
                 .andExpect(status().isForbidden());
     }
 
@@ -244,8 +246,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetNone_forbidden_noPermissions() throws Exception {
         String messageId = message4.getId().toString();
-        String url = ENDPOINT + "/none/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId;
+        mvc.perform(delete(url))
                 .andExpect(status().isForbidden());
     }
 
@@ -253,8 +255,8 @@ class ReactionControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSetNone_notFound() throws Exception {
         String messageId = UUID.randomUUID().toString();
-        String url = ENDPOINT + "/none/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId;
+        mvc.perform(delete(url))
                 .andExpect(status().isNotFound());
     }
 
@@ -262,8 +264,8 @@ class ReactionControllerIT {
     @WithAnonymousUser
     void testSetNone_unauthorized() throws Exception {
         String messageId = message1.getId().toString();
-        String url = ENDPOINT + "/none/" + messageId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/" + messageId;
+        mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());
     }
 

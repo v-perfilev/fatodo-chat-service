@@ -6,10 +6,10 @@ Contract.make {
     name 'leave chat'
     description 'should return status 200'
     request {
-        method GET()
+        method DELETE()
         url($(
-                consumer(regex("/api/members/leave/" + uuid().toString())),
-                producer("/api/members/leave/b73e8418-ff4a-472b-893d-4e248ae93797")
+                consumer(regex("/api/member/" + uuid().toString() + "/leave")),
+                producer("/api/member/b73e8418-ff4a-472b-893d-4e248ae93797/leave")
         ))
         headers {
             contentType applicationJson()

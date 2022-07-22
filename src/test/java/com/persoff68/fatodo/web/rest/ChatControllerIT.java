@@ -18,6 +18,7 @@ import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +39,16 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
 @AutoConfigureMockMvc
 class ChatControllerIT {
-    private static final String ENDPOINT = "/api/chats";
+    private static final String ENDPOINT = "/api/chat";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
     private static final String USER_ID_2 = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
@@ -80,19 +81,19 @@ class ChatControllerIT {
 
     @BeforeEach
     void setup() throws Exception {
-        when(userServiceClient.doIdsExist(any())).thenReturn(true);
-        when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
-        when(userServiceClient.getAllIdsByUsernamePart(any())).thenReturn(Collections.emptyList());
-        doNothing().when(wsServiceClient).sendChatNewEvent(any());
-        doNothing().when(wsServiceClient).sendChatUpdateEvent(any());
-        doNothing().when(eventServiceClient).addChatEvent(any());
-
-        chatRepository.deleteAll();
-        memberEventRepository.deleteAll();
-
         chat1 = createChat("test_chat", false, USER_ID_1, USER_ID_2);
         chat2 = createChat(null, false, USER_ID_2, USER_ID_3);
         createChat(null, true, USER_ID_1, USER_ID_4);
+
+        when(userServiceClient.doIdsExist(any())).thenReturn(true);
+        when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
+        when(userServiceClient.getAllIdsByUsernamePart(any())).thenReturn(Collections.emptyList());
+    }
+
+    @AfterEach
+    void cleanup() {
+        chatRepository.deleteAll();
+        memberEventRepository.deleteAll();
     }
 
     @Test
@@ -128,7 +129,7 @@ class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetFiltered_ok_byTitle() throws Exception {
-        String url = ENDPOINT + "/filtered/test";
+        String url = ENDPOINT + "/filter/test";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -142,7 +143,7 @@ class ChatControllerIT {
     void testGetFiltered_ok_byUsername() throws Exception {
         when(userServiceClient.getAllIdsByUsernamePart("test_user"))
                 .thenReturn(Collections.singletonList(UUID.fromString(USER_ID_4)));
-        String url = ENDPOINT + "/filtered/test_user";
+        String url = ENDPOINT + "/filter/test_user";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -154,7 +155,7 @@ class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetFiltered_ok_empty() throws Exception {
-        String url = ENDPOINT + "/filtered/not_found";
+        String url = ENDPOINT + "/filter/not_found";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -166,7 +167,7 @@ class ChatControllerIT {
     @Test
     @WithAnonymousUser
     void testGetFiltered_unauthorized() throws Exception {
-        String url = ENDPOINT + "/filtered/test";
+        String url = ENDPOINT + "/filter/test";
         mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
@@ -174,7 +175,7 @@ class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetById_ok() throws Exception {
-        String url = ENDPOINT + "/id/" + chat1.getId().toString();
+        String url = ENDPOINT + "/" + chat1.getId().toString();
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -185,7 +186,7 @@ class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetById_forbidden() throws Exception {
-        String url = ENDPOINT + "/id/" + chat2.getId().toString();
+        String url = ENDPOINT + "/" + chat2.getId().toString();
         mvc.perform(get(url))
                 .andExpect(status().isForbidden());
     }
@@ -193,7 +194,7 @@ class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testGetById_notFound() throws Exception {
-        String url = ENDPOINT + "/id/" + UUID.randomUUID();
+        String url = ENDPOINT + "/" + UUID.randomUUID();
         mvc.perform(get(url))
                 .andExpect(status().isNotFound());
     }
@@ -201,7 +202,7 @@ class ChatControllerIT {
     @Test
     @WithAnonymousUser
     void testGetById_unauthorized() throws Exception {
-        String url = ENDPOINT + "/id/" + UUID.randomUUID();
+        String url = ENDPOINT + "/" + UUID.randomUUID();
         mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
@@ -211,8 +212,10 @@ class ChatControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateDirect_ok() throws Exception {
         UUID userId = UUID.fromString(USER_ID_3);
-        String url = ENDPOINT + "/create-direct/" + userId;
-        ResultActions resultActions = mvc.perform(get(url))
+        String url = ENDPOINT + "/direct";
+        String requestBody = userId.toString();
+        ResultActions resultActions = mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
@@ -224,8 +227,10 @@ class ChatControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateDirect_badRequest_alreadyExists() throws Exception {
         UUID userId = UUID.fromString(USER_ID_4);
-        String url = ENDPOINT + "/create-direct/" + userId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/direct";
+        String requestBody = userId.toString();
+        mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -234,8 +239,10 @@ class ChatControllerIT {
     void testCreateDirect_notFound() throws Exception {
         when(userServiceClient.doIdsExist(any())).thenReturn(false);
         UUID userId = UUID.randomUUID();
-        String url = ENDPOINT + "/create-direct/" + userId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/direct";
+        String requestBody = userId.toString();
+        mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -243,15 +250,17 @@ class ChatControllerIT {
     @WithAnonymousUser
     void testCreateDirect_unauthorized() throws Exception {
         UUID userId = UUID.fromString(USER_ID_2);
-        String url = ENDPOINT + "/create-direct/" + userId;
-        mvc.perform(get(url))
+        String url = ENDPOINT + "/direct";
+        String requestBody = userId.toString();
+        mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateIndirect_ok() throws Exception {
-        String url = ENDPOINT + "/create-indirect";
+        String url = ENDPOINT + "/indirect";
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_2), UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         ResultActions resultActions = mvc.perform(post(url)
@@ -270,7 +279,7 @@ class ChatControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testCreateIndirect_notFound() throws Exception {
         when(userServiceClient.doIdsExist(any())).thenReturn(false);
-        String url = ENDPOINT + "/create-indirect";
+        String url = ENDPOINT + "/indirect";
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_2), UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -281,7 +290,7 @@ class ChatControllerIT {
     @Test
     @WithAnonymousUser
     void testCreateIndirect_unauthorized() throws Exception {
-        String url = ENDPOINT + "/create-indirect";
+        String url = ENDPOINT + "/indirect";
         List<UUID> userIdList = List.of(UUID.fromString(USER_ID_2), UUID.fromString(USER_ID_3));
         String requestBody = objectMapper.writeValueAsString(userIdList);
         mvc.perform(post(url)
@@ -292,9 +301,9 @@ class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRename_ok() throws Exception {
-        String url = ENDPOINT + "/rename/" + chat1.getId().toString();
+        String url = ENDPOINT + "/" + chat1.getId();
         String requestBody = "test_name";
-        ResultActions resultActions = mvc.perform(post(url)
+        ResultActions resultActions = mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
@@ -306,9 +315,9 @@ class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRename_forbidden() throws Exception {
-        String url = ENDPOINT + "/rename/" + chat2.getId().toString();
+        String url = ENDPOINT + "/" + chat2.getId();
         String requestBody = "test_name";
-        mvc.perform(post(url)
+        mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isForbidden());
     }
@@ -316,9 +325,9 @@ class ChatControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRename_notFound() throws Exception {
-        String url = ENDPOINT + "/rename/" + UUID.randomUUID();
+        String url = ENDPOINT + "/" + UUID.randomUUID();
         String requestBody = "test_name";
-        mvc.perform(post(url)
+        mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
     }
@@ -326,9 +335,9 @@ class ChatControllerIT {
     @Test
     @WithAnonymousUser
     void testRename_unauthorized() throws Exception {
-        String url = ENDPOINT + "/rename/" + chat1.getId().toString();
+        String url = ENDPOINT + "/" + chat1.getId().toString();
         String requestBody = "test_name";
-        mvc.perform(post(url)
+        mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }

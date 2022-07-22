@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -35,7 +34,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -89,11 +88,9 @@ class InfoControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void getAllChatInfoByIds_ok() throws Exception {
-        String url = ENDPOINT + "/chats";
-        List<UUID> chatIdList = List.of(chat1.getId(), chat2.getId());
-        String requestBody = objectMapper.writeValueAsString(chatIdList);
-        ResultActions resultActions = mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String idsParam = String.join(",", chat1.getId().toString(), chat2.getId().toString());
+        String url = ENDPOINT + "/chat?ids=" + idsParam;
+        ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatInfoDTO.class);
@@ -106,11 +103,9 @@ class InfoControllerIT {
     @Test
     @WithAnonymousUser
     void getAllChatInfoByIds_unauthorized() throws Exception {
-        String url = ENDPOINT + "/chats";
-        List<UUID> chatIdList = List.of(chat1.getId(), chat2.getId());
-        String requestBody = objectMapper.writeValueAsString(chatIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String idsParam = String.join(",", chat1.getId().toString(), chat2.getId().toString());
+        String url = ENDPOINT + "/chat?ids=" + idsParam;
+        mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -118,11 +113,9 @@ class InfoControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void getAllMessageInfoByIds_ok() throws Exception {
-        String url = ENDPOINT + "/messages";
-        List<UUID> chatIdList = List.of(message1.getId(), message2.getId());
-        String requestBody = objectMapper.writeValueAsString(chatIdList);
-        ResultActions resultActions = mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String idsParam = String.join(",", message1.getId().toString(), message2.getId().toString());
+        String url = ENDPOINT + "/message?ids=" + idsParam;
+        ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class,
@@ -135,11 +128,9 @@ class InfoControllerIT {
     @Test
     @WithAnonymousUser
     void getAllMessageInfoByIds_unauthorized() throws Exception {
-        String url = ENDPOINT + "/messages";
-        List<UUID> chatIdList = List.of(message1.getId(), message2.getId());
-        String requestBody = objectMapper.writeValueAsString(chatIdList);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String idsParam = String.join(",", message1.getId().toString(), message2.getId().toString());
+        String url = ENDPOINT + "/message?ids=" + idsParam;
+        mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
 

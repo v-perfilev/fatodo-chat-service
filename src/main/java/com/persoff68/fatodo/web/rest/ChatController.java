@@ -1,10 +1,10 @@
 package com.persoff68.fatodo.web.rest;
 
 import com.google.common.collect.Multimap;
+import com.persoff68.fatodo.mapper.ChatMapper;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.ChatDTO;
-import com.persoff68.fatodo.mapper.ChatMapper;
 import com.persoff68.fatodo.repository.OffsetPageRequest;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
 import com.persoff68.fatodo.security.util.SecurityUtils;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class ChatController {
-    static final String ENDPOINT = "/api/chats";
+    static final String ENDPOINT = "/api/chat";
 
     public static final int DEFAULT_SIZE = 20;
 
@@ -48,23 +49,21 @@ public class ChatController {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Pageable pageRequest = OffsetPageRequest.of(offset, size);
         Map<Chat, Message> chatMap = chatService.getAllByUserId(userId, pageRequest);
-        List<ChatDTO> chatDtoList = chatMap.entrySet().stream()
-                .map(entry -> chatMapper.pojoToDTO(entry.getKey(), entry.getValue()))
-                .toList();
+        List<ChatDTO> chatDtoList = chatMap.entrySet().stream().map(entry -> chatMapper.pojoToDTO(entry.getKey(),
+                entry.getValue())).toList();
         return ResponseEntity.ok(chatDtoList);
     }
 
-    @GetMapping("/filtered/{filter}")
+    @GetMapping("/filter/{filter}")
     public ResponseEntity<List<ChatDTO>> getFiltered(@PathVariable @NotBlank String filter) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Map<Chat, Message> chatMap = chatService.getFilteredByUserId(userId, filter);
-        List<ChatDTO> chatDtoList = chatMap.entrySet().stream()
-                .map(entry -> chatMapper.pojoToDTO(entry.getKey(), entry.getValue()))
-                .toList();
+        List<ChatDTO> chatDtoList = chatMap.entrySet().stream().map(entry -> chatMapper.pojoToDTO(entry.getKey(),
+                entry.getValue())).toList();
         return ResponseEntity.ok(chatDtoList);
     }
 
-    @GetMapping("/id/{chatId}")
+    @GetMapping("/{chatId}")
     public ResponseEntity<ChatDTO> getById(@PathVariable UUID chatId) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
@@ -72,15 +71,16 @@ public class ChatController {
         return ResponseEntity.ok(chatDTO);
     }
 
-    @GetMapping(value = "/create-direct/{secondUserId}")
-    public ResponseEntity<ChatDTO> createDirect(@PathVariable UUID secondUserId) {
+    @PostMapping(value = "/direct")
+    public ResponseEntity<ChatDTO> createDirect(@RequestBody String secondUserIdString) {
         UUID firstUserId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
+        UUID secondUserId = UUID.fromString(secondUserIdString);
         Chat chat = chatService.createDirect(firstUserId, secondUserId);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
         return ResponseEntity.status(HttpStatus.CREATED).body(chatDTO);
     }
 
-    @PostMapping("/create-indirect")
+    @PostMapping("/indirect")
     public ResponseEntity<ChatDTO> createIndirect(@RequestBody List<UUID> userIdList) {
         UUID firstUserId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Chat chat = chatService.createIndirect(firstUserId, userIdList);
@@ -88,7 +88,7 @@ public class ChatController {
         return ResponseEntity.status(HttpStatus.CREATED).body(chatDTO);
     }
 
-    @PostMapping("/rename/{chatId}")
+    @PutMapping("/{chatId}")
     public ResponseEntity<ChatDTO> rename(@PathVariable UUID chatId, @RequestBody String title) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Chat chat = chatService.rename(userId, chatId, title);
@@ -96,7 +96,7 @@ public class ChatController {
         return ResponseEntity.ok(chatDTO);
     }
 
-    @GetMapping("/unread-messages-map")
+    @GetMapping("/unread")
     public ResponseEntity<Multimap<UUID, UUID>> getUnreadMessagesMap() {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Multimap<UUID, UUID> unreadMessageIdMultimap = chatService.getUnreadMessagesMap(userId);

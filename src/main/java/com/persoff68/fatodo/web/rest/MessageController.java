@@ -1,13 +1,13 @@
 package com.persoff68.fatodo.web.rest;
 
+import com.persoff68.fatodo.mapper.MessageMapper;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.MessageDTO;
-import com.persoff68.fatodo.mapper.MessageMapper;
+import com.persoff68.fatodo.model.vm.MessageVM;
 import com.persoff68.fatodo.repository.OffsetPageRequest;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
 import com.persoff68.fatodo.security.util.SecurityUtils;
 import com.persoff68.fatodo.service.MessageService;
-import com.persoff68.fatodo.model.vm.MessageVM;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class MessageController {
-    static final String ENDPOINT = "/api/messages";
+    static final String ENDPOINT = "/api/message";
 
     private static final int DEFAULT_SIZE = 30;
 
@@ -55,7 +55,7 @@ public class MessageController {
         return ResponseEntity.ok(chatDtoList);
     }
 
-    @PostMapping("/direct/{recipientId}")
+    @PostMapping("/{recipientId}/direct")
     public ResponseEntity<MessageDTO> sendDirect(@PathVariable UUID recipientId,
                                                  @Valid @RequestBody MessageVM messageVM) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);

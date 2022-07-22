@@ -6,10 +6,10 @@ Contract.make {
     name 'read status'
     description 'should return status 201'
     request {
-        method GET()
+        method POST()
         url($(
-                consumer(regex("/api/statuses/read/" + uuid().toString())),
-                producer("/api/statuses/read/6520f3e6-0a7f-4c32-b6f8-ba5ae3ed0bd1")
+                consumer(regex("/api/status/" + uuid().toString() + "/read")),
+                producer("/api/status/6520f3e6-0a7f-4c32-b6f8-ba5ae3ed0bd1/read")
         ))
         headers {
             header 'Authorization': $(

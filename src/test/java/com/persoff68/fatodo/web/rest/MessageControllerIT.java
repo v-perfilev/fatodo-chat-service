@@ -15,10 +15,11 @@ import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.model.dto.MessageDTO;
+import com.persoff68.fatodo.model.vm.MessageVM;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
-import com.persoff68.fatodo.model.vm.MessageVM;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
 @AutoConfigureMockMvc
 class MessageControllerIT {
-    private static final String ENDPOINT = "/api/messages";
+    private static final String ENDPOINT = "/api/message";
 
     private static final String USER_ID_1 = "3c300277-b5ea-48d1-80db-ead620cf5846";
     private static final String USER_ID_2 = "357a2a99-7b7e-4336-9cd7-18f2cf73fab9";
@@ -80,18 +80,6 @@ class MessageControllerIT {
 
     @BeforeEach
     void setup() {
-        when(userServiceClient.doesIdExist(any())).thenReturn(true);
-        when(userServiceClient.doIdsExist(any())).thenReturn(true);
-        doNothing().when(wsServiceClient).sendChatLastMessageEvent(any());
-        doNothing().when(wsServiceClient).sendChatLastMessageUpdateEvent(any());
-        doNothing().when(wsServiceClient).sendMessageNewEvent(any());
-        doNothing().when(wsServiceClient).sendMessageUpdateEvent(any());
-        doNothing().when(eventServiceClient).addChatEvent(any());
-
-        chatRepository.deleteAll();
-        messageRepository.deleteAll();
-        memberEventRepository.deleteAll();
-
         chat1 = createChat(USER_ID_1, USER_ID_2);
         for (int i = 0; i < 10; i++) {
             message1 = createMessage(chat1, USER_ID_1);
@@ -102,6 +90,16 @@ class MessageControllerIT {
         for (int i = 0; i < 10; i++) {
             message3 = createMessage(chat2, USER_ID_2);
         }
+
+        when(userServiceClient.doesIdExist(any())).thenReturn(true);
+        when(userServiceClient.doIdsExist(any())).thenReturn(true);
+    }
+
+    @AfterEach
+    void cleanup() {
+        chatRepository.deleteAll();
+        messageRepository.deleteAll();
+        memberEventRepository.deleteAll();
     }
 
 
@@ -149,7 +147,7 @@ class MessageControllerIT {
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSendDirect_ok() throws Exception {
-        String url = ENDPOINT + "/direct/" + USER_ID_3;
+        String url = ENDPOINT + "/" + USER_ID_3 + "/direct";
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         ResultActions resultActions = mvc.perform(post(url)
@@ -165,7 +163,7 @@ class MessageControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testSendDirect_notFound() throws Exception {
         when(userServiceClient.doesIdExist(any())).thenReturn(false);
-        String url = ENDPOINT + "/direct/" + UUID.randomUUID();
+        String url = ENDPOINT + "/" + UUID.randomUUID() + "/direct";
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)
@@ -177,7 +175,7 @@ class MessageControllerIT {
     @WithAnonymousUser
     void testSendDirect_unauthorized() throws Exception {
         when(userServiceClient.doesIdExist(any())).thenReturn(false);
-        String url = ENDPOINT + "/direct/" + UUID.randomUUID();
+        String url = ENDPOINT + "/" + UUID.randomUUID() + "/direct";
         MessageVM vm = TestMessageVM.defaultBuilder().build().toParent();
         String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(post(url)

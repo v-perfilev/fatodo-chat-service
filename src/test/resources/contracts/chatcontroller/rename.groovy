@@ -6,10 +6,10 @@ Contract.make {
     name 'rename chat by id'
     description 'should return status 200 and ChatDTO'
     request {
-        method POST()
+        method PUT()
         url($(
-                consumer(regex("/api/chats/rename/" + uuid().toString())),
-                producer("/api/chats/rename/b73e8418-ff4a-472b-893d-4e248ae93797")
+                consumer(regex("/api/chat/" + uuid().toString())),
+                producer("/api/chat/b73e8418-ff4a-472b-893d-4e248ae93797")
         ))
         headers {
             contentType applicationJson()
