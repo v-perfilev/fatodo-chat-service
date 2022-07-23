@@ -113,9 +113,6 @@ publish-to-docker:
   only:
     - develop
     - master
-  except:
-    variables:
-      - NEXUS_ONLY
 
 publish-to-nexus:
   stage: publish
@@ -146,6 +143,3 @@ deploy-to-stage:
     url: $SERVER_URL
   only:
     - develop
-  except:
-    variables:
-      - NEXUS_ONLY
