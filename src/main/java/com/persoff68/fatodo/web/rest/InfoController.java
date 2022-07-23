@@ -11,7 +11,6 @@ import com.persoff68.fatodo.security.util.SecurityUtils;
 import com.persoff68.fatodo.service.ChatService;
 import com.persoff68.fatodo.service.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +33,7 @@ public class InfoController {
     private final ChatMapper chatMapper;
     private final MessageMapper messageMapper;
 
-    @GetMapping(value = "/chat", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/chat")
     public ResponseEntity<List<ChatInfoDTO>> getAllChatInfoByIds(@RequestParam("ids") List<UUID> chatIdList) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         List<Chat> chatList = chatService.getAllAllowedByIds(userId, chatIdList);
@@ -44,7 +43,7 @@ public class InfoController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @GetMapping(value = "/message", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/message")
     public ResponseEntity<List<MessageInfoDTO>> getAllMessageInfoByIds(@RequestParam("ids") List<UUID> messageIdList) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         List<Message> messageList = messageService.getAllAllowedByIds(userId, messageIdList);

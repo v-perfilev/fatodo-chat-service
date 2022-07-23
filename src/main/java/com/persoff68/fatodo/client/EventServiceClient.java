@@ -4,7 +4,6 @@ import com.persoff68.fatodo.client.configuration.FeignSystemConfiguration;
 import com.persoff68.fatodo.model.dto.CreateChatEventDTO;
 import com.persoff68.fatodo.model.dto.DeleteUserEventsDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -13,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
         qualifiers = {"feignEventServiceClient"})
 public interface EventServiceClient {
 
-    @PostMapping(value = "/api/events/chat", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/event/chat")
     void addChatEvent(@RequestBody CreateChatEventDTO createChatEventDTO);
 
-    @PostMapping("/api/events/chat/delete-users")
+    @PostMapping("/api/event/chat/delete-users")
     void deleteChatEventsForUser(@RequestBody DeleteUserEventsDTO deleteUserEventsDTO);
 
 }
