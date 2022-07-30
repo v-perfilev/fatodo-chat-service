@@ -24,12 +24,11 @@ Contract.make {
             contentType applicationJson()
         }
         body([
-                "data"  : [
+                "data" : [
                         "id": anyUuid()
 
                 ],
-                "count" : anyNumber(),
-                "unread": anyNumber()
+                "count": anyNumber()
         ])
     }
 }
