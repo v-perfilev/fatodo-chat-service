@@ -146,15 +146,21 @@ public class ChatService {
     }
 
     @Transactional
-    Chat getOrCreateDirectByUserIds(UUID firstUserId, UUID secondUserId) {
+    public Chat getOrCreateDirectByUserIds(UUID firstUserId, UUID secondUserId) {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         Supplier<Chat> createChatSupplier = () -> createDirect(firstUserId, secondUserId);
         return chatRepository.findDirectChat(userIdList)
                 .orElseGet(createChatSupplier);
     }
 
-    @Transactional
-    protected Chat create(List<UUID> userIdList, boolean isDirect) {
+    @Transactional(readOnly = true)
+    public Multimap<UUID, UUID> getUnreadMessagesMap(UUID userId) {
+        List<Message> unreadMessageList = messageRepository.findAllUnreadMessagesByUserId(userId);
+        Multimap<UUID, Message> unreadMessageMultimap = Multimaps.index(unreadMessageList, m -> m.getChat().getId());
+        return Multimaps.transformValues(unreadMessageMultimap, AbstractModel::getId);
+    }
+
+    private Chat create(List<UUID> userIdList, boolean isDirect) {
         if (isDirect) {
             userService.checkUsersExist(userIdList);
         } else {
@@ -165,18 +171,10 @@ public class ChatService {
         return chat;
     }
 
-    @Transactional(readOnly = true)
-    protected Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
+    private Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         return chatRepository.findDirectChat(userIdList)
                 .orElse(null);
-    }
-
-    @Transactional(readOnly = true)
-    public Multimap<UUID, UUID> getUnreadMessagesMap(UUID userId) {
-        List<Message> unreadMessageList = messageRepository.findAllUnreadMessagesByUserId(userId);
-        Multimap<UUID, Message> unreadMessageMultimap = Multimaps.index(unreadMessageList, m -> m.getChat().getId());
-        return Multimaps.transformValues(unreadMessageMultimap, AbstractModel::getId);
     }
 
 }
