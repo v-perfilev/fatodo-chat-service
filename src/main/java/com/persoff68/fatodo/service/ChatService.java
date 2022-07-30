@@ -4,7 +4,9 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.persoff68.fatodo.model.AbstractModel;
 import com.persoff68.fatodo.model.Chat;
+import com.persoff68.fatodo.model.ChatContainer;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
@@ -24,13 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ChatService {
 
     private final ChatRepository chatRepository;
@@ -43,13 +43,16 @@ public class ChatService {
     private final WsService wsService;
     private final EventService eventService;
 
-    public Map<Chat, Message> getAllByUserId(UUID userId, Pageable pageable) {
+
+    @Transactional(readOnly = true)
+    public PageableList<ChatContainer> getAllByUserId(UUID userId, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findAllByUserId(userId, pageable);
-        return messagePage.toList().stream()
-                .collect(ChatUtils.CHAT_MAP_COLLECTOR);
+        List<ChatContainer> chatList = messagePage.getContent().stream().map(ChatContainer::new).toList();
+        return PageableList.of(chatList, messagePage.getTotalElements());
     }
 
-    public Map<Chat, Message> getFilteredByUserId(UUID userId, String filter) {
+    @Transactional(readOnly = true)
+    public List<ChatContainer> getFilteredByUserId(UUID userId, String filter) {
         List<UUID> userIdList = userService.getUserIdsByUsernamePart(filter);
         List<Chat> chatList = chatRepository.findAllByUserId(userId);
         List<UUID> chatIdList = chatList.stream()
@@ -61,14 +64,15 @@ public class ChatService {
                 .map(Chat::getId)
                 .toList();
         List<Message> messageList = messageRepository.findAllByChatIdListAndUserId(chatIdList, userId);
-        return messageList.stream()
-                .collect(ChatUtils.CHAT_MAP_COLLECTOR);
+        return messageList.stream().map(ChatContainer::new).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<Chat> getAllAllowedByIds(UUID userId, List<UUID> chatIdList) {
         return chatRepository.findAllByUserIdAndIds(userId, chatIdList);
     }
 
+    @Transactional(readOnly = true)
     public Chat getByUserIdAndId(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -76,6 +80,7 @@ public class ChatService {
         return chat;
     }
 
+    @Transactional
     public Chat createDirect(UUID firstUserId, UUID secondUserId) {
         Chat oldChat = getDirectByUserIds(firstUserId, secondUserId);
         if (oldChat != null) {
@@ -99,6 +104,7 @@ public class ChatService {
         return chat;
     }
 
+    @Transactional
     public Chat createIndirect(UUID userId, List<UUID> userIdList) {
         List<UUID> allUserIdList = new ArrayList<>(userIdList);
         allUserIdList.add(userId);
@@ -119,6 +125,7 @@ public class ChatService {
         return chat;
     }
 
+    @Transactional
     public Chat rename(UUID userId, UUID chatId, String title) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -138,6 +145,7 @@ public class ChatService {
         return chat;
     }
 
+    @Transactional
     Chat getOrCreateDirectByUserIds(UUID firstUserId, UUID secondUserId) {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         Supplier<Chat> createChatSupplier = () -> createDirect(firstUserId, secondUserId);
@@ -145,6 +153,7 @@ public class ChatService {
                 .orElseGet(createChatSupplier);
     }
 
+    @Transactional
     protected Chat create(List<UUID> userIdList, boolean isDirect) {
         if (isDirect) {
             userService.checkUsersExist(userIdList);
@@ -156,12 +165,14 @@ public class ChatService {
         return chat;
     }
 
+    @Transactional(readOnly = true)
     protected Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         return chatRepository.findDirectChat(userIdList)
                 .orElse(null);
     }
 
+    @Transactional(readOnly = true)
     public Multimap<UUID, UUID> getUnreadMessagesMap(UUID userId) {
         List<Message> unreadMessageList = messageRepository.findAllUnreadMessagesByUserId(userId);
         Multimap<UUID, Message> unreadMessageMultimap = Multimaps.index(unreadMessageList, m -> m.getChat().getId());

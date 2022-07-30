@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.service.client.WsService;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
@@ -19,7 +20,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class MessageService {
 
     private final MessageRepository messageRepository;
@@ -29,14 +29,16 @@ public class MessageService {
     private final EntityManager entityManager;
     private final WsService wsService;
 
-    public List<Message> getAllByUserIdAndChatId(UUID userId, UUID chatId, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public PageableList<Message> getAllByUserIdAndChatId(UUID userId, UUID chatId, Pageable pageable) {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
         chatPermissionService.hasReadChatPermission(chat, userId);
 
         Page<Message> messagePage = messageRepository.findAllByChatIdAndUserId(chatId, userId, pageable);
-        return messagePage.toList().stream().toList();
+        return PageableList.of(messagePage.getContent(), messagePage.getTotalElements());
     }
 
+    @Transactional
     public List<Message> getAllAllowedByIds(UUID userId, List<UUID> messageIdList) {
         List<Message> messageList = messageRepository.findAllByIds(messageIdList);
         return messageList.stream()
@@ -44,6 +46,7 @@ public class MessageService {
                 .toList();
     }
 
+    @Transactional
     public Message sendDirect(UUID userId, UUID recipientId, String text, UUID referenceId) {
         userService.checkUserExists(recipientId);
         Chat chat = chatService.getOrCreateDirectByUserIds(userId, recipientId);
@@ -60,6 +63,7 @@ public class MessageService {
         return message;
     }
 
+    @Transactional
     public Message send(UUID userId, UUID chatId, String text, UUID referenceId) {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
         chatPermissionService.hasSendMessagePermission(chat, userId);
@@ -76,6 +80,7 @@ public class MessageService {
         return message;
     }
 
+    @Transactional
     public Message edit(UUID userId, UUID messageId, String text) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -95,6 +100,7 @@ public class MessageService {
         return message;
     }
 
+    @Transactional
     public void delete(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -114,6 +120,7 @@ public class MessageService {
         }
     }
 
+    @Transactional(readOnly = true)
     public boolean isMessageLastInChat(Message message) {
         UUID messageId = message.getId();
         UUID chatId = message.getChat().getId();

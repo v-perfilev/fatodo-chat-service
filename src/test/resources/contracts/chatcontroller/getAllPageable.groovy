@@ -24,11 +24,14 @@ Contract.make {
             contentType applicationJson()
         }
         body([
-                [
+                "data"  : [
                         "id"      : "b73e8418-ff4a-472b-893d-4e248ae93797",
                         "title"   : "test",
                         "isDirect": false
-                ]
+
+                ],
+                "count" : anyNumber(),
+                "unread": anyNumber()
         ])
     }
 }

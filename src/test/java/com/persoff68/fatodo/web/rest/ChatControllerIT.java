@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.web.rest;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.persoff68.fatodo.FatodoChatServiceApplication;
@@ -12,6 +13,7 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.model.dto.ChatDTO;
@@ -102,9 +104,9 @@ class ChatControllerIT {
         ResultActions resultActions = mvc.perform(get(ENDPOINT))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
-        List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList).hasSize(2);
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(PageableList.class, ChatDTO.class);
+        PageableList<ChatDTO> dtoList = objectMapper.readValue(resultString, javaType);
+        assertThat(dtoList.getData()).hasSize(2);
     }
 
     @Test
@@ -114,9 +116,9 @@ class ChatControllerIT {
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatDTO.class);
-        List<ChatDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList).hasSize(1);
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(PageableList.class, ChatDTO.class);
+        PageableList<ChatDTO> dtoList = objectMapper.readValue(resultString, javaType);
+        assertThat(dtoList.getData()).hasSize(1);
     }
 
     @Test

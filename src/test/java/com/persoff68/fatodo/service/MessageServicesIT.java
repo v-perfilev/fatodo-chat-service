@@ -7,9 +7,11 @@ import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = FatodoChatServiceApplication.class)
@@ -69,7 +70,6 @@ class MessageServicesIT {
     @MockBean
     EventServiceClient eventServiceClient;
 
-
     private Chat firstChat;
     private Chat secondChat;
 
@@ -77,13 +77,6 @@ class MessageServicesIT {
     void setup() {
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
         when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
-        doNothing().when(wsServiceClient).sendChatNewEvent(any());
-        doNothing().when(eventServiceClient).addChatEvent(any());
-        doNothing().when(eventServiceClient).deleteChatEventsForUser(any());
-
-        chatRepository.deleteAll();
-        memberEventRepository.deleteAll();
-        messageRepository.deleteAll();
 
         // create chats
         firstChat = chatService.createDirect(USER_1_ID, USER_2_ID);
@@ -94,18 +87,26 @@ class MessageServicesIT {
         messageService.send(USER_1_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
     }
 
-    @Test
-    void getAllMessagesTest() {
-        List<Message> firstUserFirstChatMessageList = messageService
-                .getAllByUserIdAndChatId(USER_1_ID, firstChat.getId(), pageable);
-        List<Message> firstUserSecondChatMessageList = messageService
-                .getAllByUserIdAndChatId(USER_1_ID, secondChat.getId(), pageable);
-
-        assertThat(firstUserFirstChatMessageList).hasSize(2);
-        assertThat(firstUserSecondChatMessageList).hasSize(2);
+    @AfterEach
+    void cleanup() {
+        messageRepository.deleteAll();
+        memberEventRepository.deleteAll();
+        chatRepository.deleteAll();
     }
 
-    private void beforeLeaveAndGetAllMessagesTest() {
+    @Test
+    void getAllMessagesTest() {
+        PageableList<Message> firstUserFirstChatMessageList = messageService.getAllByUserIdAndChatId(USER_1_ID,
+                firstChat.getId(), pageable);
+        PageableList<Message> firstUserSecondChatMessageList = messageService.getAllByUserIdAndChatId(USER_1_ID,
+                secondChat.getId(), pageable);
+
+        assertThat(firstUserFirstChatMessageList.getData()).hasSize(2);
+        assertThat(firstUserSecondChatMessageList.getData()).hasSize(2);
+    }
+
+    @Test
+    void leaveAndGetAllMessagesTest() {
         // leave second chat
         memberEventService.leaveChat(USER_1_ID, secondChat.getId());
         // message to second chat
@@ -114,40 +115,30 @@ class MessageServicesIT {
         memberEventService.addUsers(USER_2_ID, secondChat.getId(), Collections.singletonList(USER_1_ID));
         // message to second chat
         messageService.send(USER_1_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
-    }
 
-    @Test
-    void leaveAndGetAllMessagesTest() {
-        beforeLeaveAndGetAllMessagesTest();
+        PageableList<Message> firstUserSecondChatMessageList = messageService.getAllByUserIdAndChatId(USER_1_ID,
+                secondChat.getId(), pageable);
+        PageableList<Message> secondUserSecondChatMessageList = messageService.getAllByUserIdAndChatId(USER_2_ID,
+                secondChat.getId(), pageable);
 
-        List<Message> firstUserSecondChatMessageList = messageService
-                .getAllByUserIdAndChatId(USER_1_ID, secondChat.getId(), pageable);
-        List<Message> secondUserSecondChatMessageList = messageService
-                .getAllByUserIdAndChatId(USER_2_ID, secondChat.getId(), pageable);
-
-        assertThat(firstUserSecondChatMessageList).hasSize(5);
-        assertThat(secondUserSecondChatMessageList).hasSize(6);
-    }
-
-    private void beforeClearAndGetAllMessagesTest() {
-        // clear second chat
-        memberEventService.clearChat(USER_1_ID, secondChat.getId());
-
-        // messages to second chat
-        messageService.send(USER_2_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
+        assertThat(firstUserSecondChatMessageList.getData()).hasSize(5);
+        assertThat(secondUserSecondChatMessageList.getData()).hasSize(6);
     }
 
     @Test
     void clearAndGetAllMessagesTest() {
-        beforeClearAndGetAllMessagesTest();
+        // clear second chat
+        memberEventService.clearChat(USER_1_ID, secondChat.getId());
+        // messages to second chat
+        messageService.send(USER_2_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
 
-        List<Message> firstUserSecondChatMessageList = messageService
-                .getAllByUserIdAndChatId(USER_1_ID, secondChat.getId(), pageable);
-        List<Message> secondUserSecondChatMessageList = messageService
-                .getAllByUserIdAndChatId(USER_2_ID, secondChat.getId(), pageable);
+        PageableList<Message> firstUserSecondChatMessageList = messageService.getAllByUserIdAndChatId(USER_1_ID,
+                secondChat.getId(), pageable);
+        PageableList<Message> secondUserSecondChatMessageList = messageService.getAllByUserIdAndChatId(USER_2_ID,
+                secondChat.getId(), pageable);
 
-        assertThat(firstUserSecondChatMessageList).hasSize(2);
-        assertThat(secondUserSecondChatMessageList).hasSize(3);
+        assertThat(firstUserSecondChatMessageList.getData()).hasSize(2);
+        assertThat(secondUserSecondChatMessageList.getData()).hasSize(3);
     }
 
 }

@@ -23,7 +23,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class MemberEventService {
 
     private final ChatRepository chatRepository;
@@ -36,6 +35,7 @@ public class MemberEventService {
     private final WsService wsService;
     private final EventService eventService;
 
+    @Transactional
     public void addUsersUnsafe(UUID chatId, List<UUID> userIdList) {
         userService.checkUsersExist(userIdList);
 
@@ -52,6 +52,7 @@ public class MemberEventService {
         entityManager.refresh(chat);
     }
 
+    @Transactional
     public void addUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
         contactService.checkIfUsersInContactList(userIdList);
 
@@ -60,7 +61,7 @@ public class MemberEventService {
 
         chatPermissionService.hasEditMembersPermission(chat, userId);
 
-        List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat);
+        List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         List<MemberEvent> memberEventList = userIdList.stream()
                 .filter(id -> !activeUserIdList.contains(id))
                 .distinct()
@@ -81,17 +82,18 @@ public class MemberEventService {
         // WS
         wsService.sendChatUpdateEvent(chat);
         // EVENT
-        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
+        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         eventService.sendChatMemberAddEvent(recipientIdList, chat.getId(), userId, userIdList);
     }
 
+    @Transactional
     public void removeUsers(UUID userId, UUID chatId, List<UUID> userIdList) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
 
         chatPermissionService.hasEditMembersPermission(chat, userId);
 
-        List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat);
+        List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         List<MemberEvent> memberEventList = userIdList.stream()
                 .filter(activeUserIdList::contains)
                 .distinct()
@@ -116,11 +118,12 @@ public class MemberEventService {
         // WS
         wsService.sendChatUpdateEvent(chat);
         // EVENT
-        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
+        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         eventService.sendChatMemberDeleteEvent(recipientIdList, chatId, userId, userIdList);
         eventService.deleteChatEventsForUser(chatId, userIdList);
     }
 
+    @Transactional
     public void leaveChat(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -136,10 +139,11 @@ public class MemberEventService {
         // WS
         wsService.sendChatUpdateEvent(chat);
         // EVENT
-        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat);
+        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         eventService.sendChatMemberLeaveEvent(recipientIdList, chatId, userId);
     }
 
+    @Transactional
     public void clearChat(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
@@ -153,6 +157,7 @@ public class MemberEventService {
         systemMessageService.createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT);
     }
 
+    @Transactional
     public void deleteChat(UUID userId, UUID chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);

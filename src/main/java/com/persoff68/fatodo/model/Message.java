@@ -49,6 +49,7 @@ public class Message extends AbstractAuditingModel {
     @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Reaction> reactions = new HashSet<>();
 
+
     public static Message of(Chat chat, UUID userId, String text, Message reference) {
         Message message = new Message();
         message.chat = chat;

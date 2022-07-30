@@ -5,30 +5,19 @@ import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
-import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class ChatUtils {
 
     private ChatUtils() {
     }
-
-    public static final Collector<Message, ?, Map<Chat, Message>> CHAT_MAP_COLLECTOR = Collectors.toMap(
-            Message::getChat,
-            message -> message,
-            (e1, e2) -> e1,
-            LinkedHashMap::new
-    );
 
     public static boolean isUserInChat(Chat chat, UUID userId) {
         List<UUID> activeUserIdLIst = getActiveUserIdList(chat);
@@ -60,7 +49,10 @@ public class ChatUtils {
     }
 
     public static List<UUID> getActiveUserIdList(Chat chat) {
-        List<MemberEvent> memberEventList = chat.getMemberEvents();
+        return getActiveUserIdList(chat.getMemberEvents());
+    }
+
+    public static List<UUID> getActiveUserIdList(List<MemberEvent> memberEventList) {
 
         Table<UUID, MemberEventType, Integer> memberEventCountTable = getMemberEventCountTable(memberEventList);
 

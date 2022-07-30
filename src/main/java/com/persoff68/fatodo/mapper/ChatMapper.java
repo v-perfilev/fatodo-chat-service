@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.mapper;
 
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.ChatContainer;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.model.dto.ChatInfoDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
@@ -36,14 +36,13 @@ public abstract class ChatMapper {
         return dto;
     }
 
-    public ChatDTO pojoToDTO(Chat chat, Message lastMessage) {
-        if (chat == null) {
-            return null;
-        }
-        ChatDTO dto = pojoToDTO(chat);
-        MessageDTO messageDTO = messageMapper.defaultPojoToDTO(lastMessage);
-        dto.setLastMessage(messageDTO);
-        return dto;
+    public ChatDTO containerToDTO(ChatContainer chatContainer) {
+        List<UUID> memberList = ChatUtils.getActiveUserIdList(chatContainer.getMemberEvents());
+        MessageDTO messageDTO = messageMapper.pojoToDTO(chatContainer.getLastMessage());
+        ChatDTO chatDTO = defaultPojoToDTO(chatContainer.getChat());
+        chatDTO.setLastMessage(messageDTO);
+        chatDTO.setMembers(memberList);
+        return chatDTO;
     }
 
     public ChatInfoDTO pojoToInfoDTO(Chat chat) {

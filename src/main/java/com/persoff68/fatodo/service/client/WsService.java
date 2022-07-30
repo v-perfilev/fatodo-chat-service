@@ -4,6 +4,7 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.mapper.ChatMapper;
 import com.persoff68.fatodo.mapper.MessageMapper;
 import com.persoff68.fatodo.model.Chat;
+import com.persoff68.fatodo.model.ChatContainer;
 import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
@@ -44,14 +45,16 @@ public class WsService {
 
     public void sendChatLastMessageEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
-        ChatDTO chatDTO = chatMapper.pojoToDTO(message.getChat(), message);
+        ChatContainer chatContainer = new ChatContainer(message);
+        ChatDTO chatDTO = chatMapper.containerToDTO(chatContainer);
         WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
         sendChatLastMessageEventAsync(eventDTO);
     }
 
     public void sendChatLastMessageUpdateEvent(Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
-        ChatDTO chatDTO = chatMapper.pojoToDTO(message.getChat(), message);
+        ChatContainer chatContainer = new ChatContainer(message);
+        ChatDTO chatDTO = chatMapper.containerToDTO(chatContainer);
         WsEventDTO<ChatDTO> eventDTO = new WsEventDTO<>(userIdList, chatDTO);
         sendChatLastMessageUpdateEventAsync(eventDTO);
     }

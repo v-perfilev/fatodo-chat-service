@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@ToString(exclude = {"memberEvents, messages"})
+@ToString(exclude = {"memberEvents", "messages"})
 public class Chat extends AbstractAuditingModel {
 
     private String title;

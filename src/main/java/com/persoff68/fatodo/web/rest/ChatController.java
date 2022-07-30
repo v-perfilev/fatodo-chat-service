@@ -3,7 +3,8 @@ package com.persoff68.fatodo.web.rest;
 import com.google.common.collect.Multimap;
 import com.persoff68.fatodo.mapper.ChatMapper;
 import com.persoff68.fatodo.model.Chat;
-import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.ChatContainer;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.repository.OffsetPageRequest;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,14 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(ChatController.ENDPOINT)
 @RequiredArgsConstructor
-@Transactional
 public class ChatController {
     static final String ENDPOINT = "/api/chat";
 
@@ -42,24 +40,22 @@ public class ChatController {
     private final ChatMapper chatMapper;
 
     @GetMapping
-    public ResponseEntity<List<ChatDTO>> getAllPageable(@RequestParam(required = false) Integer offset,
-                                                        @RequestParam(required = false) Integer size) {
+    public ResponseEntity<PageableList<ChatDTO>> getAllPageable(@RequestParam(required = false) Integer offset,
+                                                                @RequestParam(required = false) Integer size) {
         offset = Optional.ofNullable(offset).orElse(0);
         size = Optional.ofNullable(size).orElse(DEFAULT_SIZE);
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         Pageable pageRequest = OffsetPageRequest.of(offset, size);
-        Map<Chat, Message> chatMap = chatService.getAllByUserId(userId, pageRequest);
-        List<ChatDTO> chatDtoList = chatMap.entrySet().stream().map(entry -> chatMapper.pojoToDTO(entry.getKey(),
-                entry.getValue())).toList();
-        return ResponseEntity.ok(chatDtoList);
+        PageableList<ChatContainer> chatList = chatService.getAllByUserId(userId, pageRequest);
+        PageableList<ChatDTO> dtoList = chatList.convert(chatMapper::containerToDTO);
+        return ResponseEntity.ok(dtoList);
     }
 
     @GetMapping("/filter/{filter}")
     public ResponseEntity<List<ChatDTO>> getFiltered(@PathVariable @NotBlank String filter) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Map<Chat, Message> chatMap = chatService.getFilteredByUserId(userId, filter);
-        List<ChatDTO> chatDtoList = chatMap.entrySet().stream().map(entry -> chatMapper.pojoToDTO(entry.getKey(),
-                entry.getValue())).toList();
+        List<ChatContainer> chatList = chatService.getFilteredByUserId(userId, filter);
+        List<ChatDTO> chatDtoList = chatList.stream().map(chatMapper::containerToDTO).toList();
         return ResponseEntity.ok(chatDtoList);
     }
 

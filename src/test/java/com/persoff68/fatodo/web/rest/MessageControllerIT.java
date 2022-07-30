@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.web.rest;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import com.persoff68.fatodo.FatodoChatServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestChat;
@@ -13,6 +13,7 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.vm.MessageVM;
@@ -110,9 +111,9 @@ class MessageControllerIT {
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, MessageDTO.class);
-        List<MessageDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList).hasSize(20);
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(PageableList.class, MessageDTO.class);
+        PageableList<MessageDTO> resultList = objectMapper.readValue(resultString, javaType);
+        assertThat(resultList.getData()).hasSize(20);
     }
 
     @Test
@@ -122,9 +123,9 @@ class MessageControllerIT {
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, MessageDTO.class);
-        List<MessageDTO> resultDTOList = objectMapper.readValue(resultString, listType);
-        assertThat(resultDTOList).hasSize(10);
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(PageableList.class, MessageDTO.class);
+        PageableList<MessageDTO> resultLIst = objectMapper.readValue(resultString, javaType);
+        assertThat(resultLIst.getData()).hasSize(10);
     }
 
     @Test
