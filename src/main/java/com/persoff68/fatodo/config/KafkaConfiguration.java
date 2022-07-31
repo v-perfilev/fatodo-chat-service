@@ -4,7 +4,6 @@ import com.persoff68.fatodo.config.annotation.ConditionalOnPropertyNotNull;
 import com.persoff68.fatodo.config.constant.KafkaTopics;
 import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.dto.ChatDTO;
-import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.CreateChatEventDTO;
 import com.persoff68.fatodo.model.dto.DeleteUserEventsDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
@@ -18,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
+
+import java.util.UUID;
 
 @Configuration
 @EnableKafka
@@ -61,6 +62,11 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    public KafkaTemplate<String, WsEventDTO<UUID>> wsEventUUIDKafkaTemplate() {
+        return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
+    }
+
+    @Bean
     public KafkaTemplate<String, WsEventDTO<MessageDTO>> wsEventMessageKafkaTemplate() {
         return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
     }
@@ -82,11 +88,6 @@ public class KafkaConfiguration {
 
     @Bean
     public KafkaTemplate<String, DeleteUserEventsDTO> eventDeleteUserKafkaTemplate() {
-        return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
-    }
-
-    @Bean
-    public KafkaTemplate<String, WsEventDTO<ClearEventDTO>> wsClearEventKafkaTemplate() {
         return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
     }
 

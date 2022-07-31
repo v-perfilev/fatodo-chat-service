@@ -102,8 +102,6 @@ class WsProducerIT {
 
     private ConcurrentMessageListenerContainer<String, String> wsChatContainer;
     private BlockingQueue<ConsumerRecord<String, String>> wsChatRecords;
-    private ConcurrentMessageListenerContainer<String, String> wsClearContainer;
-    private BlockingQueue<ConsumerRecord<String, String>> wsClearRecords;
 
     private Chat chat;
     private Message message;
@@ -116,7 +114,6 @@ class WsProducerIT {
         message = createMessage(chat, USER_ID_1);
 
         startWsChatConsumer();
-        startWsClearConsumer();
     }
 
     @AfterEach
@@ -128,7 +125,6 @@ class WsProducerIT {
         reactionRepository.deleteAll();
 
         stopWsChatConsumer();
-        stopWsClearConsumer();
     }
 
     @Test
@@ -157,6 +153,20 @@ class WsProducerIT {
         assertThat(recordList).isNotNull().isNotEmpty();
         assertThat(recordKeyList).contains("update");
         verify(wsServiceClient).sendChatUpdateEvent(any());
+    }
+
+    @Test
+    void testSendChatDeleteEvent() throws Exception {
+        memberEventService.leaveChat(UUID.fromString(USER_ID_2), chat.getId());
+
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(wsChatRecords, recordList, recordKeyList);
+
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
+        assertThat(recordList).isNotNull().isNotEmpty();
+        assertThat(recordKeyList).contains("delete");
+        verify(wsServiceClient).sendChatDeleteEvent(any());
     }
 
     @Test
@@ -243,19 +253,6 @@ class WsProducerIT {
         verify(wsServiceClient).sendReactionsEvent(any());
     }
 
-    @Test
-    void testSendClearEvent() throws Exception {
-        memberEventService.leaveChat(UUID.fromString(USER_ID_2), chat.getId());
-
-        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
-        List<String> recordKeyList = new ArrayList<>();
-        waitForMultipleRecords(wsClearRecords, recordList, recordKeyList);
-
-        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
-        assertThat(recordList).isNotNull().isNotEmpty();
-        verify(wsServiceClient).sendClearEvent(any());
-    }
-
     private void startWsChatConsumer() {
         ConcurrentKafkaListenerContainerFactory<String, String> stringContainerFactory =
                 KafkaUtils.buildStringContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test", "earliest");
@@ -268,20 +265,6 @@ class WsProducerIT {
 
     private void stopWsChatConsumer() {
         wsChatContainer.stop();
-    }
-
-    private void startWsClearConsumer() {
-        ConcurrentKafkaListenerContainerFactory<String, String> stringContainerFactory =
-                KafkaUtils.buildStringContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test", "earliest");
-        wsClearContainer = stringContainerFactory.createContainer("ws_clear");
-        wsClearRecords = new LinkedBlockingQueue<>();
-        wsClearContainer.setupMessageListener((MessageListener<String, String>) wsClearRecords::add);
-        wsClearContainer.start();
-        ContainerTestUtils.waitForAssignment(wsClearContainer, embeddedKafkaBroker.getPartitionsPerTopic());
-    }
-
-    private void stopWsClearConsumer() {
-        wsClearContainer.stop();
     }
 
     private void waitForMultipleRecords(BlockingQueue<ConsumerRecord<String, String>> records,

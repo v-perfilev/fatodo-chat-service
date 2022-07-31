@@ -2,7 +2,6 @@ package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.exception.ClientException;
 import com.persoff68.fatodo.model.dto.ChatDTO;
-import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
@@ -10,6 +9,8 @@ import com.persoff68.fatodo.model.dto.WsEventDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -31,6 +32,15 @@ public class WsServiceClientWrapper implements WsServiceClient {
     public void sendChatUpdateEvent(WsEventDTO<ChatDTO> event) {
         try {
             wsServiceClient.sendChatUpdateEvent(event);
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
+
+    @Override
+    public void sendChatDeleteEvent(WsEventDTO<UUID> event) {
+        try {
+            wsServiceClient.sendChatDeleteEvent(event);
         } catch (Exception e) {
             throw new ClientException();
         }
@@ -90,12 +100,4 @@ public class WsServiceClientWrapper implements WsServiceClient {
         }
     }
 
-    @Override
-    public void sendClearEvent(WsEventDTO<ClearEventDTO> event) {
-        try {
-            wsServiceClient.sendClearEvent(event);
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
 }

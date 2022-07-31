@@ -117,7 +117,7 @@ public class MemberEventService {
 
         // WS
         wsService.sendChatUpdateEvent(chat);
-        wsService.sendClearEvent(chat, userIdList);
+        wsService.sendChatDeleteEvent(chat, userIdList);
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         eventService.sendChatMemberDeleteEvent(recipientIdList, chatId, userId, userIdList);
@@ -139,7 +139,7 @@ public class MemberEventService {
 
         // WS
         wsService.sendChatUpdateEvent(chat);
-        wsService.sendClearEvent(chat, Collections.singletonList(userId));
+        wsService.sendChatDeleteEvent(chat, Collections.singletonList(userId));
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         eventService.sendChatMemberLeaveEvent(recipientIdList, chatId, userId);
@@ -174,7 +174,7 @@ public class MemberEventService {
 
         // WS
         wsService.sendChatUpdateEvent(chat);
-        wsService.sendClearEvent(chat);
+        wsService.sendChatDeleteEvent(chat);
         // EVENT
         eventService.deleteChatEventsForUser(chatId, Collections.singletonList(userId));
     }

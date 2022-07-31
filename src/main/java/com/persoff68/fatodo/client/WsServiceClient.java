@@ -2,7 +2,6 @@ package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.client.configuration.FeignSystemConfiguration;
 import com.persoff68.fatodo.model.dto.ChatDTO;
-import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
@@ -10,6 +9,8 @@ import com.persoff68.fatodo.model.dto.WsEventDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.UUID;
 
 @FeignClient(name = "ws-service", primary = false,
         configuration = {FeignSystemConfiguration.class},
@@ -21,6 +22,9 @@ public interface WsServiceClient {
 
     @PostMapping(value = "/api/chat/update")
     void sendChatUpdateEvent(@RequestBody WsEventDTO<ChatDTO> event);
+
+    @PostMapping(value = "/api/chat/delete")
+    void sendChatDeleteEvent(@RequestBody WsEventDTO<UUID> event);
 
     @PostMapping(value = "/api/chat/last-message")
     void sendChatLastMessageEvent(@RequestBody WsEventDTO<ChatDTO> event);
@@ -39,9 +43,6 @@ public interface WsServiceClient {
 
     @PostMapping(value = "/api/chat/reactions")
     void sendReactionsEvent(@RequestBody WsEventDTO<ReactionsDTO> event);
-
-    @PostMapping(value = "/api/clear")
-    void sendClearEvent(@RequestBody WsEventDTO<ClearEventDTO> event);
 
 }
 

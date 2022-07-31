@@ -6,9 +6,7 @@ import com.persoff68.fatodo.mapper.MessageMapper;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.ChatContainer;
 import com.persoff68.fatodo.model.Message;
-import com.persoff68.fatodo.model.constant.ClearEventType;
 import com.persoff68.fatodo.model.dto.ChatDTO;
-import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
@@ -89,17 +87,14 @@ public class WsService {
         sendReactionsEventAsync(eventDTO);
     }
 
-    public void sendClearEvent(Chat chat) {
+    public void sendChatDeleteEvent(Chat chat) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
-        sendClearEvent(chat, userIdList);
+        sendChatDeleteEvent(chat, userIdList);
     }
 
-    public void sendClearEvent(Chat chat, List<UUID> userIdList) {
-        ClearEventDTO clearEventDTO = new ClearEventDTO();
-        clearEventDTO.setType(ClearEventType.CHAT);
-        clearEventDTO.setId(chat.getId());
-        WsEventDTO<ClearEventDTO> eventDTO = new WsEventDTO<>(userIdList, clearEventDTO);
-        sendClearEventAsync(eventDTO);
+    public void sendChatDeleteEvent(Chat chat, List<UUID> userIdList) {
+        WsEventDTO<UUID> eventDTO = new WsEventDTO<>(userIdList, chat.getId());
+        sendChatDeleteEventAsync(eventDTO);
     }
 
     @Async
@@ -110,6 +105,11 @@ public class WsService {
     @Async
     public void sendChatUpdateEventAsync(WsEventDTO<ChatDTO> event) {
         wsServiceClient.sendChatUpdateEvent(event);
+    }
+
+    @Async
+    public void sendChatDeleteEventAsync(WsEventDTO<UUID> event) {
+        wsServiceClient.sendChatDeleteEvent(event);
     }
 
     @Async
@@ -142,8 +142,4 @@ public class WsService {
         wsServiceClient.sendReactionsEvent(event);
     }
 
-    @Async
-    public void sendClearEventAsync(WsEventDTO<ClearEventDTO> event) {
-        wsServiceClient.sendClearEvent(event);
-    }
 }
