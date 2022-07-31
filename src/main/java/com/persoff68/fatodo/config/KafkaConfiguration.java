@@ -4,6 +4,7 @@ import com.persoff68.fatodo.config.annotation.ConditionalOnPropertyNotNull;
 import com.persoff68.fatodo.config.constant.KafkaTopics;
 import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.CreateChatEventDTO;
 import com.persoff68.fatodo.model.dto.DeleteUserEventsDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
@@ -37,6 +38,11 @@ public class KafkaConfiguration {
     @Bean
     public NewTopic wsNewTopic() {
         return KafkaUtils.buildTopic(KafkaTopics.WS_CHAT.getValue(), partitions);
+    }
+
+    @Bean
+    public NewTopic eventClearNewTopic() {
+        return KafkaUtils.buildTopic(KafkaTopics.WS_CLEAR.getValue(), partitions);
     }
 
     @Bean
@@ -76,6 +82,11 @@ public class KafkaConfiguration {
 
     @Bean
     public KafkaTemplate<String, DeleteUserEventsDTO> eventDeleteUserKafkaTemplate() {
+        return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
+    }
+
+    @Bean
+    public KafkaTemplate<String, WsEventDTO<ClearEventDTO>> wsClearEventKafkaTemplate() {
         return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
     }
 

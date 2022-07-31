@@ -2,6 +2,7 @@ package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.client.configuration.FeignSystemConfiguration;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
@@ -38,6 +39,9 @@ public interface WsServiceClient {
 
     @PostMapping(value = "/api/chat/reactions")
     void sendReactionsEvent(@RequestBody WsEventDTO<ReactionsDTO> event);
+
+    @PostMapping(value = "/api/clear")
+    void sendClearEvent(@RequestBody WsEventDTO<ClearEventDTO> event);
 
 }
 

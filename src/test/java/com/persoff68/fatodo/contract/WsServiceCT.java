@@ -1,12 +1,14 @@
 package com.persoff68.fatodo.contract;
 
 import com.persoff68.fatodo.builder.TestChatDTO;
+import com.persoff68.fatodo.builder.TestClearEventDTO;
 import com.persoff68.fatodo.builder.TestMessageDTO;
 import com.persoff68.fatodo.builder.TestReactionsDTO;
 import com.persoff68.fatodo.builder.TestStatusesDTO;
 import com.persoff68.fatodo.builder.TestWsEventDTO;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
@@ -20,8 +22,8 @@ import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SpringBootTest
-@AutoConfigureStubRunner(ids = {"com.persoff68.fatodo:wsservice:+:stubs"},
-        stubsMode = StubRunnerProperties.StubsMode.REMOTE)
+@AutoConfigureStubRunner(ids = {"com.persoff68.fatodo:wsservice:+:stubs"}, stubsMode =
+        StubRunnerProperties.StubsMode.REMOTE)
 class WsServiceCT {
 
     @Autowired
@@ -72,17 +74,25 @@ class WsServiceCT {
     @Test
     void testSendStatusesEvent() {
         StatusesDTO statusesDTO = TestStatusesDTO.defaultBuilder().build().toParent();
-        WsEventDTO<StatusesDTO> dto = TestWsEventDTO.<StatusesDTO>defaultBuilder()
-                .content(statusesDTO).build().toParent();
+        WsEventDTO<StatusesDTO> dto =
+                TestWsEventDTO.<StatusesDTO>defaultBuilder().content(statusesDTO).build().toParent();
         assertDoesNotThrow(() -> wsServiceClient.sendStatusesEvent(dto));
     }
 
     @Test
     void testSendReactionsEvent() {
         ReactionsDTO reactionsDTO = TestReactionsDTO.defaultBuilder().build().toParent();
-        WsEventDTO<ReactionsDTO> dto = TestWsEventDTO.<ReactionsDTO>defaultBuilder()
-                .content(reactionsDTO).build().toParent();
+        WsEventDTO<ReactionsDTO> dto =
+                TestWsEventDTO.<ReactionsDTO>defaultBuilder().content(reactionsDTO).build().toParent();
         assertDoesNotThrow(() -> wsServiceClient.sendReactionsEvent(dto));
+    }
+
+    @Test
+    void testSendClearEvent() {
+        ClearEventDTO clearEventDTO = TestClearEventDTO.defaultBuilder().build().toParent();
+        WsEventDTO<ClearEventDTO> dto =
+                TestWsEventDTO.<ClearEventDTO>defaultBuilder().content(clearEventDTO).build().toParent();
+        assertDoesNotThrow(() -> wsServiceClient.sendClearEvent(dto));
     }
 
 }

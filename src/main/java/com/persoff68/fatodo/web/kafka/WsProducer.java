@@ -4,6 +4,7 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.config.annotation.ConditionalOnPropertyNotNull;
 import com.persoff68.fatodo.config.constant.KafkaTopics;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
@@ -21,6 +22,7 @@ public class WsProducer implements WsServiceClient {
     private final KafkaTemplate<String, WsEventDTO<MessageDTO>> wsEventMessageKafkaTemplate;
     private final KafkaTemplate<String, WsEventDTO<StatusesDTO>> wsEventStatusesKafkaTemplate;
     private final KafkaTemplate<String, WsEventDTO<ReactionsDTO>> wsEventReactionsKafkaTemplate;
+    private final KafkaTemplate<String, WsEventDTO<ClearEventDTO>> wsClearEventKafkaTemplate;
 
     public void sendChatNewEvent(WsEventDTO<ChatDTO> event) {
         wsEventChatKafkaTemplate.send(KafkaTopics.WS_CHAT.getValue(), "new", event);
@@ -52,6 +54,10 @@ public class WsProducer implements WsServiceClient {
 
     public void sendReactionsEvent(WsEventDTO<ReactionsDTO> event) {
         wsEventReactionsKafkaTemplate.send(KafkaTopics.WS_CHAT.getValue(), "reactions", event);
+    }
+
+    public void sendClearEvent(WsEventDTO<ClearEventDTO> event) {
+        wsClearEventKafkaTemplate.send(KafkaTopics.WS_CLEAR.getValue(), event);
     }
 
 }

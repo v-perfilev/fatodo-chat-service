@@ -17,6 +17,7 @@ import com.persoff68.fatodo.repository.MessageRepository;
 import com.persoff68.fatodo.repository.ReactionRepository;
 import com.persoff68.fatodo.repository.StatusRepository;
 import com.persoff68.fatodo.service.ChatService;
+import com.persoff68.fatodo.service.MemberEventService;
 import com.persoff68.fatodo.service.MessageService;
 import com.persoff68.fatodo.service.ReactionService;
 import com.persoff68.fatodo.service.StatusService;
@@ -73,6 +74,8 @@ class WsProducerIT {
     @Autowired
     MessageService messageService;
     @Autowired
+    MemberEventService memberEventService;
+    @Autowired
     StatusService statusService;
     @Autowired
     ReactionService reactionService;
@@ -97,8 +100,10 @@ class WsProducerIT {
     @SpyBean
     WsServiceClient wsServiceClient;
 
-    private ConcurrentMessageListenerContainer<String, String> wsContainer;
-    private BlockingQueue<ConsumerRecord<String, String>> wsRecords;
+    private ConcurrentMessageListenerContainer<String, String> wsChatContainer;
+    private BlockingQueue<ConsumerRecord<String, String>> wsChatRecords;
+    private ConcurrentMessageListenerContainer<String, String> wsClearContainer;
+    private BlockingQueue<ConsumerRecord<String, String>> wsClearRecords;
 
     private Chat chat;
     private Message message;
@@ -110,7 +115,8 @@ class WsProducerIT {
         chat = createChat("test_chat", false, USER_ID_1, USER_ID_2);
         message = createMessage(chat, USER_ID_1);
 
-        startWsConsumer();
+        startWsChatConsumer();
+        startWsClearConsumer();
     }
 
     @AfterEach
@@ -121,7 +127,8 @@ class WsProducerIT {
         statusRepository.deleteAll();
         reactionRepository.deleteAll();
 
-        stopWsConsumer();
+        stopWsChatConsumer();
+        stopWsClearConsumer();
     }
 
     @Test
@@ -130,7 +137,7 @@ class WsProducerIT {
 
         List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
         List<String> recordKeyList = new ArrayList<>();
-        waitForMultipleRecords(recordList, recordKeyList);
+        waitForMultipleRecords(wsChatRecords, recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().isNotEmpty();
@@ -144,7 +151,7 @@ class WsProducerIT {
 
         List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
         List<String> recordKeyList = new ArrayList<>();
-        waitForMultipleRecords(recordList, recordKeyList);
+        waitForMultipleRecords(wsChatRecords, recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().isNotEmpty();
@@ -158,7 +165,7 @@ class WsProducerIT {
 
         List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
         List<String> recordKeyList = new ArrayList<>();
-        waitForMultipleRecords(recordList, recordKeyList);
+        waitForMultipleRecords(wsChatRecords, recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().isNotEmpty();
@@ -172,7 +179,7 @@ class WsProducerIT {
 
         List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
         List<String> recordKeyList = new ArrayList<>();
-        waitForMultipleRecords(recordList, recordKeyList);
+        waitForMultipleRecords(wsChatRecords, recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().isNotEmpty();
@@ -186,7 +193,7 @@ class WsProducerIT {
 
         List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
         List<String> recordKeyList = new ArrayList<>();
-        waitForMultipleRecords(recordList, recordKeyList);
+        waitForMultipleRecords(wsChatRecords, recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().isNotEmpty();
@@ -200,7 +207,7 @@ class WsProducerIT {
 
         List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
         List<String> recordKeyList = new ArrayList<>();
-        waitForMultipleRecords(recordList, recordKeyList);
+        waitForMultipleRecords(wsChatRecords, recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().isNotEmpty();
@@ -214,7 +221,7 @@ class WsProducerIT {
 
         List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
         List<String> recordKeyList = new ArrayList<>();
-        waitForMultipleRecords(recordList, recordKeyList);
+        waitForMultipleRecords(wsChatRecords, recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().isNotEmpty();
@@ -228,7 +235,7 @@ class WsProducerIT {
 
         List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
         List<String> recordKeyList = new ArrayList<>();
-        waitForMultipleRecords(recordList, recordKeyList);
+        waitForMultipleRecords(wsChatRecords, recordList, recordKeyList);
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(recordList).isNotNull().isNotEmpty();
@@ -236,25 +243,53 @@ class WsProducerIT {
         verify(wsServiceClient).sendReactionsEvent(any());
     }
 
-    private void startWsConsumer() {
+    @Test
+    void testSendClearEvent() throws Exception {
+        memberEventService.leaveChat(UUID.fromString(USER_ID_2), chat.getId());
+
+        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+        List<String> recordKeyList = new ArrayList<>();
+        waitForMultipleRecords(wsClearRecords, recordList, recordKeyList);
+
+        assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
+        assertThat(recordList).isNotNull().isNotEmpty();
+        verify(wsServiceClient).sendClearEvent(any());
+    }
+
+    private void startWsChatConsumer() {
         ConcurrentKafkaListenerContainerFactory<String, String> stringContainerFactory =
                 KafkaUtils.buildStringContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test", "earliest");
-        wsContainer = stringContainerFactory.createContainer("ws_chat");
-        wsRecords = new LinkedBlockingQueue<>();
-        wsContainer.setupMessageListener((MessageListener<String, String>) wsRecords::add);
-        wsContainer.start();
-        ContainerTestUtils.waitForAssignment(wsContainer, embeddedKafkaBroker.getPartitionsPerTopic());
+        wsChatContainer = stringContainerFactory.createContainer("ws_chat");
+        wsChatRecords = new LinkedBlockingQueue<>();
+        wsChatContainer.setupMessageListener((MessageListener<String, String>) wsChatRecords::add);
+        wsChatContainer.start();
+        ContainerTestUtils.waitForAssignment(wsChatContainer, embeddedKafkaBroker.getPartitionsPerTopic());
     }
 
-    private void stopWsConsumer() {
-        wsContainer.stop();
+    private void stopWsChatConsumer() {
+        wsChatContainer.stop();
     }
 
-    private void waitForMultipleRecords(List<ConsumerRecord<String, String>> recordList,
+    private void startWsClearConsumer() {
+        ConcurrentKafkaListenerContainerFactory<String, String> stringContainerFactory =
+                KafkaUtils.buildStringContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test", "earliest");
+        wsClearContainer = stringContainerFactory.createContainer("ws_clear");
+        wsClearRecords = new LinkedBlockingQueue<>();
+        wsClearContainer.setupMessageListener((MessageListener<String, String>) wsClearRecords::add);
+        wsClearContainer.start();
+        ContainerTestUtils.waitForAssignment(wsClearContainer, embeddedKafkaBroker.getPartitionsPerTopic());
+    }
+
+    private void stopWsClearConsumer() {
+        wsClearContainer.stop();
+    }
+
+    private void waitForMultipleRecords(BlockingQueue<ConsumerRecord<String, String>> records,
+                                        List<ConsumerRecord<String, String>> recordList,
                                         List<String> recordKeyList) throws InterruptedException {
         ConsumerRecord<String, String> record;
         do {
-            record = wsRecords.poll(1, TimeUnit.SECONDS);
+            record = records.poll(1, TimeUnit.SECONDS);
             if (record != null) {
                 recordList.add(record);
             }

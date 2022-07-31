@@ -6,7 +6,9 @@ import com.persoff68.fatodo.mapper.MessageMapper;
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.ChatContainer;
 import com.persoff68.fatodo.model.Message;
+import com.persoff68.fatodo.model.constant.ClearEventType;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
@@ -87,6 +89,19 @@ public class WsService {
         sendReactionsEventAsync(eventDTO);
     }
 
+    public void sendClearEvent(Chat chat) {
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
+        sendClearEvent(chat, userIdList);
+    }
+
+    public void sendClearEvent(Chat chat, List<UUID> userIdList) {
+        ClearEventDTO clearEventDTO = new ClearEventDTO();
+        clearEventDTO.setType(ClearEventType.CHAT);
+        clearEventDTO.setId(chat.getId());
+        WsEventDTO<ClearEventDTO> eventDTO = new WsEventDTO<>(userIdList, clearEventDTO);
+        sendClearEventAsync(eventDTO);
+    }
+
     @Async
     public void sendChatNewEventAsync(WsEventDTO<ChatDTO> event) {
         wsServiceClient.sendChatNewEvent(event);
@@ -125,5 +140,10 @@ public class WsService {
     @Async
     public void sendReactionsEventAsync(WsEventDTO<ReactionsDTO> event) {
         wsServiceClient.sendReactionsEvent(event);
+    }
+
+    @Async
+    public void sendClearEventAsync(WsEventDTO<ClearEventDTO> event) {
+        wsServiceClient.sendClearEvent(event);
     }
 }

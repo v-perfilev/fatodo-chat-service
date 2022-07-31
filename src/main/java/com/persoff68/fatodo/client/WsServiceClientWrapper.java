@@ -2,6 +2,7 @@ package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.exception.ClientException;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.ClearEventDTO;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusesDTO;
@@ -84,6 +85,15 @@ public class WsServiceClientWrapper implements WsServiceClient {
     public void sendReactionsEvent(WsEventDTO<ReactionsDTO> event) {
         try {
             wsServiceClient.sendReactionsEvent(event);
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
+
+    @Override
+    public void sendClearEvent(WsEventDTO<ClearEventDTO> event) {
+        try {
+            wsServiceClient.sendClearEvent(event);
         } catch (Exception e) {
             throw new ClientException();
         }

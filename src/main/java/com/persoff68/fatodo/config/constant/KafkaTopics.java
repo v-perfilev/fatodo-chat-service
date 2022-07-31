@@ -5,7 +5,8 @@ import lombok.Getter;
 public enum KafkaTopics {
     EVENT_ADD("event_add"),
     EVENT_DELETE("event_delete"),
-    WS_CHAT("ws_chat");
+    WS_CHAT("ws_chat"),
+    WS_CLEAR("ws_clear");
 
     @Getter
     private final String value;
