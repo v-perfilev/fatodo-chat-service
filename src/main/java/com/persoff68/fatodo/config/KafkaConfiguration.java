@@ -42,11 +42,6 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public NewTopic eventClearNewTopic() {
-        return KafkaUtils.buildTopic(KafkaTopics.WS_CLEAR.getValue(), partitions);
-    }
-
-    @Bean
     public NewTopic eventAddNewTopic() {
         return KafkaUtils.buildTopic(KafkaTopics.EVENT_ADD.getValue(), partitions);
     }
