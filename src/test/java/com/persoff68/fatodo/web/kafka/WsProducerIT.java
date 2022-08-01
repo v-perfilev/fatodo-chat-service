@@ -272,7 +272,7 @@ class WsProducerIT {
                                         List<String> recordKeyList) throws InterruptedException {
         ConsumerRecord<String, String> record;
         do {
-            record = records.poll(1, TimeUnit.SECONDS);
+            record = records.poll(5, TimeUnit.SECONDS);
             if (record != null) {
                 recordList.add(record);
             }

@@ -57,7 +57,7 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public KafkaTemplate<String, WsEventDTO<UUID>> wsEventUUIDKafkaTemplate() {
+    public KafkaTemplate<String, WsEventDTO<UUID>> wsEventUuidKafkaTemplate() {
         return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
     }
 

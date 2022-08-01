@@ -23,7 +23,7 @@ public class WsProducer implements WsServiceClient {
     private final KafkaTemplate<String, WsEventDTO<MessageDTO>> wsEventMessageKafkaTemplate;
     private final KafkaTemplate<String, WsEventDTO<StatusesDTO>> wsEventStatusesKafkaTemplate;
     private final KafkaTemplate<String, WsEventDTO<ReactionsDTO>> wsEventReactionsKafkaTemplate;
-    private final KafkaTemplate<String, WsEventDTO<UUID>> wsEventUUIDKafkaTemplate;
+    private final KafkaTemplate<String, WsEventDTO<UUID>> wsEventUuidKafkaTemplate;
 
     public void sendChatNewEvent(WsEventDTO<ChatDTO> event) {
         wsEventChatKafkaTemplate.send(KafkaTopics.WS_CHAT.getValue(), "new", event);
@@ -34,7 +34,7 @@ public class WsProducer implements WsServiceClient {
     }
 
     public void sendChatDeleteEvent(WsEventDTO<UUID> event) {
-        wsEventUUIDKafkaTemplate.send(KafkaTopics.WS_CHAT.getValue(), "delete", event);
+        wsEventUuidKafkaTemplate.send(KafkaTopics.WS_CHAT.getValue(), "delete", event);
     }
 
     public void sendChatLastMessageEvent(WsEventDTO<ChatDTO> event) {

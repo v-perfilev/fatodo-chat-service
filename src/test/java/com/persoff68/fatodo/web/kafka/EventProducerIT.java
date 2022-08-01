@@ -107,7 +107,7 @@ class EventProducerIT {
     void testSendChatEvent_ok() throws Exception {
         chatService.createDirect(UUID.fromString(USER_ID_1), UUID.fromString(USER_ID_2));
 
-        ConsumerRecord<String, String> record = eventAddRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record = eventAddRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(eventServiceClient).isInstanceOf(EventProducer.class);
         assertThat(record).isNotNull();
@@ -119,7 +119,7 @@ class EventProducerIT {
     void testSendDeleteChatEventForUsers_ok() throws Exception {
         memberEventService.removeUsers(UUID.fromString(USER_ID_1), chat.getId(), List.of(UUID.fromString(USER_ID_3)));
 
-        ConsumerRecord<String, String> record = eventDeleteRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record = eventDeleteRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(eventServiceClient).isInstanceOf(EventProducer.class);
         assertThat(record).isNotNull();
