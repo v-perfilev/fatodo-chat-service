@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
         qualifiers = {"feignEventServiceClient"})
 public interface EventServiceClient {
 
-    @PostMapping(value = "/api/event/chat")
+    @PostMapping("/api/event/chat")
     void addChatEvent(@RequestBody CreateChatEventDTO createChatEventDTO);
 
     @PostMapping("/api/event/chat/delete-users")

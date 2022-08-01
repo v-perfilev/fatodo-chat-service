@@ -33,7 +33,7 @@ public class InfoController {
     private final ChatMapper chatMapper;
     private final MessageMapper messageMapper;
 
-    @GetMapping(value = "/chat")
+    @GetMapping("/chat")
     public ResponseEntity<List<ChatInfoDTO>> getAllChatInfoByIds(@RequestParam("ids") List<UUID> chatIdList) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         List<Chat> chatList = chatService.getAllAllowedByIds(userId, chatIdList);
@@ -43,7 +43,7 @@ public class InfoController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @GetMapping(value = "/message")
+    @GetMapping("/message")
     public ResponseEntity<List<MessageInfoDTO>> getAllMessageInfoByIds(@RequestParam("ids") List<UUID> messageIdList) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         List<Message> messageList = messageService.getAllAllowedByIds(userId, messageIdList);

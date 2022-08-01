@@ -14,13 +14,13 @@ import java.util.UUID;
         qualifiers = {"feignUserServiceClient"})
 public interface UserServiceClient {
 
-    @GetMapping(value = "/api/check/id/{id}")
+    @GetMapping("/api/check/id/{id}")
     boolean doesIdExist(@PathVariable UUID id);
 
-    @GetMapping(value = "/api/check/id")
+    @GetMapping("/api/check/id")
     boolean doIdsExist(@RequestParam("ids") List<UUID> idList);
 
-    @GetMapping(value = "/api/user-data/ids/{username}/username-part")
+    @GetMapping("/api/user-data/ids/{username}/username-part")
     List<UUID> getAllIdsByUsernamePart(@PathVariable String username);
 
 }

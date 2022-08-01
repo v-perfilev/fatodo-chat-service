@@ -67,7 +67,7 @@ public class ChatController {
         return ResponseEntity.ok(chatDTO);
     }
 
-    @PostMapping(value = "/direct")
+    @PostMapping("/direct")
     public ResponseEntity<ChatDTO> createDirect(@RequestBody String secondUserIdString) {
         UUID firstUserId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         UUID secondUserId = UUID.fromString(secondUserIdString);

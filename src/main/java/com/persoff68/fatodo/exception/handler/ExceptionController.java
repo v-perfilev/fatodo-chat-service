@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class ExceptionController implements ErrorController {
 
-    @GetMapping(value = "/error")
+    @GetMapping("/error")
     public ResponseEntity<String> error(HttpServletRequest request) {
         HttpStatus status = AttributeUtils.getStatus(request);
         String body = AttributeUtils.getMessage(new ServletWebRequest(request));
