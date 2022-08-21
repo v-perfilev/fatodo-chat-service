@@ -5,9 +5,7 @@ import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.dto.MessageDTO;
 import com.persoff68.fatodo.model.dto.MessageInfoDTO;
 import com.persoff68.fatodo.model.dto.ReactionDTO;
-import com.persoff68.fatodo.model.dto.ReactionsDTO;
 import com.persoff68.fatodo.model.dto.StatusDTO;
-import com.persoff68.fatodo.model.dto.StatusesDTO;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -47,13 +45,13 @@ public abstract class MessageMapper {
 
         Set<ReactionDTO> reactionDTOList = message.getReactions() != null
                 ? message.getReactions().stream()
-                .map(reactionMapper::pojoToDTO)
+                .map(reaction -> reactionMapper.pojoToDTO(reaction, chatId))
                 .collect(Collectors.toSet())
                 : Collections.emptySet();
 
         Set<StatusDTO> statusDTOList = message.getStatuses() != null
                 ? message.getStatuses().stream()
-                .map(statusMapper::pojoToDTO)
+                .map(status -> statusMapper.pojoToDTO(status, chatId))
                 .collect(Collectors.toSet())
                 : Collections.emptySet();
 
@@ -62,40 +60,6 @@ public abstract class MessageMapper {
         dto.setReference(referenceDTO);
         dto.setReactions(reactionDTOList);
         dto.setStatuses(statusDTOList);
-        return dto;
-    }
-
-    public StatusesDTO pojoToStatusesDTO(Message message) {
-        Chat chat = message.getChat();
-        UUID chatId = chat != null ? chat.getId() : null;
-
-        Set<StatusDTO> statusDTOList = message.getStatuses() != null
-                ? message.getStatuses().stream()
-                .map(statusMapper::pojoToDTO)
-                .collect(Collectors.toSet())
-                : Collections.emptySet();
-
-        StatusesDTO dto = new StatusesDTO();
-        dto.setChatId(chatId);
-        dto.setMessageId(message.getId());
-        dto.setStatuses(statusDTOList);
-        return dto;
-    }
-
-    public ReactionsDTO pojoToReactionsDTO(Message message) {
-        Chat chat = message.getChat();
-        UUID chatId = chat != null ? chat.getId() : null;
-
-        Set<ReactionDTO> reactionDTOList = message.getReactions() != null
-                ? message.getReactions().stream()
-                .map(reactionMapper::pojoToDTO)
-                .collect(Collectors.toSet())
-                : Collections.emptySet();
-
-        ReactionsDTO dto = new ReactionsDTO();
-        dto.setChatId(chatId);
-        dto.setMessageId(message.getId());
-        dto.setReactions(reactionDTOList);
         return dto;
     }
 

@@ -9,6 +9,8 @@ import java.util.UUID;
 @Data
 public class StatusDTO {
 
+    private UUID chatId;
+
     private UUID messageId;
 
     private UUID userId;

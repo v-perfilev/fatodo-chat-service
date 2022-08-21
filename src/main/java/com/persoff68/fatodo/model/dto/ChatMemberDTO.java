@@ -2,16 +2,17 @@ package com.persoff68.fatodo.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class WsEventDTO<T> {
+public class ChatMemberDTO {
 
-    private final List<UUID> userIds;
+    private UUID chatId;
 
-    private final T content;
+    private UUID userId;
 
 }

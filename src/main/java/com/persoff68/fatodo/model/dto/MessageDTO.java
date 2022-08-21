@@ -25,6 +25,9 @@ public class MessageDTO extends AbstractAuditingDTO {
     @JsonProperty("isEvent")
     private boolean isEvent;
 
+    @JsonProperty("isLastMessage")
+    private boolean isLastMessage;
+
     private Set<StatusDTO> statuses;
 
     private Set<ReactionDTO> reactions;

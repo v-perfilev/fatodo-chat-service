@@ -58,7 +58,6 @@ public class MessageService {
 
         // WS
         wsService.sendMessageNewEvent(message);
-        wsService.sendChatLastMessageEvent(message);
 
         return message;
     }
@@ -75,7 +74,6 @@ public class MessageService {
 
         // WS
         wsService.sendMessageNewEvent(message);
-        wsService.sendChatLastMessageEvent(message);
 
         return message;
     }
@@ -92,10 +90,8 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendMessageUpdateEvent(message);
-        if (isMessageLastInChat(message)) {
-            wsService.sendChatLastMessageUpdateEvent(message);
-        }
+        boolean isLastMessage = isMessageLastInChat(message);
+        wsService.sendMessageUpdateEvent(message, isLastMessage);
 
         return message;
     }
@@ -114,10 +110,8 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendMessageUpdateEvent(message);
-        if (isMessageLastInChat(message)) {
-            wsService.sendChatLastMessageUpdateEvent(message);
-        }
+        boolean isLastMessage = isMessageLastInChat(message);
+        wsService.sendMessageUpdateEvent(message, isLastMessage);
     }
 
     @Transactional(readOnly = true)

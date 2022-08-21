@@ -1,48 +1,18 @@
 package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.client.configuration.FeignSystemConfiguration;
-import com.persoff68.fatodo.model.dto.ChatDTO;
-import com.persoff68.fatodo.model.dto.MessageDTO;
-import com.persoff68.fatodo.model.dto.ReactionsDTO;
-import com.persoff68.fatodo.model.dto.StatusesDTO;
-import com.persoff68.fatodo.model.dto.WsEventDTO;
+import com.persoff68.fatodo.model.dto.WsEventWithUsersDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.UUID;
 
 @FeignClient(name = "ws-service", primary = false,
         configuration = {FeignSystemConfiguration.class},
         qualifiers = {"feignWsServiceClient"})
 public interface WsServiceClient {
 
-    @PostMapping("/api/chat/new")
-    void sendChatNewEvent(@RequestBody WsEventDTO<ChatDTO> event);
-
-    @PostMapping("/api/chat/update")
-    void sendChatUpdateEvent(@RequestBody WsEventDTO<ChatDTO> event);
-
-    @PostMapping("/api/chat/delete")
-    void sendChatDeleteEvent(@RequestBody WsEventDTO<UUID> event);
-
-    @PostMapping("/api/chat/last-message")
-    void sendChatLastMessageEvent(@RequestBody WsEventDTO<ChatDTO> event);
-
-    @PostMapping("/api/chat/last-message-update")
-    void sendChatLastMessageUpdateEvent(@RequestBody WsEventDTO<ChatDTO> event);
-
-    @PostMapping("/api/chat/message-new")
-    void sendMessageNewEvent(@RequestBody WsEventDTO<MessageDTO> event);
-
-    @PostMapping("/api/chat/message-update")
-    void sendMessageUpdateEvent(@RequestBody WsEventDTO<MessageDTO> event);
-
-    @PostMapping("/api/chat/statuses")
-    void sendStatusesEvent(@RequestBody WsEventDTO<StatusesDTO> event);
-
-    @PostMapping("/api/chat/reactions")
-    void sendReactionsEvent(@RequestBody WsEventDTO<ReactionsDTO> event);
+    @PostMapping(value = "/api/event")
+    void sendEvent(@RequestBody WsEventWithUsersDTO event);
 
 }
 

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -41,15 +43,18 @@ public class ReactionService {
         chatPermissionService.hasReactOnMessagePermission(message, userId);
 
         Reaction.ReactionId id = new Reaction.ReactionId(messageId, userId);
-        reactionRepository.findById(id).ifPresent(reactionRepository::delete);
-        reactionRepository.flush();
+        Optional<Reaction> reactionOptional = reactionRepository.findById(id);
 
-        entityManager.refresh(message);
+        reactionOptional.ifPresent(reaction -> {
+            reactionRepository.delete(reaction);
 
-        // WS
-        wsService.sendMessageReactionEvent(message);
-        // EVENT
-        eventService.sendChatReactionEvent(message.getUserId(), message.getChat().getId(), userId, null);
+            // WS
+            reaction.setType(ReactionType.NONE);
+            wsService.sendMessageReactionEvent(reaction, message.getChat());
+            wsService.sendMessageReactionIncomingEvent(reaction, message.getChat(), message.getUserId());
+            // EVENT
+            eventService.sendChatReactionEvent(message.getUserId(), message.getChat().getId(), userId, null);
+        });
     }
 
     protected void set(UUID userId, UUID messageId, ReactionType type) {
@@ -61,11 +66,13 @@ public class ReactionService {
         Reaction reaction = reactionRepository.findById(id)
                 .orElse(new Reaction(messageId, userId, type));
         reaction.setType(type);
-        reactionRepository.saveAndFlush(reaction);
+        reaction.setTimestamp(new Date());
+        reaction = reactionRepository.saveAndFlush(reaction);
         entityManager.refresh(message);
 
         // WS
-        wsService.sendMessageReactionEvent(message);
+        wsService.sendMessageReactionEvent(reaction, message.getChat());
+        wsService.sendMessageReactionIncomingEvent(reaction, message.getChat(), message.getUserId());
         // EVENT
         eventService.sendChatReactionEvent(message.getUserId(), message.getChat().getId(), userId, type);
     }

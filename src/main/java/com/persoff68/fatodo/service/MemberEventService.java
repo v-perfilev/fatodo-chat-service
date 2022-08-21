@@ -80,7 +80,7 @@ public class MemberEventService {
         );
 
         // WS
-        wsService.sendChatUpdateEvent(chat);
+        userIdList.forEach(id -> wsService.sendMemberAddEvent(chat, id));
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         eventService.sendChatMemberAddEvent(recipientIdList, chat.getId(), userId, userIdList);
@@ -116,8 +116,8 @@ public class MemberEventService {
         );
 
         // WS
-        wsService.sendChatUpdateEvent(chat);
         wsService.sendChatDeleteEvent(chat, userIdList);
+        userIdList.forEach(id -> wsService.sendMemberDeleteEvent(chat, id));
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         eventService.sendChatMemberDeleteEvent(recipientIdList, chatId, userId, userIdList);
@@ -138,8 +138,8 @@ public class MemberEventService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendChatUpdateEvent(chat);
         wsService.sendChatDeleteEvent(chat, Collections.singletonList(userId));
+        wsService.sendMemberLeaveEvent(chat, userId);
         // EVENT
         List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         eventService.sendChatMemberLeaveEvent(recipientIdList, chatId, userId);
@@ -174,7 +174,7 @@ public class MemberEventService {
 
         // WS
         wsService.sendChatUpdateEvent(chat);
-        wsService.sendChatDeleteEvent(chat);
+        wsService.sendChatDeleteEvent(chat, List.of(userId));
         // EVENT
         eventService.deleteChatEventsForUser(chatId, Collections.singletonList(userId));
     }
