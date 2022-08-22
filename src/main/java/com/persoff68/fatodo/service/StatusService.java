@@ -38,7 +38,7 @@ public class StatusService {
             entityManager.refresh(message);
 
             // WS
-            wsService.sendMessageStatusEvent(message);
+            wsService.sendMessageStatusEvent(status);
         }
     }
 

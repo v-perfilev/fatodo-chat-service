@@ -108,9 +108,10 @@ public class WsService {
     }
 
     public void sendMessageStatusEvent(Status status) {
-//        List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
-        StatusDTO statusDTO = null; // TODO
-        WsEventWithUsersDTO eventDTO = new WsEventWithUsersDTO(null, WsEventType.CHAT_STATUS, statusDTO);
+        Chat chat = status.getMessage().getChat();
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
+        StatusDTO statusDTO = statusMapper.pojoToDTO(status, chat.getId());
+        WsEventWithUsersDTO eventDTO = new WsEventWithUsersDTO(userIdList, WsEventType.CHAT_STATUS, statusDTO);
         wsServiceClient.sendEvent(eventDTO);
     }
 
