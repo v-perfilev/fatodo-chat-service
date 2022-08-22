@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -94,7 +95,7 @@ class WsProducerIT {
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
-        verify(wsServiceClient).sendEvent(any());
+        verify(wsServiceClient, times(2)).sendEvent(any());
     }
 
     private void startWsChatConsumer() {
