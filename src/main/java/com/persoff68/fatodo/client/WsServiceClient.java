@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.client.configuration.FeignSystemConfiguration;
-import com.persoff68.fatodo.model.dto.WsEventWithUsersDTO;
+import com.persoff68.fatodo.model.dto.WsEventDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface WsServiceClient {
 
     @PostMapping(value = "/api/event")
-    void sendEvent(@RequestBody WsEventWithUsersDTO event);
+    void sendEvent(@RequestBody WsEventDTO event);
 
 }
 

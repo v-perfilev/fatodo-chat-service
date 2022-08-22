@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WsEventWithUsersDTO {
+public class WsEventDTO {
 
     private List<UUID> userIds;
 
