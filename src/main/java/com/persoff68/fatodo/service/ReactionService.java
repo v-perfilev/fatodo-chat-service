@@ -47,6 +47,8 @@ public class ReactionService {
 
         reactionOptional.ifPresent(reaction -> {
             reactionRepository.delete(reaction);
+            reactionRepository.flush();
+            entityManager.refresh(message);
 
             // WS
             reaction.setType(ReactionType.NONE);
