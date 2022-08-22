@@ -19,6 +19,6 @@ public class ReactionDTO {
 
     private ReactionType type;
 
-    private Date timestamp;
+    private Date date;
 
 }

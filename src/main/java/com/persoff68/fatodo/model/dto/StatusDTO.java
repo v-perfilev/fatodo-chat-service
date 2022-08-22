@@ -17,6 +17,6 @@ public class StatusDTO {
 
     private StatusType type;
 
-    private Date timestamp;
+    private Date date;
 
 }

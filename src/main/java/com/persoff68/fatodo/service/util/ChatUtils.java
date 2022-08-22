@@ -41,7 +41,7 @@ public class ChatUtils {
 
         Optional<MemberEvent> lastMemberEventOptional = memberEventList.stream()
                 .filter(memberEvent -> memberEvent.getUserId().equals(userId))
-                .max(Comparator.comparing(MemberEvent::getTimestamp));
+                .max(Comparator.comparing(MemberEvent::getDate));
 
         return lastMemberEventOptional
                 .map(memberEvent -> memberEvent.getType().equals(MemberEventType.DELETE_MEMBER))

@@ -27,7 +27,7 @@ public class TestStatus extends Status {
         status.setUserId(getUserId());
         status.setMessage(getMessage());
         status.setType(getType());
-        status.setTimestamp(getTimestamp());
+        status.setDate(getDate());
         return status;
     }
 

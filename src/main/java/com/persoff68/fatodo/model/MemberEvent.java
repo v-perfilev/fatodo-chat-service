@@ -39,7 +39,7 @@ public class MemberEvent extends AbstractModel {
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
-    private Date timestamp = new Date();
+    private Date date = new Date();
 
     public MemberEvent(Chat chat, UUID userId, MemberEventType type) {
         this.chat = chat;

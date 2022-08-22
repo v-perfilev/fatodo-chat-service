@@ -24,7 +24,7 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
                                                    when type like 'LEAVE_CHAT' then -1
                                                    else 0
                                                    end)
-                                           over (partition by chat_id order by timestamp rows unbounded preceding) sum
+                                           over (partition by chat_id order by date rows unbounded preceding) sum
                                     from ftd_chat_member_event e
                                     where user_id = :userId
                                 ) c

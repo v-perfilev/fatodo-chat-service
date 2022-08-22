@@ -16,15 +16,15 @@ public class TestMemberEvent extends MemberEvent {
                            @NotNull Chat chat,
                            @NotNull UUID userId,
                            @NotNull MemberEventType type,
-                           @NotNull Date timestamp) {
-        super(chat, userId, type, timestamp);
+                           @NotNull Date date) {
+        super(chat, userId, type, date);
         super.id = id;
     }
 
     public static TestMemberEventBuilder defaultBuilder() {
         return TestMemberEvent.builder()
                 .type(MemberEventType.ADD_MEMBER)
-                .timestamp(new Date());
+                .date(new Date());
     }
 
     public MemberEvent toParent() {
@@ -33,7 +33,7 @@ public class TestMemberEvent extends MemberEvent {
         member.setChat(getChat());
         member.setUserId(getUserId());
         member.setType(getType());
-        member.setTimestamp(getTimestamp());
+        member.setDate(getDate());
         return member;
     }
 

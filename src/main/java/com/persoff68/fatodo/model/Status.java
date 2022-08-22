@@ -44,7 +44,7 @@ public class Status {
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
-    private Date timestamp = new Date();
+    private Date date = new Date();
 
     public static Status of(Message message, UUID userId, StatusType type) {
         Status status = new Status();

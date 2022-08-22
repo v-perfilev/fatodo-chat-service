@@ -19,7 +19,7 @@
             <column name="type" type="varchar(16)">
                 <constraints nullable="false"/>
             </column>
-            <column name="timestamp" type="timestamp(6)">
+            <column name="date" type="datetime">
                 <constraints nullable="false"/>
             </column>
         </createTable>
