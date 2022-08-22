@@ -30,7 +30,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -78,7 +80,7 @@ class StatusControllerIT {
         message1 = createMessage(chat1, USER_ID_2);
         message2 = createMessage(chat1, USER_ID_1);
         message3 = createMessage(chat1, USER_ID_2);
-        createStatuses(message3.getId(), USER_ID_1);
+        createStatuses(message3, USER_ID_1);
 
         Chat chat2 = createDirectChat();
         createMemberEvents(chat2, USER_ID_2, USER_ID_3);
@@ -104,7 +106,7 @@ class StatusControllerIT {
                 .andExpect(status().isCreated());
         List<Status> statusList = statusRepository.findAll();
         boolean statusExists = statusList.stream()
-                .anyMatch(status -> status.getMessageId().toString().equals(messageId)
+                .anyMatch(status -> status.getMessage().getId().toString().equals(messageId)
                         && status.getUserId().toString().equals(USER_ID_1)
                         && status.getType().equals(StatusType.READ));
         assertThat(statusExists).isTrue();
@@ -175,11 +177,12 @@ class StatusControllerIT {
         return messageRepository.save(message);
     }
 
-    private void createStatuses(UUID messageId, String... readUserIds) {
-        List<Status> statusList = Arrays.stream(readUserIds)
+    private void createStatuses(Message message, String... readUserIds) {
+        Set<Status> statusList = Arrays.stream(readUserIds)
                 .map(id -> TestStatus.defaultBuilder()
-                        .messageId(messageId).userId(UUID.fromString(id)).build().toParent())
-                .toList();
-        statusRepository.saveAll(statusList);
+                        .message(message).userId(UUID.fromString(id)).build().toParent())
+                .collect(Collectors.toSet());
+        message.getStatuses().addAll(statusList);
+        messageRepository.save(message);
     }
 }

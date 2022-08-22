@@ -77,9 +77,9 @@ class ContractBase {
         Chat chat = createChat("test", CHAT_ID);
         createAddMemberEvent(chat, USER_ID_1);
         createAddMemberEvent(chat, USER_ID_2);
-        createMessage(chat, MESSAGE_ID_1, USER_ID_1);
+        Message message = createMessage(chat, MESSAGE_ID_1, USER_ID_1);
         createMessage(chat, MESSAGE_ID_2, UUID.randomUUID());
-        createReaction(MESSAGE_ID_1, USER_ID_1);
+        createReaction(message, USER_ID_1);
 
         when(userServiceClient.doesIdExist(any())).thenReturn(true);
         when(userServiceClient.doIdsExist(any())).thenReturn(true);
@@ -111,7 +111,7 @@ class ContractBase {
         entityManager.refresh(chat);
     }
 
-    private void createMessage(Chat chat, UUID messageId, UUID userId) {
+    private Message createMessage(Chat chat, UUID messageId, UUID userId) {
         Message message = TestMessage.defaultBuilder()
                 .chat(chat)
                 .id(messageId)
@@ -119,18 +119,20 @@ class ContractBase {
                 .text("test")
                 .build()
                 .toParent();
-        entityManager.merge(message);
+        message = entityManager.merge(message);
         entityManager.refresh(chat);
+        return message;
     }
 
-    private void createReaction(UUID messageId, UUID userId) {
+    private void createReaction(Message message, UUID userId) {
         Reaction reaction = TestReaction.defaultBuilder()
-                .messageId(messageId)
+                .message(message)
                 .userId(userId)
                 .type(ReactionType.LIKE)
                 .build()
                 .toParent();
-        reactionRepository.saveAndFlush(reaction);
+        message.getReactions().add(reaction);
+        messageRepository.save(message);
     }
 
 }

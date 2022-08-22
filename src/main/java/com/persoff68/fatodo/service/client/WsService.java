@@ -93,15 +93,16 @@ public class WsService {
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendMessageReactionEvent(Reaction reaction, Chat chat) {
-        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction, chat.getId());
-        WsEventWithUsersDTO eventDTO = new WsEventWithUsersDTO(null, WsEventType.CHAT_REACTION, reactionDTO);
+    public void sendMessageReactionEvent(Reaction reaction) {
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(reaction.getMessage().getChat());
+        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction, reaction.getMessage().getChat().getId());
+        WsEventWithUsersDTO eventDTO = new WsEventWithUsersDTO(userIdList, WsEventType.CHAT_REACTION, reactionDTO);
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendMessageReactionIncomingEvent(Reaction reaction, Chat chat, UUID userId) {
-        List<UUID> userIdList = List.of(userId);
-        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction, chat.getId());
+    public void sendMessageReactionIncomingEvent(Reaction reaction) {
+        List<UUID> userIdList = List.of(reaction.getMessage().getUserId());
+        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction, reaction.getMessage().getChat().getId());
         WsEventWithUsersDTO eventDTO = new WsEventWithUsersDTO(userIdList,
                 WsEventType.CHAT_REACTION_INCOMING, reactionDTO);
         wsServiceClient.sendEvent(eventDTO);

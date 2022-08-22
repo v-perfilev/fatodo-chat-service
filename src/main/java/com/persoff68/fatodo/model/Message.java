@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.model;
 
+import com.persoff68.fatodo.config.constant.AppConstants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,6 +15,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -25,7 +28,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true, exclude = {"chat", "reference", "statuses", "reactions"})
 @ToString(exclude = {"chat", "reference", "statuses", "reactions"})
-public class Message extends AbstractAuditingModel {
+public class Message extends AbstractAuditingModel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
     @ManyToOne
     private Chat chat;
@@ -43,10 +48,10 @@ public class Message extends AbstractAuditingModel {
 
     private boolean isDeleted = false;
 
-    @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "message", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Status> statuses = new HashSet<>();
 
-    @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "message", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "message", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Reaction> reactions = new HashSet<>();
 
 

@@ -81,7 +81,7 @@ class ReactionControllerIT {
         message1 = createMessage(chat1, USER_ID_2);
         message2 = createMessage(chat1, USER_ID_1);
         message3 = createMessage(chat1, USER_ID_2);
-        createReaction(message3.getId(), USER_ID_1, ReactionType.DISLIKE);
+        createReaction(message3, USER_ID_1, ReactionType.DISLIKE);
 
         Chat chat2 = createDirectChat();
         createMemberEvents(chat2, USER_ID_2, USER_ID_3);
@@ -107,7 +107,7 @@ class ReactionControllerIT {
                 .andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
         boolean reactionExists = reactionList.stream()
-                .anyMatch(status -> status.getMessageId().toString().equals(messageId)
+                .anyMatch(status -> status.getMessage().getId().toString().equals(messageId)
                         && status.getUserId().toString().equals(USER_ID_1)
                         && status.getType().equals(ReactionType.LIKE));
         assertThat(reactionExists).isTrue();
@@ -122,7 +122,7 @@ class ReactionControllerIT {
                 .andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
         boolean reactionExists = reactionList.stream()
-                .anyMatch(status -> status.getMessageId().toString().equals(messageId)
+                .anyMatch(status -> status.getMessage().getId().toString().equals(messageId)
                         && status.getUserId().toString().equals(USER_ID_1)
                         && status.getType().equals(ReactionType.LIKE));
         assertThat(reactionExists).isTrue();
@@ -174,7 +174,7 @@ class ReactionControllerIT {
                 .andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
         boolean reactionExists = reactionList.stream()
-                .anyMatch(status -> status.getMessageId().toString().equals(messageId)
+                .anyMatch(status -> status.getMessage().getId().toString().equals(messageId)
                         && status.getUserId().toString().equals(USER_ID_1)
                         && status.getType().equals(ReactionType.DISLIKE));
         assertThat(reactionExists).isTrue();
@@ -227,7 +227,7 @@ class ReactionControllerIT {
                 .andExpect(status().isCreated());
         List<Reaction> reactionList = reactionRepository.findAll();
         boolean reactionExists = reactionList.stream()
-                .anyMatch(status -> status.getMessageId().toString().equals(messageId)
+                .anyMatch(status -> status.getMessage().getId().toString().equals(messageId)
                         && status.getUserId().toString().equals(USER_ID_1));
         assertThat(reactionExists).isFalse();
     }
@@ -290,10 +290,11 @@ class ReactionControllerIT {
         return messageRepository.save(message);
     }
 
-    private void createReaction(UUID messageId, String userId, ReactionType type) {
+    private void createReaction(Message message, String userId, ReactionType type) {
         Reaction reaction = TestReaction.defaultBuilder()
-                .messageId(messageId).userId(UUID.fromString(userId)).type(type).build().toParent();
-        reactionRepository.save(reaction);
+                .message(message).userId(UUID.fromString(userId)).type(type).build().toParent();
+        message.getReactions().add(reaction);
+        messageRepository.save(message);
     }
 
 }

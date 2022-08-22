@@ -1,6 +1,5 @@
 package com.persoff68.fatodo.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.persoff68.fatodo.config.constant.AppConstants;
 import com.persoff68.fatodo.model.constant.StatusType;
 import lombok.AllArgsConstructor;
@@ -8,13 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -35,8 +32,8 @@ import java.util.UUID;
 public class Status {
 
     @Id
-    @Column(name = "message_id")
-    private UUID messageId;
+    @ManyToOne
+    private Message message;
 
     @Id
     private UUID userId;
@@ -49,15 +46,12 @@ public class Status {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp = new Date();
 
-    @ManyToOne(targetEntity = Message.class)
-    @JoinColumn(name = "message_id", insertable = false, updatable = false)
-    @JsonBackReference
-    private Message message;
-
-    public Status(UUID messageId, UUID userId, StatusType type) {
-        this.messageId = messageId;
-        this.userId = userId;
-        this.type = type;
+    public static Status of(Message message, UUID userId, StatusType type) {
+        Status status = new Status();
+        status.message = message;
+        status.userId = userId;
+        status.type = type;
+        return status;
     }
 
     @Data
@@ -67,7 +61,7 @@ public class Status {
         @Serial
         private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
-        private UUID messageId;
+        private Message message;
         private UUID userId;
     }
 

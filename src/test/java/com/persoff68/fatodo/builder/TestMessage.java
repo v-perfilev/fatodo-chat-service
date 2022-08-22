@@ -7,6 +7,7 @@ import com.persoff68.fatodo.model.Status;
 import lombok.Builder;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,7 +35,10 @@ public class TestMessage extends Message {
     }
 
     public static TestMessageBuilder defaultBuilder() {
-        return TestMessage.builder().text(DEFAULT_VALUE);
+        return TestMessage.builder()
+                .text(DEFAULT_VALUE)
+                .reactions(new HashSet<>())
+                .statuses(new HashSet<>());
     }
 
     public Message toParent() {
