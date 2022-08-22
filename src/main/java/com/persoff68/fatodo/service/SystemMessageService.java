@@ -76,7 +76,6 @@ public class SystemMessageService {
 
             // WS
             wsService.sendMessageNewEvent(message);
-            wsService.sendChatLastMessageEvent(message);
 
         } catch (IOException e) {
             log.error(e.getMessage());
