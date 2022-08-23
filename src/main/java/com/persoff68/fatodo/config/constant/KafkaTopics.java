@@ -3,8 +3,7 @@ package com.persoff68.fatodo.config.constant;
 import lombok.Getter;
 
 public enum KafkaTopics {
-    EVENT_ADD("event_add"),
-    EVENT_DELETE("event_delete"),
+    EVENT("event"),
     WS("ws");
 
     @Getter

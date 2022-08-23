@@ -15,8 +15,8 @@ public class WsProducer implements WsServiceClient {
 
     private final KafkaTemplate<String, WsEventDTO> wsKafkaTemplate;
 
-    public void sendEvent(WsEventDTO event) {
-        wsKafkaTemplate.send(KafkaTopics.WS.getValue(), event);
+    public void sendEvent(WsEventDTO eventDTO) {
+        wsKafkaTemplate.send(KafkaTopics.WS.getValue(), eventDTO);
     }
 
 }

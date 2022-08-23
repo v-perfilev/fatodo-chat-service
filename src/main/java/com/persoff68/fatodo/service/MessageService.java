@@ -57,7 +57,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendMessageNewEvent(message);
+        wsService.sendMessageNewEvent(message, userId);
 
         return message;
     }
@@ -73,7 +73,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendMessageNewEvent(message);
+        wsService.sendMessageNewEvent(message, userId);
 
         return message;
     }
@@ -90,8 +90,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        boolean isLastMessage = isMessageLastInChat(message);
-        wsService.sendMessageUpdateEvent(message, isLastMessage);
+        wsService.sendMessageUpdateEvent(message, userId);
 
         return message;
     }
@@ -110,16 +109,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        boolean isLastMessage = isMessageLastInChat(message);
-        wsService.sendMessageUpdateEvent(message, isLastMessage);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean isMessageLastInChat(Message message) {
-        UUID messageId = message.getId();
-        UUID chatId = message.getChat().getId();
-        Message lastMessageInChat = messageRepository.findLastMessageInChat(chatId);
-        return lastMessageInChat != null && lastMessageInChat.getId() == messageId;
+        wsService.sendMessageUpdateEvent(message, userId);
     }
 
     private Message getReferenceById(UUID userId, UUID messageId) {

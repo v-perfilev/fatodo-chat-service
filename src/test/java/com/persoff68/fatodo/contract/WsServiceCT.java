@@ -22,7 +22,7 @@ class WsServiceCT {
     WsServiceClient wsServiceClient;
 
     @Test
-    void testSendChatNewEvent() {
+    void testSendEvent() {
         ChatDTO chatDTO = TestChatDTO.defaultBuilder().build().toParent();
         WsEventDTO dto = TestWsEventDTO.defaultBuilder().payload(chatDTO).build().toParent();
         assertDoesNotThrow(() -> wsServiceClient.sendEvent(dto));

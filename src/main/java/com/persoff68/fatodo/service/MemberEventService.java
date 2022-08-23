@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -80,10 +79,9 @@ public class MemberEventService {
         );
 
         // WS
-        userIdList.forEach(id -> wsService.sendMemberAddEvent(chat, id));
+        wsService.sendMemberAddEvent(chat, userIdList, userId);
         // EVENT
-        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
-        eventService.sendChatMemberAddEvent(recipientIdList, chat.getId(), userId, userIdList);
+        eventService.sendMemberAddEvent(chat, userIdList, userId);
     }
 
     @Transactional
@@ -116,12 +114,9 @@ public class MemberEventService {
         );
 
         // WS
-        wsService.sendChatDeleteEvent(chat, userIdList);
-        userIdList.forEach(id -> wsService.sendMemberDeleteEvent(chat, id));
+        wsService.sendMemberDeleteEvent(chat, userIdList, userId);
         // EVENT
-        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
-        eventService.sendChatMemberDeleteEvent(recipientIdList, chatId, userId, userIdList);
-        eventService.deleteChatEventsForUser(chatId, userIdList);
+        eventService.sendMemberDeleteEvent(chat, userIdList, userId);
     }
 
     @Transactional
@@ -138,11 +133,9 @@ public class MemberEventService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendChatDeleteEvent(chat, Collections.singletonList(userId));
         wsService.sendMemberLeaveEvent(chat, userId);
         // EVENT
-        List<UUID> recipientIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
-        eventService.sendChatMemberLeaveEvent(recipientIdList, chatId, userId);
+        eventService.sendMemberLeaveEvent(chat, userId);
     }
 
     @Transactional
@@ -173,10 +166,9 @@ public class MemberEventService {
         systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
 
         // WS
-        wsService.sendChatUpdateEvent(chat);
-        wsService.sendChatDeleteEvent(chat, List.of(userId));
+        wsService.sendChatDeleteEvent(chat, userId);
         // EVENT
-        eventService.deleteChatEventsForUser(chatId, Collections.singletonList(userId));
+        eventService.sendChatDeleteEvent(chat, userId);
     }
 
 }

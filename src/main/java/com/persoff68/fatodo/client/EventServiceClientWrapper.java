@@ -1,8 +1,7 @@
 package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.exception.ClientException;
-import com.persoff68.fatodo.model.dto.CreateChatEventDTO;
-import com.persoff68.fatodo.model.dto.DeleteUserEventsDTO;
+import com.persoff68.fatodo.model.dto.EventDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -15,18 +14,9 @@ public class EventServiceClientWrapper implements EventServiceClient {
     private final EventServiceClient eventServiceClient;
 
     @Override
-    public void addChatEvent(CreateChatEventDTO createChatEventDTO) {
+    public void addEvent(EventDTO eventDTO) {
         try {
-            eventServiceClient.addChatEvent(createChatEventDTO);
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
-
-    @Override
-    public void deleteChatEventsForUser(DeleteUserEventsDTO deleteUserEventsDTO) {
-        try {
-            eventServiceClient.deleteChatEventsForUser(deleteUserEventsDTO);
+            eventServiceClient.addEvent(eventDTO);
         } catch (Exception e) {
             throw new ClientException();
         }

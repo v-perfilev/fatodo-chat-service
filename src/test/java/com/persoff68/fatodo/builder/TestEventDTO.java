@@ -1,28 +1,28 @@
 package com.persoff68.fatodo.builder;
 
-import com.persoff68.fatodo.model.constant.WsEventType;
-import com.persoff68.fatodo.model.dto.WsEventDTO;
+import com.persoff68.fatodo.model.constant.EventType;
+import com.persoff68.fatodo.model.dto.EventDTO;
 import lombok.Builder;
 
 import java.util.List;
 import java.util.UUID;
 
-public class TestWsEventDTO extends WsEventDTO {
+public class TestEventDTO extends EventDTO {
 
     @Builder
-    TestWsEventDTO(List<UUID> userIdList, WsEventType type, Object payload, UUID userId) {
+    TestEventDTO(List<UUID> userIdList, EventType type, Object payload, UUID userId) {
         super(userIdList, type, payload, userId);
     }
 
-    public static TestWsEventDTOBuilder defaultBuilder() {
-        return TestWsEventDTO.builder()
+    public static TestEventDTOBuilder defaultBuilder() {
+        return TestEventDTO.builder()
                 .userIdList(List.of(UUID.randomUUID()))
-                .type(WsEventType.CHAT_CREATE)
+                .type(EventType.CHAT_CREATE)
                 .userId(UUID.randomUUID());
     }
 
-    public WsEventDTO toParent() {
-        WsEventDTO dto = new WsEventDTO();
+    public EventDTO toParent() {
+        EventDTO dto = new EventDTO();
         dto.setUserIds(getUserIds());
         dto.setType(getType());
         dto.setPayload(getPayload());

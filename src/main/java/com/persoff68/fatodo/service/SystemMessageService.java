@@ -6,8 +6,8 @@ import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
-import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.client.WsService;
+import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,7 +75,7 @@ public class SystemMessageService {
             entityManager.refresh(chat);
 
             // WS
-            wsService.sendMessageNewEvent(message);
+            wsService.sendMessageNewEvent(message, userId);
 
         } catch (IOException e) {
             log.error(e.getMessage());

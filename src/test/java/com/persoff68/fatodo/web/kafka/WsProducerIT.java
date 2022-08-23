@@ -2,6 +2,7 @@ package com.persoff68.fatodo.web.kafka;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.config.util.KafkaUtils;
@@ -65,6 +66,8 @@ class WsProducerIT {
 
     @MockBean
     UserServiceClient userServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     @SpyBean
     WsServiceClient wsServiceClient;
@@ -82,13 +85,14 @@ class WsProducerIT {
     @AfterEach
     void cleanup() {
         chatRepository.deleteAll();
+        messageRepository.deleteAll();
         memberEventRepository.deleteAll();
 
         stopWsConsumer();
     }
 
     @Test
-    void testSendChatNewEvent() throws Exception {
+    void testSendEvent() throws Exception {
         chatService.createDirect(UUID.randomUUID(), UUID.randomUUID());
 
         ConsumerRecord<String, WsEventDTO> record = wsRecords.poll(5, TimeUnit.SECONDS);
@@ -100,10 +104,10 @@ class WsProducerIT {
 
     private void startWsConsumer() {
         JavaType javaType = objectMapper.getTypeFactory().constructType(WsEventDTO.class);
-        ConcurrentKafkaListenerContainerFactory<String, WsEventDTO> stringContainerFactory =
+        ConcurrentKafkaListenerContainerFactory<String, WsEventDTO> containerFactory =
                 KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(),
                         "test", "earliest", javaType);
-        wsContainer = stringContainerFactory.createContainer("ws");
+        wsContainer = containerFactory.createContainer("ws");
         wsRecords = new LinkedBlockingQueue<>();
         wsContainer.setupMessageListener((MessageListener<String, WsEventDTO>) wsRecords::add);
         wsContainer.start();

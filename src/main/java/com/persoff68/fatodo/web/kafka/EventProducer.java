@@ -3,8 +3,7 @@ package com.persoff68.fatodo.web.kafka;
 import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.config.annotation.ConditionalOnPropertyNotNull;
 import com.persoff68.fatodo.config.constant.KafkaTopics;
-import com.persoff68.fatodo.model.dto.CreateChatEventDTO;
-import com.persoff68.fatodo.model.dto.DeleteUserEventsDTO;
+import com.persoff68.fatodo.model.dto.EventDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -14,18 +13,11 @@ import org.springframework.stereotype.Component;
 @ConditionalOnPropertyNotNull(value = "kafka.bootstrapAddress")
 public class EventProducer implements EventServiceClient {
 
-    private final KafkaTemplate<String, CreateChatEventDTO> eventChatKafkaTemplate;
-    private final KafkaTemplate<String, DeleteUserEventsDTO> eventDeleteUserKafkaTemplate;
+    private final KafkaTemplate<String, EventDTO> eventKafkaTemplate;
 
     @Override
-    public void addChatEvent(CreateChatEventDTO createChatEventDTO) {
-        eventChatKafkaTemplate.send(KafkaTopics.EVENT_ADD.getValue(), "chat", createChatEventDTO);
-    }
-
-    @Override
-    public void deleteChatEventsForUser(DeleteUserEventsDTO deleteUserEventsDTO) {
-        eventDeleteUserKafkaTemplate.send(KafkaTopics.EVENT_DELETE.getValue(), "chat-delete-users",
-                deleteUserEventsDTO);
+    public void addEvent(EventDTO eventDTO) {
+        eventKafkaTemplate.send(KafkaTopics.EVENT.getValue(), eventDTO);
     }
 
 }

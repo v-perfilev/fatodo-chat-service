@@ -1,14 +1,20 @@
 package com.persoff68.fatodo.service.client;
 
 import com.persoff68.fatodo.client.EventServiceClient;
-import com.persoff68.fatodo.model.constant.ReactionType;
-import com.persoff68.fatodo.model.dto.CreateChatEventDTO;
-import com.persoff68.fatodo.model.dto.DeleteUserEventsDTO;
+import com.persoff68.fatodo.mapper.ChatMapper;
+import com.persoff68.fatodo.mapper.ReactionMapper;
+import com.persoff68.fatodo.model.Chat;
+import com.persoff68.fatodo.model.Reaction;
+import com.persoff68.fatodo.model.constant.EventType;
+import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.ChatMemberDTO;
+import com.persoff68.fatodo.model.dto.EventDTO;
+import com.persoff68.fatodo.model.dto.ReactionDTO;
+import com.persoff68.fatodo.service.util.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,44 +24,61 @@ import java.util.UUID;
 public class EventService {
 
     private final EventServiceClient eventServiceClient;
+    private final ChatMapper chatMapper;
+    private final ReactionMapper reactionMapper;
 
-    public void sendChatCreateEvent(UUID chatId, UUID userId, List<UUID> userIdList) {
-        List<UUID> recipientIdList = new ArrayList<>();
-        recipientIdList.add(userId);
-        recipientIdList.addAll(userIdList);
-        CreateChatEventDTO dto = CreateChatEventDTO.chatCreate(recipientIdList, chatId, userId, userIdList);
-        eventServiceClient.addChatEvent(dto);
+    public void sendChatNewEvent(Chat chat, UUID userId) {
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
+        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_CREATE, chatDTO, userId);
+        eventServiceClient.addEvent(eventDTO);
     }
 
-    public void sendChatUpdateEvent(List<UUID> recipientIdList, UUID chatId, UUID userId) {
-        CreateChatEventDTO dto = CreateChatEventDTO.chatUpdate(recipientIdList, chatId, userId);
-        eventServiceClient.addChatEvent(dto);
+    public void sendChatUpdateEvent(Chat chat, UUID userId) {
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
+        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_UPDATE, chatDTO, userId);
+        eventServiceClient.addEvent(eventDTO);
     }
 
-    public void sendChatMemberAddEvent(List<UUID> recipientIdList, UUID chatId, UUID userId, List<UUID> userIdList) {
-        CreateChatEventDTO dto = CreateChatEventDTO.chatMemberAdd(recipientIdList, chatId, userId, userIdList);
-        eventServiceClient.addChatEvent(dto);
+    public void sendChatDeleteEvent(Chat chat, UUID userId) {
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
+        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_DELETE, chatDTO, userId);
+        eventServiceClient.addEvent(eventDTO);
     }
 
-    public void sendChatMemberDeleteEvent(List<UUID> recipientIdList, UUID chatId, UUID userId, List<UUID> userIdList) {
-        CreateChatEventDTO dto = CreateChatEventDTO.chatMemberDelete(recipientIdList, chatId, userId, userIdList);
-        eventServiceClient.addChatEvent(dto);
+    public void sendMemberAddEvent(Chat chat, List<UUID> memberIdList, UUID userId) {
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
+        List<ChatMemberDTO> chatMemberDTOList = memberIdList.stream()
+                .map(memberId -> new ChatMemberDTO(chat.getId(), memberId))
+                .toList();
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_MEMBER_ADD, chatMemberDTOList, userId);
+        eventServiceClient.addEvent(eventDTO);
     }
 
-    public void sendChatMemberLeaveEvent(List<UUID> recipientIdList, UUID chatId, UUID userId) {
-        CreateChatEventDTO dto = CreateChatEventDTO.chatMemberLeave(recipientIdList, chatId, userId);
-        eventServiceClient.addChatEvent(dto);
+    public void sendMemberDeleteEvent(Chat chat, List<UUID> memberIdList, UUID userId) {
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
+        List<ChatMemberDTO> chatMemberDTOList = memberIdList.stream()
+                .map(memberId -> new ChatMemberDTO(chat.getId(), memberId))
+                .toList();
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_MEMBER_DELETE, chatMemberDTOList, userId);
+        eventServiceClient.addEvent(eventDTO);
     }
 
-    public void sendChatReactionEvent(UUID recipientId, UUID chatId, UUID userId, ReactionType reaction) {
-        String reactionName = reaction != null ? reaction.name() : null;
-        CreateChatEventDTO dto = CreateChatEventDTO.chatReaction(recipientId, chatId, userId, reactionName);
-        eventServiceClient.addChatEvent(dto);
+    public void sendMemberLeaveEvent(Chat chat, UUID userId) {
+        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
+        ChatMemberDTO chatMemberDTO = new ChatMemberDTO(chat.getId(), userId);
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_MEMBER_LEAVE, chatMemberDTO, userId);
+        eventServiceClient.addEvent(eventDTO);
     }
 
-    public void deleteChatEventsForUser(UUID chatId, List<UUID> userIdList) {
-        DeleteUserEventsDTO dto = new DeleteUserEventsDTO(chatId, userIdList);
-        eventServiceClient.deleteChatEventsForUser(dto);
+    public void sendMessageReactionIncomingEvent(Reaction reaction, UUID userId) {
+        List<UUID> userIdList = List.of(reaction.getMessage().getUserId());
+        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction, reaction.getMessage().getChat().getId());
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_REACTION_INCOMING, reactionDTO, userId);
+        eventServiceClient.addEvent(eventDTO);
     }
+
 
 }
