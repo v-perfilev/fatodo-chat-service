@@ -75,7 +75,7 @@ public class SystemMessageService {
             entityManager.refresh(chat);
 
             // WS
-            wsService.sendMessageNewEvent(message, userId);
+            wsService.sendMessageNewEvent(message);
 
         } catch (IOException e) {
             log.error(e.getMessage());

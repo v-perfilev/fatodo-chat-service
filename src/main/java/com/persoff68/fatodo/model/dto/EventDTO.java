@@ -24,13 +24,6 @@ public class EventDTO {
 
     private Date date;
 
-    public EventDTO(List<UUID> userIds, EventType type, Object payload) {
-        this.userIds = userIds;
-        this.type = type;
-        this.payload = payload;
-        this.date = new Date();
-    }
-
     public EventDTO(List<UUID> userIds, EventType type, Object payload, UUID userId) {
         this.userIds = userIds;
         this.type = type;

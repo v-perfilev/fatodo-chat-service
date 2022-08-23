@@ -36,7 +36,7 @@ public class StatusService {
             messageRepository.save(message);
 
             // WS
-            wsService.sendMessageStatusEvent(status, userId);
+            wsService.sendMessageStatusEvent(status);
         }
     }
 

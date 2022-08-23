@@ -46,10 +46,10 @@ public class ReactionService {
 
                     // WS
                     reaction.setType(ReactionType.NONE);
-                    wsService.sendMessageReactionEvent(reaction, userId);
-                    wsService.sendMessageReactionIncomingEvent(reaction, userId);
+                    wsService.sendMessageReactionEvent(reaction);
+                    wsService.sendMessageReactionIncomingEvent(reaction);
                     // EVENT
-                    eventService.sendMessageReactionIncomingEvent(reaction, userId);
+                    eventService.sendMessageReactionIncomingEvent(reaction);
                 });
     }
 
@@ -73,10 +73,10 @@ public class ReactionService {
         messageRepository.save(message);
 
         // WS
-        wsService.sendMessageReactionEvent(reaction, userId);
-        wsService.sendMessageReactionIncomingEvent(reaction, userId);
+        wsService.sendMessageReactionEvent(reaction);
+        wsService.sendMessageReactionIncomingEvent(reaction);
         // EVENT
-        eventService.sendMessageReactionIncomingEvent(reaction, userId);
+        eventService.sendMessageReactionIncomingEvent(reaction);
     }
 
 }

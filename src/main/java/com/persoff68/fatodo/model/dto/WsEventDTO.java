@@ -24,13 +24,6 @@ public class WsEventDTO {
 
     private Date date;
 
-    public WsEventDTO(List<UUID> userIds, WsEventType type, Object payload) {
-        this.userIds = userIds;
-        this.type = type;
-        this.payload = payload;
-        this.date = new Date();
-    }
-
     public WsEventDTO(List<UUID> userIds, WsEventType type, Object payload, UUID userId) {
         this.userIds = userIds;
         this.type = type;

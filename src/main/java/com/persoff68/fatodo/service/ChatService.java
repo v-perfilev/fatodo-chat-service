@@ -97,9 +97,9 @@ public class ChatService {
         );
 
         // WS
-        wsService.sendChatNewEvent(chat, firstUserId);
+        wsService.sendChatNewEvent(chat);
         // EVENT
-        eventService.sendChatNewEvent(chat, firstUserId);
+        eventService.sendChatNewEvent(chat);
 
         return chat;
     }
@@ -118,9 +118,9 @@ public class ChatService {
         );
 
         // WS
-        wsService.sendChatNewEvent(chat, userId);
+        wsService.sendChatNewEvent(chat);
         // EVENT
-        eventService.sendChatNewEvent(chat, userId);
+        eventService.sendChatNewEvent(chat);
 
         return chat;
     }
@@ -137,9 +137,9 @@ public class ChatService {
         systemMessageService.createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title);
 
         // WS
-        wsService.sendChatUpdateEvent(chat, userId);
+        wsService.sendChatUpdateEvent(chat);
         // EVENT
-        eventService.sendChatUpdateEvent(chat, userId);
+        eventService.sendChatUpdateEvent(chat);
 
         return chat;
     }
