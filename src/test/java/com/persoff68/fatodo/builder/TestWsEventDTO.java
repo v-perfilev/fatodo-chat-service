@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.builder;
 
 import com.persoff68.fatodo.model.constant.WsEventType;
-import com.persoff68.fatodo.model.dto.WsEventDTO;
+import com.persoff68.fatodo.model.dto.event.WsEventDTO;
 import lombok.Builder;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.UUID;
 public class TestWsEventDTO extends WsEventDTO {
 
     @Builder
-    TestWsEventDTO(List<UUID> userIdList, WsEventType type, Object payload, UUID userId) {
+    TestWsEventDTO(List<UUID> userIdList, WsEventType type, String payload, UUID userId) {
         super(userIdList, type, payload, userId);
     }
 

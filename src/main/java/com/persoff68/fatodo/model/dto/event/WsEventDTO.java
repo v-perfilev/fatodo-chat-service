@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.model.dto;
+package com.persoff68.fatodo.model.dto.event;
 
 import com.persoff68.fatodo.model.constant.WsEventType;
 import lombok.AllArgsConstructor;
@@ -18,13 +18,13 @@ public class WsEventDTO {
 
     private WsEventType type;
 
-    private Object payload;
+    private String payload;
 
     private UUID userId;
 
     private Date date;
 
-    public WsEventDTO(List<UUID> userIds, WsEventType type, Object payload, UUID userId) {
+    public WsEventDTO(List<UUID> userIds, WsEventType type, String payload, UUID userId) {
         this.userIds = userIds;
         this.type = type;
         this.payload = payload;

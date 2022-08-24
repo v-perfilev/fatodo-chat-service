@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.builder;
 
 import com.persoff68.fatodo.model.constant.EventType;
-import com.persoff68.fatodo.model.dto.EventDTO;
+import com.persoff68.fatodo.model.dto.event.EventDTO;
 import lombok.Builder;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.UUID;
 public class TestEventDTO extends EventDTO {
 
     @Builder
-    TestEventDTO(List<UUID> userIdList, EventType type, Object payload, UUID userId) {
+    TestEventDTO(List<UUID> userIdList, EventType type, String payload, UUID userId) {
         super(userIdList, type, payload, userId);
     }
 
