@@ -41,13 +41,6 @@ public class EventService {
         eventServiceClient.addEvent(eventDTO);
     }
 
-    public void sendChatDeleteEvent(Chat chat, UUID userId) {
-        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
-        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_DELETE, chatDTO, userId);
-        eventServiceClient.addEvent(eventDTO);
-    }
-
     public void sendMemberAddEvent(Chat chat, List<UUID> memberIdList, UUID userId) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         List<ChatMemberDTO> chatMemberDTOList = memberIdList.stream()

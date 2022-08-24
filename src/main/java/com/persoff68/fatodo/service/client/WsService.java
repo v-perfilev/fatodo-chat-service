@@ -49,13 +49,6 @@ public class WsService {
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendChatDeleteEvent(Chat chat, UUID userId) {
-        List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
-        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_DELETE, chatDTO, userId);
-        wsServiceClient.sendEvent(eventDTO);
-    }
-
     public void sendMemberAddEvent(Chat chat, List<UUID> memberIdList, UUID userId) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         List<ChatMemberDTO> chatMemberDTOList = memberIdList.stream()
