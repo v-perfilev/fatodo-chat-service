@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.model;
 
+import com.persoff68.fatodo.config.constant.AppConstants;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -25,7 +28,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(exclude = "chat")
-public class MemberEvent extends AbstractModel {
+public class MemberEvent extends AbstractModel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
     @ManyToOne
     private Chat chat;

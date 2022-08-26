@@ -29,7 +29,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @IdClass(Status.StatusId.class)
 @ToString(exclude = {"message"})
-public class Status {
+public class Status implements Serializable {
+    @Serial
+    private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
     @Id
     @ManyToOne

@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.model;
 
+import com.persoff68.fatodo.config.constant.AppConstants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,6 +11,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +23,9 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(exclude = {"memberEvents", "messages"})
-public class Chat extends AbstractAuditingModel {
+public class Chat extends AbstractAuditingModel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
     private String title;
 

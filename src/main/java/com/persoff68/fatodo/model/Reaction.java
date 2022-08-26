@@ -28,7 +28,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @IdClass(Reaction.ReactionId.class)
 @ToString(exclude = {"message"})
-public class Reaction {
+public class Reaction implements Serializable {
+    @Serial
+    private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
 
     @Id
     @ManyToOne
