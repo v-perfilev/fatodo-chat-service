@@ -40,7 +40,8 @@ public class ReactionService {
 
         message.getReactions().stream()
                 .filter(reaction -> reaction.getUserId().equals(userId))
-                .findFirst().ifPresent(reaction -> {
+                .findFirst()
+                .ifPresent(reaction -> {
                     message.getReactions().remove(reaction);
                     messageRepository.save(message);
 

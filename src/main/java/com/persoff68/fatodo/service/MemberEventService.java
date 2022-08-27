@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +29,6 @@ public class MemberEventService {
     private final UserService userService;
     private final ContactService contactService;
     private final ChatPermissionService chatPermissionService;
-    private final EntityManager entityManager;
     private final WsService wsService;
     private final EventService eventService;
 
@@ -47,8 +45,6 @@ public class MemberEventService {
                 .toList();
 
         memberEventRepository.saveAll(newMemberList);
-        memberEventRepository.flush();
-        entityManager.refresh(chat);
     }
 
     @Transactional
@@ -60,6 +56,8 @@ public class MemberEventService {
 
         chatPermissionService.hasEditMembersPermission(chat, userId);
 
+        systemMessageService.createIdsEventMessage(userId, chatId, EventMessageType.ADD_MEMBERS, userIdList);
+
         List<UUID> activeUserIdList = ChatUtils.getActiveUserIdList(chat.getMemberEvents());
         List<MemberEvent> memberEventList = userIdList.stream()
                 .filter(id -> !activeUserIdList.contains(id))
@@ -67,16 +65,12 @@ public class MemberEventService {
                 .map(id -> new MemberEvent(chat, id, MemberEventType.ADD_MEMBER))
                 .toList();
 
-        systemMessageService.createIdsEventMessage(userId, chatId, EventMessageType.ADD_MEMBERS, userIdList);
+        memberEventRepository.saveAll(memberEventList);
 
         // WS
         wsService.sendMemberAddEvent(chat, userIdList, userId);
         // EVENT
         eventService.sendMemberAddEvent(chat, userIdList, userId);
-
-        memberEventRepository.saveAll(memberEventList);
-        memberEventRepository.flush();
-        entityManager.refresh(chat);
     }
 
     @Transactional
@@ -99,14 +93,12 @@ public class MemberEventService {
 
         systemMessageService.createIdsEventMessage(userId, chatId, EventMessageType.DELETE_MEMBERS, userIdList);
 
+        memberEventRepository.saveAll(memberEventList);
+
         // WS
         wsService.sendMemberDeleteEvent(chat, userIdList, userId);
         // EVENT
         eventService.sendMemberDeleteEvent(chat, userIdList, userId);
-
-        memberEventRepository.saveAll(memberEventList);
-        memberEventRepository.flush();
-        entityManager.refresh(chat);
     }
 
     @Transactional
@@ -118,15 +110,13 @@ public class MemberEventService {
 
         systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
 
+        MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.LEAVE_CHAT);
+        memberEventRepository.save(memberEvent);
+
         // WS
         wsService.sendMemberLeaveEvent(chat, userId);
         // EVENT
         eventService.sendMemberLeaveEvent(chat, userId);
-
-
-        MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.LEAVE_CHAT);
-        memberEventRepository.saveAndFlush(memberEvent);
-        entityManager.refresh(chat);
     }
 
     @Transactional
@@ -136,11 +126,10 @@ public class MemberEventService {
 
         chatPermissionService.hasClearChatPermission(chat, userId);
 
-        MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.CLEAR_CHAT);
-        memberEventRepository.saveAndFlush(memberEvent);
-        entityManager.refresh(chat);
-
         systemMessageService.createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT);
+
+        MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.CLEAR_CHAT);
+        memberEventRepository.save(memberEvent);
     }
 
     @Transactional
@@ -152,14 +141,13 @@ public class MemberEventService {
 
         systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
 
+        MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.DELETE_MEMBER);
+        memberEventRepository.save(memberEvent);
+
         // WS
         wsService.sendMemberLeaveEvent(chat, userId);
         // EVENT
         eventService.sendMemberLeaveEvent(chat, userId);
-
-        MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.DELETE_MEMBER);
-        memberEventRepository.saveAndFlush(memberEvent);
-        entityManager.refresh(chat);
     }
 
 }
