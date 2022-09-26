@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -16,7 +15,7 @@ public class ChatDTO extends AbstractAuditingDTO {
     @JsonProperty("isDirect")
     private boolean isDirect;
 
-    private List<UUID> members;
+    private List<ChatMemberDTO> members;
 
     MessageDTO lastMessage;
 
