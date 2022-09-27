@@ -17,6 +17,7 @@ import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.dto.ChatMemberDTO;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
@@ -221,7 +222,8 @@ class ChatControllerIT {
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
-        assertThat(resultDTO.getMembers()).contains(UUID.fromString(USER_ID_1), UUID.fromString(USER_ID_3));
+        List<UUID> memberIdList = resultDTO.getMembers().stream().map(ChatMemberDTO::getUserId).toList();
+        assertThat(memberIdList).contains(UUID.fromString(USER_ID_1), UUID.fromString(USER_ID_3));
         assertThat(resultDTO.isDirect()).isTrue();
     }
 
@@ -270,7 +272,8 @@ class ChatControllerIT {
                 .andExpect(status().isCreated());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
-        assertThat(resultDTO.getMembers()).contains(
+        List<UUID> memberIdList = resultDTO.getMembers().stream().map(ChatMemberDTO::getUserId).toList();
+        assertThat(memberIdList).contains(
                 UUID.fromString(USER_ID_1),
                 UUID.fromString(USER_ID_2),
                 UUID.fromString(USER_ID_3));
