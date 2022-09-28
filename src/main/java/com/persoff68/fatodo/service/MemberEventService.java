@@ -123,6 +123,11 @@ public class MemberEventService {
 
         chatPermissionService.hasLeaveChatPermission(chat, userId);
 
+        // SYSTEM MESSAGE
+        Message systemMessage = systemMessageService
+                .createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT, 0);
+        wsService.sendMessageNewEvent(systemMessage);
+
         // WS
         wsService.sendMemberLeaveEvent(chat, userId);
         // EVENT
@@ -131,11 +136,6 @@ public class MemberEventService {
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.LEAVE_CHAT);
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
-
-        // SYSTEM MESSAGE
-        Message systemMessage = systemMessageService
-                .createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT, -1);
-        wsService.sendMessageNewEvent(systemMessage);
     }
 
     @Transactional

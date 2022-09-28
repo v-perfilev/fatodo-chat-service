@@ -92,19 +92,21 @@ class ChatServicesIT {
 
     @Test
     void leaveAndGetAllChatsByUserIdTest() throws InterruptedException {
+        Thread.sleep(1000);
         memberEventService.leaveChat(USER_1_ID, secondChat.getId());
         Thread.sleep(1000);
 
         PageableList<ChatContainer> firstUserList = chatService.getAllByUserId(USER_1_ID, pageable);
         PageableList<ChatContainer> secondUserList = chatService.getAllByUserId(USER_2_ID, pageable);
 
-        assertThat(firstUserList.getData()).hasSize(1);
+        assertThat(firstUserList.getData()).hasSize(2);
         assertThat(secondUserList.getData()).hasSize(2);
     }
 
     @Test
     @Transactional
     void clearAndGetAllChatsByUserIdTest() throws InterruptedException {
+        Thread.sleep(1000);
         memberEventService.clearChat(USER_1_ID, secondChat.getId());
         Thread.sleep(1000);
 
@@ -118,6 +120,7 @@ class ChatServicesIT {
     @Test
     @Transactional
     void deleteAndGetAllChatsByUserIdTest() throws InterruptedException {
+        Thread.sleep(1000);
         memberEventService.deleteChat(USER_1_ID, secondChat.getId());
         Thread.sleep(1000);
 
