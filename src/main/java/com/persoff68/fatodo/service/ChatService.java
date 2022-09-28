@@ -55,14 +55,11 @@ public class ChatService {
     public List<ChatContainer> getFilteredByUserId(UUID userId, String filter) {
         List<UUID> userIdList = userService.getUserIdsByUsernamePart(filter);
         List<Chat> chatList = chatRepository.findAllByUserId(userId);
-        List<UUID> chatIdList = chatList.stream()
-                .filter(chat -> {
-                    boolean filteredByTitle = chat.getTitle() != null && chat.getTitle().contains(filter);
-                    boolean filteredByUsers = ChatUtils.isAnyUserInChat(chat, userIdList);
-                    return filteredByTitle || filteredByUsers;
-                })
-                .map(Chat::getId)
-                .toList();
+        List<UUID> chatIdList = chatList.stream().filter(chat -> {
+            boolean filteredByTitle = chat.getTitle() != null && chat.getTitle().contains(filter);
+            boolean filteredByUsers = ChatUtils.isAnyUserInChat(chat, userIdList);
+            return filteredByTitle || filteredByUsers;
+        }).map(Chat::getId).toList();
         List<Message> messageList = messageRepository.findAllByChatIdListAndUserId(chatIdList, userId);
         return messageList.stream().map(ChatContainer::new).toList();
     }
@@ -74,8 +71,7 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public Chat getByUserIdAndId(UUID userId, UUID chatId) {
-        Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(ModelNotFoundException::new);
+        Chat chat = chatRepository.findById(chatId).orElseThrow(ModelNotFoundException::new);
         chatPermissionService.hasReadChatPermission(chat, userId);
         return chat;
     }
@@ -90,9 +86,8 @@ public class ChatService {
         Chat chat = create(userIdList, true);
 
         // SYSTEM MESSAGE
-        Message systemMessage = systemMessageService
-                .createIdsEventMessage(firstUserId, chat.getId(), EventMessageType.CREATE_DIRECT_CHAT,
-                        Collections.singletonList(secondUserId), 1);
+        Message systemMessage = systemMessageService.createIdsEventMessage(firstUserId, chat.getId(),
+                EventMessageType.CREATE_DIRECT_CHAT, Collections.singletonList(secondUserId));
 
         // WS
         wsService.sendChatNewEvent(chat, systemMessage);
@@ -109,8 +104,8 @@ public class ChatService {
         Chat chat = create(allUserIdList, false);
 
         // SYSTEM MESSAGE
-        Message systemMessage = systemMessageService
-                .createIdsEventMessage(userId, chat.getId(), EventMessageType.CREATE_CHAT, userIdList, 1);
+        Message systemMessage = systemMessageService.createIdsEventMessage(userId, chat.getId(),
+                EventMessageType.CREATE_CHAT, userIdList);
 
         // WS
         wsService.sendChatNewEvent(chat, systemMessage);
@@ -122,16 +117,15 @@ public class ChatService {
 
     @Transactional
     public ChatContainer rename(UUID userId, UUID chatId, String title) {
-        Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(ModelNotFoundException::new);
+        Chat chat = chatRepository.findById(chatId).orElseThrow(ModelNotFoundException::new);
         chatPermissionService.hasRenameChatPermission(chat, userId);
 
         chat.setTitle(title);
         chat = chatRepository.save(chat);
 
         // SYSTEM MESSAGE
-        Message systemMessage = systemMessageService
-                .createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title, 1);
+        Message systemMessage = systemMessageService.createTextEventMessage(userId, chatId,
+                EventMessageType.RENAME_CHAT, title);
         wsService.sendMessageNewEvent(systemMessage);
 
         // WS
@@ -146,8 +140,7 @@ public class ChatService {
     public Chat getOrCreateDirectByUserIds(UUID firstUserId, UUID secondUserId) {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         Supplier<Chat> createChatSupplier = () -> createDirect(firstUserId, secondUserId).getChat();
-        return chatRepository.findDirectChat(userIdList)
-                .orElseGet(createChatSupplier);
+        return chatRepository.findDirectChat(userIdList).orElseGet(createChatSupplier);
     }
 
     @Transactional(readOnly = true)
@@ -170,8 +163,7 @@ public class ChatService {
 
     private Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
-        return chatRepository.findDirectChat(userIdList)
-                .orElse(null);
+        return chatRepository.findDirectChat(userIdList).orElse(null);
     }
 
 }

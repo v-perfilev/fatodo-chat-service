@@ -14,9 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,35 +33,33 @@ public class SystemMessageService {
     private final EntityManager entityManager;
     private final ObjectMapper objectMapper;
 
-    public Message createSimpleEventMessage(UUID userId, UUID chatId, EventMessageType type, int timeShift) {
+    public Message createSimpleEventMessage(UUID userId, UUID chatId, EventMessageType type) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put(TYPE_FIELD, type);
-        return createEventMessage(userId, chatId, paramMap, false, timeShift);
+        return createEventMessage(userId, chatId, paramMap, false);
     }
 
-    public Message createTextEventMessage(UUID userId, UUID chatId, EventMessageType type, String text, int timeShift) {
+    public Message createTextEventMessage(UUID userId, UUID chatId, EventMessageType type, String text) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put(TYPE_FIELD, type);
         paramMap.put(TEXT_FIELD, text);
-        return createEventMessage(userId, chatId, paramMap, false, timeShift);
+        return createEventMessage(userId, chatId, paramMap, false);
     }
 
-    public Message createIdsEventMessage(UUID userId, UUID chatId, EventMessageType type, List<UUID> idList,
-                                         int timeShift) {
+    public Message createIdsEventMessage(UUID userId, UUID chatId, EventMessageType type, List<UUID> idList) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put(TYPE_FIELD, type);
         paramMap.put(IDS_FIELD, idList);
-        return createEventMessage(userId, chatId, paramMap, false, timeShift);
+        return createEventMessage(userId, chatId, paramMap, false);
     }
 
-    public Message createPrivateEventMessage(UUID userId, UUID chatId, EventMessageType type, int timeShift) {
+    public Message createPrivateEventMessage(UUID userId, UUID chatId, EventMessageType type) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put(TYPE_FIELD, type);
-        return createEventMessage(userId, chatId, paramMap, true, timeShift);
+        return createEventMessage(userId, chatId, paramMap, true);
     }
 
-    private Message createEventMessage(UUID userId, UUID chatId, Map<String, Object> paramMap,
-                                       boolean isPrivate, int timeShift) {
+    private Message createEventMessage(UUID userId, UUID chatId, Map<String, Object> paramMap, boolean isPrivate) {
         try {
             Chat chat = chatRepository.findById(chatId)
                     .orElseThrow(ModelNotFoundException::new);
@@ -75,16 +70,6 @@ public class SystemMessageService {
                     : Message.event(chat, userId, params);
 
             message = messageRepository.saveAndFlush(message);
-
-            if (timeShift != 0) {
-                Instant eventInstant = timeShift > 0
-                        ? Instant.now().plus(timeShift, ChronoUnit.SECONDS)
-                        : Instant.now().minus(Math.abs(timeShift), ChronoUnit.SECONDS);
-                Date eventMessageDate = Date.from(eventInstant);
-                message.setCreatedAt(eventMessageDate);
-                message = messageRepository.saveAndFlush(message);
-            }
-
             entityManager.refresh(chat);
 
             return message;

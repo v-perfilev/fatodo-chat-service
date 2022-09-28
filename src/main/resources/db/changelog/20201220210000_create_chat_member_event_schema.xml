@@ -22,7 +22,7 @@
             <column name="type" type="varchar(16)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date" type="datetime">
+            <column name="date" type="datetime(2)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

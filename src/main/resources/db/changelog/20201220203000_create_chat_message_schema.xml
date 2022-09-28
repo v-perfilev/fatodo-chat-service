@@ -34,9 +34,9 @@
             </column>
 
             <column name="created_by" type="binary(16)"/>
-            <column name="created_at" type="datetime"/>
+            <column name="created_at" type="datetime(2)"/>
             <column name="last_modified_by" type="binary(16)"/>
-            <column name="last_modified_at" type="datetime"/>
+            <column name="last_modified_at" type="datetime(2)"/>
         </createTable>
 
         <createIndex indexName="index_chat_message_chat" tableName="ftd_chat_message">

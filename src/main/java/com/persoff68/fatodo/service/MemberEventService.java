@@ -79,7 +79,7 @@ public class MemberEventService {
 
         // SYSTEM MESSAGE
         Message systemMessage = systemMessageService
-                .createIdsEventMessage(userId, chatId, EventMessageType.ADD_MEMBERS, userIdList, 1);
+                .createIdsEventMessage(userId, chatId, EventMessageType.ADD_MEMBERS, userIdList);
         wsService.sendMessageNewEvent(systemMessage);
     }
 
@@ -112,7 +112,7 @@ public class MemberEventService {
 
         // SYSTEM MESSAGE
         Message systemMessage = systemMessageService
-                .createIdsEventMessage(userId, chatId, EventMessageType.DELETE_MEMBERS, userIdList, 1);
+                .createIdsEventMessage(userId, chatId, EventMessageType.DELETE_MEMBERS, userIdList);
         wsService.sendMessageNewEvent(systemMessage);
     }
 
@@ -125,7 +125,7 @@ public class MemberEventService {
 
         // SYSTEM MESSAGE
         Message systemMessage = systemMessageService
-                .createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT, 0);
+                .createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
         wsService.sendMessageNewEvent(systemMessage);
 
         // WS
@@ -151,7 +151,7 @@ public class MemberEventService {
 
         // SYSTEM MESSAGE
         Message systemMessage = systemMessageService
-                .createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT, 1);
+                .createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT);
         wsService.sendMessageNewEvent(systemMessage);
     }
 
@@ -173,7 +173,7 @@ public class MemberEventService {
 
         // SYSTEM MESSAGE
         Message systemMessage = systemMessageService
-                .createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT, 1);
+                .createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
         wsService.sendMessageNewEvent(systemMessage);
     }
 

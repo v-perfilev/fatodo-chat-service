@@ -106,8 +106,7 @@ class MessageServicesIT {
     }
 
     @Test
-    void leaveAndGetAllMessagesTest() throws InterruptedException {
-        Thread.sleep(1000);
+    void leaveAndGetAllMessagesTest() {
         // leave second chat
         memberEventService.leaveChat(USER_1_ID, secondChat.getId());
         // message to second chat
@@ -127,8 +126,7 @@ class MessageServicesIT {
     }
 
     @Test
-    void clearAndGetAllMessagesTest() throws InterruptedException {
-        Thread.sleep(1000);
+    void clearAndGetAllMessagesTest() {
         // clear second chat
         memberEventService.clearChat(USER_1_ID, secondChat.getId());
         // messages to second chat

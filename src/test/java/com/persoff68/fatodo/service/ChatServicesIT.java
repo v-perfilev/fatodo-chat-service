@@ -91,10 +91,8 @@ class ChatServicesIT {
     }
 
     @Test
-    void leaveAndGetAllChatsByUserIdTest() throws InterruptedException {
-        Thread.sleep(1000);
+    void leaveAndGetAllChatsByUserIdTest() {
         memberEventService.leaveChat(USER_1_ID, secondChat.getId());
-        Thread.sleep(1000);
 
         PageableList<ChatContainer> firstUserList = chatService.getAllByUserId(USER_1_ID, pageable);
         PageableList<ChatContainer> secondUserList = chatService.getAllByUserId(USER_2_ID, pageable);
@@ -105,10 +103,8 @@ class ChatServicesIT {
 
     @Test
     @Transactional
-    void clearAndGetAllChatsByUserIdTest() throws InterruptedException {
-        Thread.sleep(1000);
+    void clearAndGetAllChatsByUserIdTest() {
         memberEventService.clearChat(USER_1_ID, secondChat.getId());
-        Thread.sleep(1000);
 
         PageableList<ChatContainer> firstUserList = chatService.getAllByUserId(USER_1_ID, pageable);
         PageableList<ChatContainer> secondUserList = chatService.getAllByUserId(USER_2_ID, pageable);
@@ -119,10 +115,8 @@ class ChatServicesIT {
 
     @Test
     @Transactional
-    void deleteAndGetAllChatsByUserIdTest() throws InterruptedException {
-        Thread.sleep(1000);
+    void deleteAndGetAllChatsByUserIdTest() {
         memberEventService.deleteChat(USER_1_ID, secondChat.getId());
-        Thread.sleep(1000);
 
         PageableList<ChatContainer> firstUserList = chatService.getAllByUserId(USER_1_ID, pageable);
         PageableList<ChatContainer> secondUserList = chatService.getAllByUserId(USER_2_ID, pageable);
