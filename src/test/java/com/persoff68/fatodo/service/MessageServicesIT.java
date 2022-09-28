@@ -79,8 +79,8 @@ class MessageServicesIT {
         when(contactServiceClient.areUsersInContactList(any())).thenReturn(true);
 
         // create chats
-        firstChat = chatService.createDirect(USER_1_ID, USER_2_ID);
-        secondChat = chatService.createIndirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID));
+        firstChat = chatService.createDirect(USER_1_ID, USER_2_ID).getChat();
+        secondChat = chatService.createIndirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID)).getChat();
 
         // init with messages
         messageService.send(USER_1_ID, firstChat.getId(), UUID.randomUUID().toString(), null);
@@ -106,7 +106,8 @@ class MessageServicesIT {
     }
 
     @Test
-    void leaveAndGetAllMessagesTest() {
+    void leaveAndGetAllMessagesTest() throws InterruptedException {
+        Thread.sleep(1000);
         // leave second chat
         memberEventService.leaveChat(USER_1_ID, secondChat.getId());
         // message to second chat
@@ -126,11 +127,12 @@ class MessageServicesIT {
     }
 
     @Test
-    void clearAndGetAllMessagesTest() {
+    void clearAndGetAllMessagesTest() throws InterruptedException {
+        Thread.sleep(1000);
         // clear second chat
         memberEventService.clearChat(USER_1_ID, secondChat.getId());
         // messages to second chat
-        messageService.send(USER_2_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
+        messageService.send(USER_2_ID, secondChat.getId(), "test", null);
 
         PageableList<Message> firstUserSecondChatMessageList = messageService.getAllByUserIdAndChatId(USER_1_ID,
                 secondChat.getId(), pageable);

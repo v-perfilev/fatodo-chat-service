@@ -71,7 +71,7 @@ class ChatServicesIT {
 
         // create chats
         chatService.createDirect(USER_1_ID, USER_2_ID);
-        secondChat = chatService.createIndirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID));
+        secondChat = chatService.createIndirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID)).getChat();
     }
 
     @AfterEach
@@ -90,30 +90,23 @@ class ChatServicesIT {
         assertThat(secondUserList.getData()).hasSize(2);
     }
 
-    private void beforeLeaveAndGetAllChatsByUserIdTest() {
+    @Test
+    void leaveAndGetAllChatsByUserIdTest() throws InterruptedException {
         memberEventService.leaveChat(USER_1_ID, secondChat.getId());
-    }
-
-    @Test
-    void leaveAndGetAllChatsByUserIdTest() {
-        beforeLeaveAndGetAllChatsByUserIdTest();
+        Thread.sleep(1000);
 
         PageableList<ChatContainer> firstUserList = chatService.getAllByUserId(USER_1_ID, pageable);
         PageableList<ChatContainer> secondUserList = chatService.getAllByUserId(USER_2_ID, pageable);
 
-        assertThat(firstUserList.getData()).hasSize(2);
+        assertThat(firstUserList.getData()).hasSize(1);
         assertThat(secondUserList.getData()).hasSize(2);
-        ;
     }
 
-    private void beforeClearAndGetAllChatsByUserIdTest() {
+    @Test
+    @Transactional
+    void clearAndGetAllChatsByUserIdTest() throws InterruptedException {
         memberEventService.clearChat(USER_1_ID, secondChat.getId());
-    }
-
-    @Test
-    @Transactional
-    void clearAndGetAllChatsByUserIdTest() {
-        beforeClearAndGetAllChatsByUserIdTest();
+        Thread.sleep(1000);
 
         PageableList<ChatContainer> firstUserList = chatService.getAllByUserId(USER_1_ID, pageable);
         PageableList<ChatContainer> secondUserList = chatService.getAllByUserId(USER_2_ID, pageable);
@@ -122,14 +115,11 @@ class ChatServicesIT {
         assertThat(secondUserList.getData()).hasSize(2);
     }
 
-    private void beforeDeleteAndGetAllChatsByUserIdTest() {
-        memberEventService.deleteChat(USER_1_ID, secondChat.getId());
-    }
-
     @Test
     @Transactional
-    void deleteAndGetAllChatsByUserIdTest() {
-        beforeDeleteAndGetAllChatsByUserIdTest();
+    void deleteAndGetAllChatsByUserIdTest() throws InterruptedException {
+        memberEventService.deleteChat(USER_1_ID, secondChat.getId());
+        Thread.sleep(1000);
 
         PageableList<ChatContainer> firstUserList = chatService.getAllByUserId(USER_1_ID, pageable);
         PageableList<ChatContainer> secondUserList = chatService.getAllByUserId(USER_2_ID, pageable);

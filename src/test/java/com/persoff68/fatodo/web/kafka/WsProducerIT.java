@@ -99,7 +99,7 @@ class WsProducerIT {
 
         assertThat(wsServiceClient).isInstanceOf(WsProducer.class);
         assertThat(record).isNotNull();
-        verify(wsServiceClient, times(2)).sendEvent(any());
+        verify(wsServiceClient, times(1)).sendEvent(any());
     }
 
     private void startWsConsumer() {

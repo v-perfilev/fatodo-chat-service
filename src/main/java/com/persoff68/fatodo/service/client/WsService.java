@@ -39,17 +39,17 @@ public class WsService {
     private final StatusMapper statusMapper;
     private final ObjectMapper objectMapper;
 
-    public void sendChatNewEvent(Chat chat) {
+    public void sendChatNewEvent(Chat chat, Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        ChatDTO chatDTO = chatMapper.pojoToDTO(chat, message);
         String payload = serialize(chatDTO);
         WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_CREATE, payload, chat.getCreatedBy());
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendChatUpdateEvent(Chat chat) {
+    public void sendChatUpdateEvent(Chat chat, Message message) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        ChatDTO chatDTO = chatMapper.pojoToDTO(chat, message);
         String payload = serialize(chatDTO);
         WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_UPDATE, payload, chat.getLastModifiedBy());
         wsServiceClient.sendEvent(eventDTO);

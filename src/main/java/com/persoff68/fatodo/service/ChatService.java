@@ -81,7 +81,7 @@ public class ChatService {
     }
 
     @Transactional
-    public Chat createDirect(UUID firstUserId, UUID secondUserId) {
+    public ChatContainer createDirect(UUID firstUserId, UUID secondUserId) {
         Chat oldChat = getDirectByUserIds(firstUserId, secondUserId);
         if (oldChat != null) {
             throw new ModelAlreadyExistsException();
@@ -89,44 +89,39 @@ public class ChatService {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
         Chat chat = create(userIdList, true);
 
-        systemMessageService.createIdsEventMessage(
-                firstUserId,
-                chat.getId(),
-                EventMessageType.CREATE_DIRECT_CHAT,
-                Collections.singletonList(secondUserId)
-        );
+        // SYSTEM MESSAGE
+        Message systemMessage = systemMessageService
+                .createIdsEventMessage(firstUserId, chat.getId(), EventMessageType.CREATE_DIRECT_CHAT,
+                        Collections.singletonList(secondUserId), 1);
 
         // WS
-        wsService.sendChatNewEvent(chat);
+        wsService.sendChatNewEvent(chat, systemMessage);
         // EVENT
         eventService.sendChatNewEvent(chat);
 
-        return chat;
+        return new ChatContainer(systemMessage);
     }
 
     @Transactional
-    public Chat createIndirect(UUID userId, List<UUID> userIdList) {
+    public ChatContainer createIndirect(UUID userId, List<UUID> userIdList) {
         List<UUID> allUserIdList = new ArrayList<>(userIdList);
         allUserIdList.add(userId);
         Chat chat = create(allUserIdList, false);
 
-        systemMessageService.createIdsEventMessage(
-                userId,
-                chat.getId(),
-                EventMessageType.CREATE_CHAT,
-                userIdList
-        );
+        // SYSTEM MESSAGE
+        Message systemMessage = systemMessageService
+                .createIdsEventMessage(userId, chat.getId(), EventMessageType.CREATE_CHAT, userIdList, 1);
 
         // WS
-        wsService.sendChatNewEvent(chat);
+        wsService.sendChatNewEvent(chat, systemMessage);
         // EVENT
         eventService.sendChatNewEvent(chat);
 
-        return chat;
+        return new ChatContainer(systemMessage);
     }
 
     @Transactional
-    public Chat rename(UUID userId, UUID chatId, String title) {
+    public ChatContainer rename(UUID userId, UUID chatId, String title) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(ModelNotFoundException::new);
         chatPermissionService.hasRenameChatPermission(chat, userId);
@@ -134,20 +129,23 @@ public class ChatService {
         chat.setTitle(title);
         chat = chatRepository.save(chat);
 
-        systemMessageService.createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title);
+        // SYSTEM MESSAGE
+        Message systemMessage = systemMessageService
+                .createTextEventMessage(userId, chatId, EventMessageType.RENAME_CHAT, title, 1);
+        wsService.sendMessageNewEvent(systemMessage);
 
         // WS
-        wsService.sendChatUpdateEvent(chat);
+        wsService.sendChatUpdateEvent(chat, systemMessage);
         // EVENT
         eventService.sendChatUpdateEvent(chat);
 
-        return chat;
+        return new ChatContainer(systemMessage);
     }
 
     @Transactional
     public Chat getOrCreateDirectByUserIds(UUID firstUserId, UUID secondUserId) {
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
-        Supplier<Chat> createChatSupplier = () -> createDirect(firstUserId, secondUserId);
+        Supplier<Chat> createChatSupplier = () -> createDirect(firstUserId, secondUserId).getChat();
         return chatRepository.findDirectChat(userIdList)
                 .orElseGet(createChatSupplier);
     }

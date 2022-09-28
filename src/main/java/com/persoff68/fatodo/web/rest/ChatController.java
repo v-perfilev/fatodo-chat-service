@@ -71,24 +71,24 @@ public class ChatController {
     public ResponseEntity<ChatDTO> createDirect(@RequestBody String secondUserIdString) {
         UUID firstUserId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
         UUID secondUserId = UUID.fromString(secondUserIdString);
-        Chat chat = chatService.createDirect(firstUserId, secondUserId);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        ChatContainer chatContainer = chatService.createDirect(firstUserId, secondUserId);
+        ChatDTO chatDTO = chatMapper.containerToDTO(chatContainer);
         return ResponseEntity.status(HttpStatus.CREATED).body(chatDTO);
     }
 
     @PostMapping("/indirect")
     public ResponseEntity<ChatDTO> createIndirect(@RequestBody List<UUID> userIdList) {
         UUID firstUserId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Chat chat = chatService.createIndirect(firstUserId, userIdList);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        ChatContainer chatContainer = chatService.createIndirect(firstUserId, userIdList);
+        ChatDTO chatDTO = chatMapper.containerToDTO(chatContainer);
         return ResponseEntity.status(HttpStatus.CREATED).body(chatDTO);
     }
 
     @PutMapping("/{chatId}")
     public ResponseEntity<ChatDTO> rename(@PathVariable UUID chatId, @RequestBody String title) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        Chat chat = chatService.rename(userId, chatId, title);
-        ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
+        ChatContainer chatContainer = chatService.rename(userId, chatId, title);
+        ChatDTO chatDTO = chatMapper.containerToDTO(chatContainer);
         return ResponseEntity.ok(chatDTO);
     }
 

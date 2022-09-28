@@ -2,6 +2,7 @@ package com.persoff68.fatodo.service;
 
 import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.MemberEvent;
+import com.persoff68.fatodo.model.Message;
 import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.repository.ChatRepository;
@@ -76,7 +77,10 @@ public class MemberEventService {
         memberEventRepository.flush();
         entityManager.refresh(chat);
 
-        systemMessageService.createIdsEventMessage(userId, chatId, EventMessageType.ADD_MEMBERS, userIdList);
+        // SYSTEM MESSAGE
+        Message systemMessage = systemMessageService
+                .createIdsEventMessage(userId, chatId, EventMessageType.ADD_MEMBERS, userIdList, 1);
+        wsService.sendMessageNewEvent(systemMessage);
     }
 
     @Transactional
@@ -106,7 +110,10 @@ public class MemberEventService {
         memberEventRepository.flush();
         entityManager.refresh(chat);
 
-        systemMessageService.createIdsEventMessage(userId, chatId, EventMessageType.DELETE_MEMBERS, userIdList);
+        // SYSTEM MESSAGE
+        Message systemMessage = systemMessageService
+                .createIdsEventMessage(userId, chatId, EventMessageType.DELETE_MEMBERS, userIdList, 1);
+        wsService.sendMessageNewEvent(systemMessage);
     }
 
     @Transactional
@@ -116,8 +123,6 @@ public class MemberEventService {
 
         chatPermissionService.hasLeaveChatPermission(chat, userId);
 
-        systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
-
         // WS
         wsService.sendMemberLeaveEvent(chat, userId);
         // EVENT
@@ -126,6 +131,11 @@ public class MemberEventService {
         MemberEvent memberEvent = new MemberEvent(chat, userId, MemberEventType.LEAVE_CHAT);
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
+
+        // SYSTEM MESSAGE
+        Message systemMessage = systemMessageService
+                .createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT, -1);
+        wsService.sendMessageNewEvent(systemMessage);
     }
 
     @Transactional
@@ -139,7 +149,10 @@ public class MemberEventService {
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
 
-        systemMessageService.createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT);
+        // SYSTEM MESSAGE
+        Message systemMessage = systemMessageService
+                .createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT, 1);
+        wsService.sendMessageNewEvent(systemMessage);
     }
 
     @Transactional
@@ -158,7 +171,10 @@ public class MemberEventService {
         memberEventRepository.saveAndFlush(memberEvent);
         entityManager.refresh(chat);
 
-        systemMessageService.createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT);
+        // SYSTEM MESSAGE
+        Message systemMessage = systemMessageService
+                .createSimpleEventMessage(userId, chatId, EventMessageType.LEAVE_CHAT, 1);
+        wsService.sendMessageNewEvent(systemMessage);
     }
 
 }
