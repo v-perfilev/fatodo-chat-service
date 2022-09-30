@@ -101,7 +101,7 @@ public class WsService {
 
     public void sendMessageReactionEvent(Reaction reaction) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(reaction.getMessage().getChat());
-        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction, reaction.getMessage().getChat().getId());
+        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
         String payload = serialize(reactionDTO);
         WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_REACTION, payload, reaction.getUserId());
         wsServiceClient.sendEvent(eventDTO);
@@ -109,7 +109,7 @@ public class WsService {
 
     public void sendMessageReactionIncomingEvent(Reaction reaction) {
         List<UUID> userIdList = List.of(reaction.getMessage().getUserId());
-        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction, reaction.getMessage().getChat().getId());
+        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
         String payload = serialize(reactionDTO);
         WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_REACTION_INCOMING,
                 payload, reaction.getUserId());
@@ -119,7 +119,7 @@ public class WsService {
     public void sendMessageStatusEvent(Status status) {
         Chat chat = status.getMessage().getChat();
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
-        StatusDTO statusDTO = statusMapper.pojoToDTO(status, chat.getId());
+        StatusDTO statusDTO = statusMapper.pojoToDTO(status);
         String payload = serialize(statusDTO);
         WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_STATUS, payload, status.getUserId());
         wsServiceClient.sendEvent(eventDTO);

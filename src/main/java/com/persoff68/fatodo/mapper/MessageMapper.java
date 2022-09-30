@@ -45,13 +45,13 @@ public abstract class MessageMapper {
 
         Set<ReactionDTO> reactionDTOList = message.getReactions() != null
                 ? message.getReactions().stream()
-                .map(reaction -> reactionMapper.pojoToDTO(reaction, chatId))
+                .map(reaction -> reactionMapper.pojoToDTO(reaction))
                 .collect(Collectors.toSet())
                 : Collections.emptySet();
 
         Set<StatusDTO> statusDTOList = message.getStatuses() != null
                 ? message.getStatuses().stream()
-                .map(status -> statusMapper.pojoToDTO(status, chatId))
+                .map(status -> statusMapper.pojoToDTO(status))
                 .collect(Collectors.toSet())
                 : Collections.emptySet();
 

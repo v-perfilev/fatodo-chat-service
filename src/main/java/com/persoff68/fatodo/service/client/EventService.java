@@ -77,7 +77,7 @@ public class EventService {
 
     public void sendMessageReactionIncomingEvent(Reaction reaction) {
         List<UUID> userIdList = List.of(reaction.getMessage().getUserId());
-        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction, reaction.getMessage().getChat().getId());
+        ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
         String payload = serialize(reactionDTO);
         EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_REACTION_INCOMING, payload, reaction.getUserId());
         eventServiceClient.addEvent(eventDTO);
