@@ -20,7 +20,9 @@ Contract.make {
         }
         body($(
                 consumer(regex(".+")),
-                producer("test")
+                producer([
+                        "title": "test"
+                ])
         ))
     }
     response {

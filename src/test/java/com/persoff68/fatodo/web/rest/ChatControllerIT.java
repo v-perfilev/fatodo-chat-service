@@ -18,6 +18,7 @@ import com.persoff68.fatodo.model.constant.EventMessageType;
 import com.persoff68.fatodo.model.constant.MemberEventType;
 import com.persoff68.fatodo.model.dto.ChatDTO;
 import com.persoff68.fatodo.model.dto.ChatMemberDTO;
+import com.persoff68.fatodo.model.vm.ChatRenameVM;
 import com.persoff68.fatodo.repository.ChatRepository;
 import com.persoff68.fatodo.repository.MemberEventRepository;
 import com.persoff68.fatodo.repository.MessageRepository;
@@ -307,21 +308,23 @@ class ChatControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRename_ok() throws Exception {
         String url = ENDPOINT + "/" + chat1.getId();
-        String requestBody = "test_name";
+        ChatRenameVM vm = new ChatRenameVM("test_name");
+        String requestBody = objectMapper.writeValueAsString(vm);
         ResultActions resultActions = mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         ChatDTO resultDTO = objectMapper.readValue(resultString, ChatDTO.class);
         assertThat(resultDTO.getId()).isEqualTo(chat1.getId());
-        assertThat(resultDTO.getTitle()).isEqualTo(requestBody);
+        assertThat(resultDTO.getTitle()).isEqualTo(vm.getTitle());
     }
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRename_forbidden() throws Exception {
         String url = ENDPOINT + "/" + chat2.getId();
-        String requestBody = "test_name";
+        ChatRenameVM vm = new ChatRenameVM("test_name");
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isForbidden());
@@ -331,7 +334,8 @@ class ChatControllerIT {
     @WithCustomSecurityContext(id = USER_ID_1)
     void testRename_notFound() throws Exception {
         String url = ENDPOINT + "/" + UUID.randomUUID();
-        String requestBody = "test_name";
+        ChatRenameVM vm = new ChatRenameVM("test_name");
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNotFound());
@@ -341,7 +345,8 @@ class ChatControllerIT {
     @WithAnonymousUser
     void testRename_unauthorized() throws Exception {
         String url = ENDPOINT + "/" + chat1.getId().toString();
-        String requestBody = "test_name";
+        ChatRenameVM vm = new ChatRenameVM("test_name");
+        String requestBody = objectMapper.writeValueAsString(vm);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());

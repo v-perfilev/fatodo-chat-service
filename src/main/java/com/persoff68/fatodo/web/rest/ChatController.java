@@ -6,6 +6,7 @@ import com.persoff68.fatodo.model.Chat;
 import com.persoff68.fatodo.model.ChatContainer;
 import com.persoff68.fatodo.model.PageableList;
 import com.persoff68.fatodo.model.dto.ChatDTO;
+import com.persoff68.fatodo.model.vm.ChatRenameVM;
 import com.persoff68.fatodo.repository.OffsetPageRequest;
 import com.persoff68.fatodo.security.exception.UnauthorizedException;
 import com.persoff68.fatodo.security.util.SecurityUtils;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
@@ -85,9 +87,9 @@ public class ChatController {
     }
 
     @PutMapping("/{chatId}")
-    public ResponseEntity<ChatDTO> rename(@PathVariable UUID chatId, @RequestBody String title) {
+    public ResponseEntity<ChatDTO> rename(@PathVariable UUID chatId, @RequestBody @Valid ChatRenameVM vm) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        ChatContainer chatContainer = chatService.rename(userId, chatId, title);
+        ChatContainer chatContainer = chatService.rename(userId, chatId, vm.getTitle());
         ChatDTO chatDTO = chatMapper.containerToDTO(chatContainer);
         return ResponseEntity.ok(chatDTO);
     }
