@@ -23,11 +23,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -83,7 +83,10 @@ public class ChatService {
             throw new ModelAlreadyExistsException();
         }
         List<UUID> userIdList = List.of(firstUserId, secondUserId);
-        Chat chat = create(userIdList, true);
+
+        userService.checkUsersExist(userIdList);
+        Chat chat = chatRepository.saveAndFlush(new Chat(true));
+        memberEventService.addUsersUnsafe(chat.getId(), userIdList);
 
         // SYSTEM MESSAGE
         Message systemMessage = systemMessageService.createIdsEventMessage(firstUserId, chat.getId(),
@@ -99,9 +102,11 @@ public class ChatService {
 
     @Transactional
     public ChatContainer createIndirect(UUID userId, List<UUID> userIdList) {
-        List<UUID> allUserIdList = new ArrayList<>(userIdList);
-        allUserIdList.add(userId);
-        Chat chat = create(allUserIdList, false);
+        List<UUID> allUserIdList = Stream.concat(userIdList.stream(), Stream.of(userId)).toList();
+
+        contactService.checkIfUsersInContactList(userIdList);
+        Chat chat = chatRepository.saveAndFlush(new Chat(false));
+        memberEventService.addUsersUnsafe(chat.getId(), allUserIdList);
 
         // SYSTEM MESSAGE
         Message systemMessage = systemMessageService.createIdsEventMessage(userId, chat.getId(),
@@ -148,17 +153,6 @@ public class ChatService {
         List<Message> unreadMessageList = messageRepository.findAllUnreadMessagesByUserId(userId);
         Multimap<UUID, Message> unreadMessageMultimap = Multimaps.index(unreadMessageList, m -> m.getChat().getId());
         return Multimaps.transformValues(unreadMessageMultimap, AbstractModel::getId);
-    }
-
-    private Chat create(List<UUID> userIdList, boolean isDirect) {
-        if (isDirect) {
-            userService.checkUsersExist(userIdList);
-        } else {
-            contactService.checkIfUsersInContactList(userIdList);
-        }
-        Chat chat = chatRepository.saveAndFlush(new Chat(isDirect));
-        memberEventService.addUsersUnsafe(chat.getId(), userIdList);
-        return chat;
     }
 
     private Chat getDirectByUserIds(UUID firstUserId, UUID secondUserId) {
