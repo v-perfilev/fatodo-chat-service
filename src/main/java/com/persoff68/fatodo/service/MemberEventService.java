@@ -150,9 +150,7 @@ public class MemberEventService {
         entityManager.refresh(chat);
 
         // SYSTEM MESSAGE
-        Message systemMessage = systemMessageService
-                .createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT);
-        wsService.sendMessageNewEvent(systemMessage);
+        systemMessageService.createPrivateEventMessage(userId, chatId, EventMessageType.CLEAR_CHAT);
     }
 
     @Transactional
