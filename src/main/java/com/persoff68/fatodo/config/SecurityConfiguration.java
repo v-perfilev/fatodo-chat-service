@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.config;
 
+import com.persoff68.fatodo.config.constant.AuthorityType;
 import com.persoff68.fatodo.security.filter.JwtTokenFilter;
 import com.persoff68.fatodo.security.filter.SecurityLocaleFilter;
 import com.persoff68.fatodo.security.filter.SecurityProblemSupport;
@@ -64,6 +65,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilterAfter(securityLocaleFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(publicUrls).permitAll()
+                .antMatchers("/api/system/**").hasAuthority(AuthorityType.Constants.SYSTEM_VALUE)
                 .anyRequest().authenticated();
     }
 
