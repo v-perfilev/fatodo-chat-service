@@ -21,7 +21,6 @@
             </column>
 
             <column name="text" type="clob"/>
-            <column name="reference_id" type="binary(16)"/>
 
             <column name="is_event" type="boolean">
                 <constraints nullable="false"/>

@@ -83,8 +83,8 @@ class MessageServicesIT {
         secondChat = chatService.createIndirect(USER_1_ID, List.of(USER_2_ID, USER_3_ID)).getChat();
 
         // init with messages
-        messageService.send(USER_1_ID, firstChat.getId(), UUID.randomUUID().toString(), null);
-        messageService.send(USER_1_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
+        messageService.send(USER_1_ID, firstChat.getId(), UUID.randomUUID().toString());
+        messageService.send(USER_1_ID, secondChat.getId(), UUID.randomUUID().toString());
     }
 
     @AfterEach
@@ -110,11 +110,11 @@ class MessageServicesIT {
         // leave second chat
         memberEventService.leaveChat(USER_1_ID, secondChat.getId());
         // message to second chat
-        messageService.send(USER_2_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
+        messageService.send(USER_2_ID, secondChat.getId(), UUID.randomUUID().toString());
         // enter second chat
         memberEventService.addUsers(USER_2_ID, secondChat.getId(), Collections.singletonList(USER_1_ID));
         // message to second chat
-        messageService.send(USER_1_ID, secondChat.getId(), UUID.randomUUID().toString(), null);
+        messageService.send(USER_1_ID, secondChat.getId(), UUID.randomUUID().toString());
 
         PageableList<Message> firstUserSecondChatMessageList = messageService.getAllByUserIdAndChatId(USER_1_ID,
                 secondChat.getId(), pageable);
@@ -130,7 +130,7 @@ class MessageServicesIT {
         // clear second chat
         memberEventService.clearChat(USER_1_ID, secondChat.getId());
         // messages to second chat
-        messageService.send(USER_2_ID, secondChat.getId(), "test", null);
+        messageService.send(USER_2_ID, secondChat.getId(), "test");
 
         PageableList<Message> firstUserSecondChatMessageList = messageService.getAllByUserIdAndChatId(USER_1_ID,
                 secondChat.getId(), pageable);

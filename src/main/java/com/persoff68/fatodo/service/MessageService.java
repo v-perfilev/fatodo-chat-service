@@ -47,12 +47,11 @@ public class MessageService {
     }
 
     @Transactional
-    public Message sendDirect(UUID userId, UUID recipientId, String text, UUID referenceId) {
+    public Message sendDirect(UUID userId, UUID recipientId, String text) {
         userService.checkUserExists(recipientId);
         Chat chat = chatService.getOrCreateDirectByUserIds(userId, recipientId);
 
-        Message reference = getReferenceById(userId, referenceId);
-        Message message = Message.of(chat, userId, text, reference);
+        Message message = Message.of(chat, userId, text);
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 
@@ -63,12 +62,11 @@ public class MessageService {
     }
 
     @Transactional
-    public Message send(UUID userId, UUID chatId, String text, UUID referenceId) {
+    public Message send(UUID userId, UUID chatId, String text) {
         Chat chat = chatService.getByUserIdAndId(userId, chatId);
         chatPermissionService.hasSendMessagePermission(chat, userId);
 
-        Message reference = getReferenceById(userId, referenceId);
-        Message message = Message.of(chat, userId, text, reference);
+        Message message = Message.of(chat, userId, text);
         message = messageRepository.save(message);
         entityManager.refresh(chat);
 
@@ -102,7 +100,6 @@ public class MessageService {
         chatPermissionService.hasEditMessagePermission(message, userId);
 
         message.setText(null);
-        message.setReference(null);
         message.setDeleted(true);
         message = messageRepository.save(message);
         Chat chat = message.getChat();
@@ -110,16 +107,6 @@ public class MessageService {
 
         // WS
         wsService.sendMessageUpdateEvent(message);
-    }
-
-    private Message getReferenceById(UUID userId, UUID messageId) {
-        if (messageId == null) {
-            return null;
-        }
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(ModelNotFoundException::new);
-        chatPermissionService.hasReadChatPermission(message.getChat(), userId);
-        return message;
     }
 
 }

@@ -19,7 +19,6 @@ public class TestMessage extends Message {
                        @NotNull Chat chat,
                        @NotNull UUID userId,
                        @NotNull String text,
-                       Message reference,
                        boolean isEvent,
                        Set<Status> statuses,
                        Set<Reaction> reactions) {
@@ -27,7 +26,6 @@ public class TestMessage extends Message {
         super.setChat(chat);
         super.setUserId(userId);
         super.setText(text);
-        super.setReference(reference);
         super.setId(id);
         super.setEvent(isEvent);
         super.setStatuses(statuses);
@@ -47,7 +45,6 @@ public class TestMessage extends Message {
         message.setChat(getChat());
         message.setUserId(getUserId());
         message.setText(getText());
-        message.setReference(getReference());
         message.setEvent(isEvent());
         message.setStatuses(getStatuses());
         message.setReactions(getReactions());

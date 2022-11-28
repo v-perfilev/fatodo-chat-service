@@ -27,7 +27,6 @@ public abstract class MessageMapper {
     @Autowired
     private StatusMapper statusMapper;
 
-    @Mapping(target = "reference", ignore = true)
     @Mapping(target = "statuses", ignore = true)
     @Mapping(target = "reactions", ignore = true)
     abstract MessageDTO defaultPojoToDTO(Message message);
@@ -40,8 +39,6 @@ public abstract class MessageMapper {
         }
         Chat chat = message.getChat();
         UUID chatId = chat != null ? chat.getId() : null;
-
-        MessageDTO referenceDTO = pojoToDTO(message.getReference());
 
         Set<ReactionDTO> reactionDTOList = message.getReactions() != null
                 ? message.getReactions().stream()
@@ -57,7 +54,6 @@ public abstract class MessageMapper {
 
         MessageDTO dto = defaultPojoToDTO(message);
         dto.setChatId(chatId);
-        dto.setReference(referenceDTO);
         dto.setReactions(reactionDTOList);
         dto.setStatuses(statusDTOList);
         return dto;

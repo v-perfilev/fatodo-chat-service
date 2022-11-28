@@ -12,7 +12,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serial;
@@ -26,8 +25,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true, exclude = {"chat", "reference", "statuses", "reactions"})
-@ToString(exclude = {"chat", "reference", "statuses", "reactions"})
+@EqualsAndHashCode(callSuper = true, exclude = {"chat", "statuses", "reactions"})
+@ToString(exclude = {"chat", "statuses", "reactions"})
 public class Message extends AbstractAuditingModel implements Serializable {
     @Serial
     private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
@@ -39,9 +38,6 @@ public class Message extends AbstractAuditingModel implements Serializable {
     private UUID userId;
 
     private String text;
-
-    @OneToOne
-    private Message reference;
 
     private boolean isEvent = false;
     private boolean isPrivate = false;
@@ -55,12 +51,11 @@ public class Message extends AbstractAuditingModel implements Serializable {
     private Set<Reaction> reactions = new HashSet<>();
 
 
-    public static Message of(Chat chat, UUID userId, String text, Message reference) {
+    public static Message of(Chat chat, UUID userId, String text) {
         Message message = new Message();
         message.chat = chat;
         message.userId = userId;
         message.text = text;
-        message.reference = reference;
         return message;
     }
 

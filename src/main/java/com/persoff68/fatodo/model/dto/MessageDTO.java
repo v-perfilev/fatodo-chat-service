@@ -17,8 +17,6 @@ public class MessageDTO extends AbstractAuditingDTO {
 
     private String text;
 
-    private MessageDTO reference;
-
     @JsonProperty("isDeleted")
     private boolean isDeleted;
 
