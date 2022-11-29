@@ -6,7 +6,7 @@ Contract.make {
     name 'delete account permanently'
     description 'should return status 200'
     request {
-        method POST()
+        method DELETE()
         url($(
                 consumer(regex("/api/system/" + uuid().toString())),
                 producer("/api/system/8f9a7cae-73c8-4ad6-b135-5bd109b51d2e")
