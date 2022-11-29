@@ -24,7 +24,7 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
                                                    when type like 'LEAVE_CHAT' then -1
                                                    else 0
                                                    end)
-                                           over (partition by chat_id order by date rows unbounded preceding) sum
+                                           over (partition by chat_id) sum
                                     from ftd_chat_member_event e
                                     where user_id = :userId
                                 ) c
@@ -45,7 +45,7 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
                 from ftd_chat as c
                 where c.id in (select id from chat_id) and c.id in :chatIds
             """, nativeQuery = true)
-    List<Chat> findAllByUserIdAndIds(@Param("userId") UUID userId,@Param("chatIds") List<UUID> chatIds);
+    List<Chat> findAllByUserIdAndIds(@Param("userId") UUID userId, @Param("chatIds") List<UUID> chatIds);
 
     @Query(value = """
             select c from Chat c where c.isDirect = true and c.id in
