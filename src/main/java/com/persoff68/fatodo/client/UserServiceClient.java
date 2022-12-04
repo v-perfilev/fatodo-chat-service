@@ -20,7 +20,7 @@ public interface UserServiceClient {
     @GetMapping("/api/check/id")
     boolean doIdsExist(@RequestParam("ids") List<UUID> idList);
 
-    @GetMapping("/api/user-data/ids/{username}/username-part")
+    @GetMapping("/api/info/ids/{username}/username-part")
     List<UUID> getAllIdsByUsernamePart(@PathVariable String username);
 
 }
