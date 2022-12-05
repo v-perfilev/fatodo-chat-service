@@ -73,16 +73,19 @@ class StatusControllerIT {
     private Message message3;
     private Message message4;
 
+    private Chat chat1;
+    private Chat chat2;
+
     @BeforeEach
     void setup() {
-        Chat chat1 = createDirectChat();
+        chat1 = createDirectChat();
         createMemberEvents(chat1, USER_ID_1, USER_ID_2);
         message1 = createMessage(chat1, USER_ID_2);
         message2 = createMessage(chat1, USER_ID_1);
         message3 = createMessage(chat1, USER_ID_2);
         createStatuses(message3, USER_ID_1);
 
-        Chat chat2 = createDirectChat();
+        chat2 = createDirectChat();
         createMemberEvents(chat2, USER_ID_2, USER_ID_3);
         message4 = createMessage(chat2, USER_ID_2);
 
@@ -99,7 +102,7 @@ class StatusControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetRead_ok() throws Exception {
+    void testSetMessageRead_ok() throws Exception {
         String messageId = message1.getId().toString();
         String url = ENDPOINT + "/" + messageId + "/read";
         mvc.perform(post(url))
@@ -114,7 +117,7 @@ class StatusControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetRead_ok_ignoreIfRead() throws Exception {
+    void testSetMessageRead_ok_ignoreIfRead() throws Exception {
         String messageId = message3.getId().toString();
         String url = ENDPOINT + "/" + messageId + "/read";
         mvc.perform(post(url))
@@ -123,7 +126,7 @@ class StatusControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetRead_forbidden_ownMessage() throws Exception {
+    void testSetMessageRead_forbidden_ownMessage() throws Exception {
         String messageId = message2.getId().toString();
         String url = ENDPOINT + "/" + messageId + "/read";
         mvc.perform(post(url))
@@ -132,7 +135,7 @@ class StatusControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetRead_forbidden_noPermissions() throws Exception {
+    void testSetMessageRead_forbidden_noPermissions() throws Exception {
         String messageId = message4.getId().toString();
         String url = ENDPOINT + "/" + messageId + "/read";
         mvc.perform(post(url))
@@ -141,7 +144,7 @@ class StatusControllerIT {
 
     @Test
     @WithCustomSecurityContext(id = USER_ID_1)
-    void testSetRead_notFound() throws Exception {
+    void testSetMessageRead_notFound() throws Exception {
         String messageId = UUID.randomUUID().toString();
         String url = ENDPOINT + "/" + messageId + "/read";
         mvc.perform(post(url))
@@ -150,12 +153,56 @@ class StatusControllerIT {
 
     @Test
     @WithAnonymousUser
-    void testSetRead_unauthorized() throws Exception {
+    void testSetMessageRead_unauthorized() throws Exception {
         String messageId = message1.getId().toString();
         String url = ENDPOINT + "/" + messageId + "/read";
         mvc.perform(post(url))
                 .andExpect(status().isUnauthorized());
     }
+
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSetChatRead_ok() throws Exception {
+        String chatId = chat1.getId().toString();
+        String url = ENDPOINT + "/" + chatId + "/chat/read";
+        mvc.perform(post(url))
+                .andExpect(status().isCreated());
+        List<Status> statusList = statusRepository.findAll();
+        List<Status> filteredList = statusList.stream()
+                .filter(status -> status.getMessage().getChat().getId().toString().equals(chatId)
+                        && status.getUserId().toString().equals(USER_ID_1))
+                .toList();
+        boolean statusesExist = filteredList.stream()
+                .allMatch(status -> status.getType().equals(StatusType.READ));
+        assertThat(filteredList).isNotEmpty();
+        assertThat(statusesExist).isTrue();
+    }
+
+    @Test
+    @WithCustomSecurityContext(id = USER_ID_1)
+    void testSetChatRead_ok_noMessagesFound() throws Exception {
+        String chatId = chat2.getId().toString();
+        String url = ENDPOINT + "/" + chatId + "/chat/read";
+        mvc.perform(post(url))
+                .andExpect(status().isCreated());
+        List<Status> statusList = statusRepository.findAll();
+        List<Status> filteredList = statusList.stream()
+                .filter(status -> status.getMessage().getChat().getId().toString().equals(chatId)
+                        && status.getUserId().toString().equals(USER_ID_1))
+                .toList();
+        assertThat(filteredList).isEmpty();
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testSetChatRead_unauthorized() throws Exception {
+        String chatId = chat2.getId().toString();
+        String url = ENDPOINT + "/" + chatId + "/chat/read";
+        mvc.perform(post(url))
+                .andExpect(status().isUnauthorized());
+    }
+
 
     private Chat createDirectChat() {
         Chat chat = TestChat.defaultBuilder().isDirect(true).build().toParent();

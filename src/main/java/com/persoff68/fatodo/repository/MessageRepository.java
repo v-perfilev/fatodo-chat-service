@@ -58,6 +58,23 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
                     where user_id = :userId)
             """;
 
+    String UNIFIED_ALL_UNREAD_MESSAGES_AND_EVENTS_BY_CHAT_ID = """
+            unified as (
+                    select m.id, m.chat_id, m.user_id, m.is_event, m.is_private,
+                           m.created_at as date, null as type, s.type as is_read
+                    from ftd_chat_message as m
+                             left join ftd_chat_status as s on m.id = s.message_id
+                                and s.user_id = :userId
+                                and s.type = 'READ'
+                             right join ftd_chat_member_event as e on m.chat_id = e.chat_id
+                    where e.user_id = :userId and m.user_id <> :userId
+                    union
+                    select id, chat_id, null as user_id, null as is_event, null as is_private,
+                           date, type, null as is_read
+                    from ftd_chat_member_event
+                    where user_id = :userId and chat_id = :chatId)
+            """;
+
 
     String UNIFIED_FILTERED_CHAT_MESSAGES_AND_EVENTS = """
             unified as (
@@ -174,6 +191,17 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             @Param("userId") UUID userId
     );
 
+    @Query(value = "with "
+            + UNIFIED_ALL_UNREAD_MESSAGES_AND_EVENTS_BY_CHAT_ID + ", " + VALIDATED + ", " + UNREAD_MESSAGE_IDS + """
+                select m.*
+                from ftd_chat_message as m
+                where id in (select id from message_id)
+            """, nativeQuery = true)
+    List<Message> findAllUnreadMessagesByUserIdAndChatId(
+            @Param("chatId") UUID chatId,
+            @Param("userId") UUID userId
+    );
+
     @Query(value = "with " + UNIFIED_FILTERED_CHAT_MESSAGES_AND_EVENTS
             + ", " + VALIDATED + ", " + LAST_MESSAGE_IDS + """
                 select m.*
@@ -191,13 +219,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             @Param("userId") UUID userId
     );
 
-    @Query(value = """
-            select m.* from ftd_chat_message as m
-            where m.chat_id = :chatId  order by m.created_at desc limit 1
-            """, nativeQuery = true)
-    Message findLastMessageInChat(
-            @Param("chatId") UUID chatId
-    );
 
     @Query(value = """
             select m from Message m

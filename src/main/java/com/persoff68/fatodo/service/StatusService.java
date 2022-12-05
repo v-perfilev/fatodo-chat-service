@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class StatusService {
     private final ChatPermissionService chatPermissionService;
     private final WsService wsService;
 
-    public void markAsRead(UUID userId, UUID messageId) {
+    public void markMessageAsRead(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(ModelNotFoundException::new);
         chatPermissionService.hasReadMessagePermission(message, userId);
@@ -38,6 +39,15 @@ public class StatusService {
             // WS
             wsService.sendMessageStatusEvent(status);
         }
+    }
+
+    public void markChatAsRead(UUID userId, UUID chatId) {
+        List<Message> unreadMessageList = messageRepository.findAllUnreadMessagesByUserIdAndChatId(userId, chatId);
+        unreadMessageList.forEach(message -> {
+            Status status = Status.of(message, userId, StatusType.READ);
+            message.getStatuses().add(status);
+            messageRepository.save(message);
+        });
     }
 
 }

@@ -3,7 +3,7 @@ package contracts.statuscontroller
 import org.springframework.cloud.contract.spec.Contract
 
 Contract.make {
-    name 'read status'
+    name 'read status message'
     description 'should return status 201'
     request {
         method POST()

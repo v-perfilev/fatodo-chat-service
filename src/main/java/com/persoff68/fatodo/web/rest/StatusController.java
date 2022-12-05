@@ -22,9 +22,16 @@ public class StatusController {
     private final StatusService statusService;
 
     @PostMapping("/{messageId}/read")
-    public ResponseEntity<Void> setRead(@PathVariable UUID messageId) {
+    public ResponseEntity<Void> setMessageRead(@PathVariable UUID messageId) {
         UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
-        statusService.markAsRead(userId, messageId);
+        statusService.markMessageAsRead(userId, messageId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/{chatId}/chat/read")
+    public ResponseEntity<Void> setChatRead(@PathVariable UUID chatId) {
+        UUID userId = SecurityUtils.getCurrentId().orElseThrow(UnauthorizedException::new);
+        statusService.markChatAsRead(userId, chatId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
