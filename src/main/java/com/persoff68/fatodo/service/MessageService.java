@@ -56,7 +56,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendMessageNewEvent(message);
+        wsService.sendMessageNewEvent(message, userId);
 
         return message;
     }
@@ -71,7 +71,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendMessageNewEvent(message);
+        wsService.sendMessageNewEvent(message, userId);
 
         return message;
     }
@@ -88,7 +88,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendMessageUpdateEvent(message);
+        wsService.sendMessageUpdateEvent(message, userId);
 
         return message;
     }
@@ -106,7 +106,7 @@ public class MessageService {
         entityManager.refresh(chat);
 
         // WS
-        wsService.sendMessageUpdateEvent(message);
+        wsService.sendMessageUpdateEvent(message, userId);
     }
 
 }

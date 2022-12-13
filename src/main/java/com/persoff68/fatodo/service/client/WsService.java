@@ -39,19 +39,19 @@ public class WsService {
     private final StatusMapper statusMapper;
     private final ObjectMapper objectMapper;
 
-    public void sendChatNewEvent(Chat chat, Message message) {
+    public void sendChatNewEvent(Chat chat, Message message, UUID userId) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat, message);
         String payload = serialize(chatDTO);
-        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_CREATE, payload, chat.getCreatedBy());
+        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_CREATE, payload, userId);
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendChatUpdateEvent(Chat chat, Message message) {
+    public void sendChatUpdateEvent(Chat chat, Message message, UUID userId) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat, message);
         String payload = serialize(chatDTO);
-        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_UPDATE, payload, chat.getLastModifiedBy());
+        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_UPDATE, payload, userId);
         wsServiceClient.sendEvent(eventDTO);
     }
 
@@ -83,45 +83,44 @@ public class WsService {
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendMessageNewEvent(Message message) {
+    public void sendMessageNewEvent(Message message, UUID userId) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         MessageDTO messageDTO = messageMapper.pojoToDTO(message);
         String payload = serialize(messageDTO);
-        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_MESSAGE_CREATE, payload, message.getUserId());
+        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_MESSAGE_CREATE, payload, userId);
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendMessageUpdateEvent(Message message) {
+    public void sendMessageUpdateEvent(Message message, UUID userId) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(message.getChat());
         MessageDTO messageDTO = messageMapper.pojoToDTO(message);
         String payload = serialize(messageDTO);
-        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_MESSAGE_UPDATE, payload, message.getUserId());
+        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_MESSAGE_UPDATE, payload, userId);
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendMessageReactionEvent(Reaction reaction) {
+    public void sendMessageReactionEvent(Reaction reaction, UUID userId) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(reaction.getMessage().getChat());
         ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
         String payload = serialize(reactionDTO);
-        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_REACTION, payload, reaction.getUserId());
+        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_REACTION, payload, userId);
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendMessageReactionIncomingEvent(Reaction reaction) {
+    public void sendMessageReactionIncomingEvent(Reaction reaction, UUID userId) {
         List<UUID> userIdList = List.of(reaction.getMessage().getUserId());
         ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
         String payload = serialize(reactionDTO);
-        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_REACTION_INCOMING,
-                payload, reaction.getUserId());
+        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_REACTION_INCOMING, payload, userId);
         wsServiceClient.sendEvent(eventDTO);
     }
 
-    public void sendMessageStatusEvent(Status status) {
+    public void sendMessageStatusEvent(Status status, UUID userId) {
         Chat chat = status.getMessage().getChat();
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
         StatusDTO statusDTO = statusMapper.pojoToDTO(status);
         String payload = serialize(statusDTO);
-        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_STATUS, payload, status.getUserId());
+        WsEventDTO eventDTO = new WsEventDTO(userIdList, WsEventType.CHAT_STATUS, payload, userId);
         wsServiceClient.sendEvent(eventDTO);
     }
 

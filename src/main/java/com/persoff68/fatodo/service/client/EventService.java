@@ -31,19 +31,19 @@ public class EventService {
     private final ReactionMapper reactionMapper;
     private final ObjectMapper objectMapper;
 
-    public void sendChatNewEvent(Chat chat) {
+    public void sendChatNewEvent(Chat chat, UUID userId) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
         String payload = serialize(chatDTO);
-        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_CREATE, payload, chat.getCreatedBy());
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_CREATE, payload, userId);
         eventServiceClient.addEvent(eventDTO);
     }
 
-    public void sendChatUpdateEvent(Chat chat) {
+    public void sendChatUpdateEvent(Chat chat, UUID userId) {
         List<UUID> userIdList = ChatUtils.getActiveUserIdList(chat);
         ChatDTO chatDTO = chatMapper.pojoToDTO(chat);
         String payload = serialize(chatDTO);
-        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_UPDATE, payload, chat.getLastModifiedBy());
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_UPDATE, payload, userId);
         eventServiceClient.addEvent(eventDTO);
     }
 
@@ -75,11 +75,11 @@ public class EventService {
         eventServiceClient.addEvent(eventDTO);
     }
 
-    public void sendMessageReactionIncomingEvent(Reaction reaction) {
+    public void sendMessageReactionIncomingEvent(Reaction reaction, UUID userId) {
         List<UUID> userIdList = List.of(reaction.getMessage().getUserId());
         ReactionDTO reactionDTO = reactionMapper.pojoToDTO(reaction);
         String payload = serialize(reactionDTO);
-        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_REACTION_INCOMING, payload, reaction.getUserId());
+        EventDTO eventDTO = new EventDTO(userIdList, EventType.CHAT_REACTION_INCOMING, payload, userId);
         eventServiceClient.addEvent(eventDTO);
     }
 

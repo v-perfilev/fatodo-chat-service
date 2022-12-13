@@ -93,9 +93,9 @@ public class ChatService {
                 EventMessageType.CREATE_DIRECT_CHAT, Collections.singletonList(secondUserId));
 
         // WS
-        wsService.sendChatNewEvent(chat, systemMessage);
+        wsService.sendChatNewEvent(chat, systemMessage, firstUserId);
         // EVENT
-        eventService.sendChatNewEvent(chat);
+        eventService.sendChatNewEvent(chat, firstUserId);
 
         return new ChatContainer(systemMessage);
     }
@@ -113,9 +113,9 @@ public class ChatService {
                 EventMessageType.CREATE_CHAT, userIdList);
 
         // WS
-        wsService.sendChatNewEvent(chat, systemMessage);
+        wsService.sendChatNewEvent(chat, systemMessage, userId);
         // EVENT
-        eventService.sendChatNewEvent(chat);
+        eventService.sendChatNewEvent(chat, userId);
 
         return new ChatContainer(systemMessage);
     }
@@ -131,12 +131,12 @@ public class ChatService {
         // SYSTEM MESSAGE
         Message systemMessage = systemMessageService.createTextEventMessage(userId, chatId,
                 EventMessageType.RENAME_CHAT, title);
-        wsService.sendMessageNewEvent(systemMessage);
+        wsService.sendMessageNewEvent(systemMessage, userId);
 
         // WS
-        wsService.sendChatUpdateEvent(chat, systemMessage);
+        wsService.sendChatUpdateEvent(chat, systemMessage, userId);
         // EVENT
-        eventService.sendChatUpdateEvent(chat);
+        eventService.sendChatUpdateEvent(chat, userId);
 
         return new ChatContainer(systemMessage);
     }

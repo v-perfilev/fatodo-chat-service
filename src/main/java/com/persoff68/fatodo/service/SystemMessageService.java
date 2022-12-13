@@ -53,10 +53,10 @@ public class SystemMessageService {
         return createEventMessage(userId, chatId, paramMap, false);
     }
 
-    public Message createPrivateEventMessage(UUID userId, UUID chatId, EventMessageType type) {
+    public void createPrivateEventMessage(UUID userId, UUID chatId, EventMessageType type) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put(TYPE_FIELD, type);
-        return createEventMessage(userId, chatId, paramMap, true);
+        createEventMessage(userId, chatId, paramMap, true);
     }
 
     private Message createEventMessage(UUID userId, UUID chatId, Map<String, Object> paramMap, boolean isPrivate) {
