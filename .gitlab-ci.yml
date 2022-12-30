@@ -101,65 +101,65 @@ checkstyle:
       - $DEPLOY_ONLY
       - $NEXUS_ONLY
 
-#publish-to-docker:
-#  image: docker:20
-#  stage: publish
-#  services:
-#    - docker:20-dind
-#  script:
-#    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-#    - docker build -t $IMAGE:$TAG -t $IMAGE:latest .
-#    - docker push $IMAGE:$TAG
-#    - docker push $IMAGE:latest
-#  only:
-#    - develop
-#    - master
-#
-#publish-to-nexus:
-#  stage: publish
-#  dependencies:
-#    - compile
-#  script:
-#    - ./mvnw $MAVEN_CLI_OPTS deploy $MAVEN_OPTS
-#      -Dmaven.test.skip=true
-#      -Dmaven.repo.url=$MAVEN_URL
-#      -Dmaven.repo.username=$MAVEN_USERNAME
-#      -Dmaven.repo.password=$MAVEN_PASSWORD
-#  except:
-#    variables:
-#      - $DEPLOY_ONLY
-#  only:
-#    - develop
-#
-#deploy-to-stage:
-#  image: alpine:latest
-#  stage: deploy
-#  script:
-#    - chmod og= $STAGE_SERVER_ID_RSA
-#    - apk update && apk add openssh-client
-#    - ssh -i $STAGE_SERVER_ID_RSA -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-#    - ssh -i $STAGE_SERVER_ID_RSA -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_IP "docker pull $IMAGE:$TAG"
-#    - ssh -i $STAGE_SERVER_ID_RSA -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_IP "docker container rm -f $APP_NAME || true"
-#    - ssh -i $STAGE_SERVER_ID_RSA -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_IP "docker run -d $DOCKER_APP_PARAMS $DOCKER_COMMON_PARAMS --name $APP_NAME $IMAGE:$TAG"
-#  environment:
-#    name: staging
-#    url: $STAGE_SERVER_URL
-#  only:
-#    - develop
-#
-#deploy-to-prod:
-#  stage: deploy
-#  image: dtzar/helm-kubectl:3.10
-#  before_script:
-#    - export KUBECONFIG=$PROD_KUBECONFIG
-#  script:
-#    - helm repo add project --username ${CI_REGISTRY_USER} --password ${CI_REGISTRY_PASSWORD} ${HELM_REPOSITORY}
-#    - helm upgrade $HELM_PROJECT_NAME project/$HELM_PROJECT_CHART
-#      --install --wait --reuse-values
-#      --set $HELM_APP_NAME.image.repository=$IMAGE
-#      --set $HELM_APP_NAME.image.tag=$TAG
-#  environment:
-#    name: production
-#    url: $PROD_URL
-#  only:
-#    - master
+publish-to-docker:
+  image: docker:20
+  stage: publish
+  services:
+    - docker:20-dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build -t $IMAGE:$TAG -t $IMAGE:latest .
+    - docker push $IMAGE:$TAG
+    - docker push $IMAGE:latest
+  only:
+    - develop
+    - master
+
+publish-to-nexus:
+  stage: publish
+  dependencies:
+    - compile
+  script:
+    - ./mvnw $MAVEN_CLI_OPTS deploy $MAVEN_OPTS
+      -Dmaven.test.skip=true
+      -Dmaven.repo.url=$MAVEN_URL
+      -Dmaven.repo.username=$MAVEN_USERNAME
+      -Dmaven.repo.password=$MAVEN_PASSWORD
+  except:
+    variables:
+      - $DEPLOY_ONLY
+  only:
+    - develop
+
+deploy-to-stage:
+  image: alpine:latest
+  stage: deploy
+  script:
+    - chmod og= $STAGE_SERVER_ID_RSA
+    - apk update && apk add openssh-client
+    - ssh -i $STAGE_SERVER_ID_RSA -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
+    - ssh -i $STAGE_SERVER_ID_RSA -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_IP "docker pull $IMAGE:$TAG"
+    - ssh -i $STAGE_SERVER_ID_RSA -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_IP "docker container rm -f $APP_NAME || true"
+    - ssh -i $STAGE_SERVER_ID_RSA -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_IP "docker run -d $DOCKER_APP_PARAMS $DOCKER_COMMON_PARAMS --name $APP_NAME $IMAGE:$TAG"
+  environment:
+    name: staging
+    url: $STAGE_SERVER_URL
+  only:
+    - develop
+
+deploy-to-prod:
+  stage: deploy
+  image: dtzar/helm-kubectl:3.10
+  before_script:
+    - export KUBECONFIG=$PROD_KUBECONFIG
+  script:
+    - helm repo add project --username ${CI_REGISTRY_USER} --password ${CI_REGISTRY_PASSWORD} ${HELM_REPOSITORY}
+    - helm upgrade $HELM_PROJECT_NAME project/$HELM_PROJECT_CHART
+      --install --wait --reuse-values
+      --set $HELM_APP_NAME.image.repository=$IMAGE
+      --set $HELM_APP_NAME.image.tag=$TAG
+  environment:
+    name: production
+    url: $PROD_URL
+  only:
+    - master
