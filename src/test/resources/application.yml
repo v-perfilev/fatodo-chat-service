@@ -7,6 +7,7 @@ app:
 
 stubrunner:
   idsToServiceIds:
+    alyticsservice: analytics-service
     authservice: auth-service
     userservice: user-service
     itemservice: item-service

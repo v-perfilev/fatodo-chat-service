@@ -4,7 +4,7 @@
     <!-- Stdout Appender -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [${app-name}] %-7([%level]) %logger{36} - %msg%n</pattern>s
+            <pattern>%d{HH:mm:ss.SSS} [${app-name}] %-7([%level]) %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
