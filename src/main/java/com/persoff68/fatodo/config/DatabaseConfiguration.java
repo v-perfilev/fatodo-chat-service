@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -41,7 +42,8 @@ public class DatabaseConfiguration {
         String queryTemplate = "DELETE FROM DATABASECHANGELOGLOCK WHERE LOCKED=true AND LOCKGRANTED<'%s'";
         String query = String.format(queryTemplate, lastLockTime);
 
-        try (Statement statement = dataSource.getConnection().createStatement()) {
+        try (Connection connection = dataSource.getConnection()) {
+            Statement statement = connection.createStatement();
             int updateCount = statement.executeUpdate(query);
             if (updateCount > 0) {
                 log.warn("Liquibase locks removed: {}.", updateCount);
